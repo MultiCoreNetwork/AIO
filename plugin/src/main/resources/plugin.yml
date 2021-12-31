@@ -1,0 +1,9 @@
+name: ${project.name}
+version: ${project.version}
+main: ${project.groupId}.${project.name}
+api-version: ${apiVersion}
+authors: ["LoreSchaeffer", "DanTTV"]
+description: ${project.description}
+prefix: aio
+softdepend: ["Vault", "LuckPerms", "PlaceholderAPI", "PremiumVanish", "SuperVanish"]
+website: ${project.url}
