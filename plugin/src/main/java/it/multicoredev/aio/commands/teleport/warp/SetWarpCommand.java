@@ -69,7 +69,7 @@ public class SetWarpCommand extends PluginCommand {
         }
 
         warpStorage.createWarp(name, player.getLocation(), global);
-        warpStorage.save();
+        warpStorage.saveWarps();
 
         Chat.send(localization.warpCreated, sender);
         return true;

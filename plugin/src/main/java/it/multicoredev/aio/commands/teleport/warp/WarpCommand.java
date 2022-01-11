@@ -3,9 +3,10 @@ package it.multicoredev.aio.commands.teleport.warp;
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.tp.ITeleportManager;
 import it.multicoredev.aio.commands.PluginCommand;
-import it.multicoredev.aio.models.Warp;
+import it.multicoredev.aio.api.models.Warp;
 import it.multicoredev.aio.storage.data.WarpStorage;
 import it.multicoredev.mbcore.spigot.Chat;
+import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -13,6 +14,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -112,6 +114,7 @@ public class WarpCommand extends PluginCommand {
 
     @Override
     public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
-        return aio.getWarpStorage().warpList(sender);
-    }
+        if (args.length == 1) return aio.getWarpStorage().getWarpNames(sender);
+        else if (args.length == 2) return TabCompleterUtil.getPlayers(args[1], sender.hasPermission("pv.see"));
+        else return new ArrayList<>();    }
 }

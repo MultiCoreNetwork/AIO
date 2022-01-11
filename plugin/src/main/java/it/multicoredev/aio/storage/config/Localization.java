@@ -194,6 +194,19 @@ public class Localization extends JsonConfig {
     @SerializedName("helpbook_given_self")
     public String helpbookGivenSelf;
 
+    @SerializedName("kit_empty")
+    public String kitEmpty;
+    @SerializedName("kit_not_found")
+    public String kitNotFound;
+    @SerializedName("kit_no_perms")
+    public String kitNoPerms;
+    @SerializedName("kit_no_space")
+    public String kitNoSpace;
+    @SerializedName("kit_success")
+    public String kitSuccess;
+    @SerializedName("invalid_kit")
+    public String invalidKit;
+
     @SerializedName("invalid_nickname")
     public String invalidNickname;
     @SerializedName("nickname_set")
@@ -402,6 +415,13 @@ public class Localization extends JsonConfig {
         if (helpbookGiven == null) helpbookGiven = "&hYou gave &e{book} &hto {DISPLAYNAME}.";
         if (helpbookGivenSelf == null) helpbookGivenSelf = "&hYou received &e{book}&h.";
 
+        if (invalidKit == null) invalidKit = "&eSome items described in the kit {KIT} are invalid: {INVALID}";
+        if (kitEmpty == null) kitEmpty = "&cThis kit is empty.";
+        if (kitNotFound == null) kitNotFound = "&cKit not found.";
+        if (kitNoPerms == null) kitNoPerms = "&cYou don't have permissions for use this kit.";
+        if (kitNoSpace == null) kitNoSpace = "&cThere is not enough inventory space.";
+        if (kitSuccess == null) kitSuccess = "&hKit given.";
+
         if (invalidNickname == null) invalidNickname = "&cThis nickname is not allowed.";
         if (nicknameSet == null) nicknameSet = "&h{NAME}'s nickname is now {DISPLAYNAME}.";
         if (nicknameSetSelf == null) nicknameSetSelf = "&hYour nickname is now {DISPLAYNAME}.";
@@ -473,6 +493,9 @@ public class Localization extends JsonConfig {
         if (!commandUsages.containsKey("helpbook")) commandUsages.put("helpbook", "/helpbook [book] [player]");
         if (!commandUsages.containsKey("home")) commandUsages.put("home", "/home <name>");
         if (!commandUsages.containsKey("homes")) commandUsages.put("homes", "/homes");
+        if (!commandUsages.containsKey("kit")) commandUsages.put("kit", "/kit <name> [player]");
+        if (!commandUsages.containsKey("kits")) commandUsages.put("kits", "/kits");
+        if (!commandUsages.containsKey("lightning")) commandUsages.put("lightning", "/lightning [player]");
         if (!commandUsages.containsKey("nickname")) commandUsages.put("nickname", "/nickname [player] <nickname>");
         if (!commandUsages.containsKey("night")) commandUsages.put("night", "/night [world]");
         if (!commandUsages.containsKey("rain")) commandUsages.put("rain", "/rain [world]");
@@ -513,6 +536,9 @@ public class Localization extends JsonConfig {
         if (!commandDescriptions.containsKey("helpbook")) commandDescriptions.put("helpbook", "Get a book with some useful information");
         if (!commandDescriptions.containsKey("home")) commandDescriptions.put("helpbook", "Teleport to an home");
         if (!commandDescriptions.containsKey("homes")) commandDescriptions.put("homes", "Get homes available");
+        if (!commandDescriptions.containsKey("kit")) commandDescriptions.put("kit", "Give a kit");
+        if (!commandDescriptions.containsKey("kits")) commandDescriptions.put("kits", "Get kit list");
+        if (!commandDescriptions.containsKey("lightning")) commandDescriptions.put("lightning", "Throw a lightning on a player");
         if (!commandDescriptions.containsKey("nickname")) commandDescriptions.put("nickname", "Change the nickname of a player");
         if (!commandDescriptions.containsKey("night")) commandDescriptions.put("night", "Set world time to night");
         if (!commandDescriptions.containsKey("playerhome")) commandDescriptions.put("playerhome", "Teleport to another player home");

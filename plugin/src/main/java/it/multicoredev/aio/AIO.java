@@ -4,8 +4,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import it.multicoredev.aio.api.*;
 import it.multicoredev.aio.api.Module;
+import it.multicoredev.aio.api.*;
 import it.multicoredev.aio.api.listeners.IListenerRegistry;
 import it.multicoredev.aio.api.listeners.ListenerCompound;
 import it.multicoredev.aio.api.tp.ITeleportManager;
@@ -13,6 +13,8 @@ import it.multicoredev.aio.commands.AIOCommand;
 import it.multicoredev.aio.commands.AliasCommand;
 import it.multicoredev.aio.commands.economy.EconomyCommand;
 import it.multicoredev.aio.commands.player.*;
+import it.multicoredev.aio.commands.player.kits.KitCommand;
+import it.multicoredev.aio.commands.player.kits.KitsCommand;
 import it.multicoredev.aio.commands.staff.CleanChatCommand;
 import it.multicoredev.aio.commands.teleport.BackCommand;
 import it.multicoredev.aio.commands.teleport.RTPCommand;
@@ -37,6 +39,7 @@ import it.multicoredev.aio.storage.config.modules.CommandAliasesModule;
 import it.multicoredev.aio.storage.config.modules.SpawnModule;
 import it.multicoredev.aio.storage.config.sections.StorageSection;
 import it.multicoredev.aio.storage.data.FileStorage;
+import it.multicoredev.aio.storage.data.KitStorage;
 import it.multicoredev.aio.storage.data.WarpStorage;
 import it.multicoredev.aio.tasks.ClearCacheTask;
 import it.multicoredev.aio.tasks.SavePlayerDataTask;
@@ -96,6 +99,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     private final File configFile = new File(root, "config.yml");
     private final File localizationFile = new File(root, "localization.yml");
     private final File userMapFile = new File(root, "usermap.json");
+    private final File kitsFile = new File(root, "kits.json");
     private final File warpsFile = new File(root, "warps.json");
 
     private Config config;
@@ -103,6 +107,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     private ModuleManager moduleManager;
     private IStorage storage;
     private Map<String, UUID> usermap;
+    private KitStorage kitStorage;
     private WarpStorage warpStorage;
     private final Map<UUID, User> usersCache = new HashMap<>();
 
@@ -221,6 +226,10 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     @Override
     public ITeleportManager getTeleportManager() {
         return tpManager;
+    }
+
+    public KitStorage getKitStorage() {
+        return kitStorage;
     }
 
     public WarpStorage getWarpStorage() {
@@ -572,6 +581,49 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             }
         }
 
+        if (!kitsFile.exists() || !kitsFile.isFile()) {
+            kitStorage = new KitStorage(this, kitsFile);
+
+            try {
+                serialize(kitsFile, kitStorage);
+            } catch (Exception e) {
+                Chat.severe("&4" + e.getMessage());
+                if (debug) e.printStackTrace();
+                return false;
+            }
+        } else {
+            try {
+                kitStorage = deserialize(kitsFile, KitStorage.class);
+                if (kitStorage == null) throw new NullPointerException(("KitStorage is null"));
+            } catch (Exception e) {
+                Chat.severe("&4" + e.getMessage());
+                if (debug) e.printStackTrace();
+
+                if (!backupFile(kitsFile)) return false;
+                Chat.warning("&4KitStorage file is corrupted, creating new one");
+
+                kitStorage = new KitStorage(this, kitsFile);
+
+                try {
+                    serialize(kitsFile, kitStorage);
+                } catch (Exception e1) {
+                    Chat.severe("&4" + e1.getMessage());
+                    if (debug) e1.printStackTrace();
+                    return false;
+                }
+            }
+
+            if (kitStorage.completeMissing()) {
+                try {
+                    serialize(kitsFile, kitStorage);
+                } catch (Exception e) {
+                    Chat.severe("&4" + e.getMessage());
+                    if (debug) e.printStackTrace();
+                    return false;
+                }
+            }
+        }
+
         return true;
     }
 
@@ -675,6 +727,12 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             commandRegistry.registerCommand(new HomeCommand(this), this);
         if (config.getCommandData("homes").enabled)
             commandRegistry.registerCommand(new HomesCommand(this), this);
+        if (config.getCommandData("kit").enabled)
+            commandRegistry.registerCommand(new KitCommand(this), this);
+        if (config.getCommandData("kits").enabled)
+            commandRegistry.registerCommand(new KitsCommand(this), this);
+        if (config.getCommandData("lightning").enabled)
+            commandRegistry.registerCommand(new LightningCommand(this), this);
         if (config.getCommandData("nickname").enabled)
             commandRegistry.registerCommand(new NicknameCommand(this), this);
         if (config.getCommandData("night").enabled)

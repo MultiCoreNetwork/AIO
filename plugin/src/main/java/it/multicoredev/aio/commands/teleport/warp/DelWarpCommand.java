@@ -52,7 +52,7 @@ public class DelWarpCommand extends PluginCommand {
 
         WarpStorage warpStorage = aio.getWarpStorage();
         warpStorage.deleteWarp(name);
-        warpStorage.save();
+        warpStorage.saveWarps();
 
         Chat.send(localization.warpDeleted, sender);
         return true;

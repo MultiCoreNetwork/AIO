@@ -3,7 +3,8 @@ package it.multicoredev.aio.storage.data;
 import com.google.common.base.Preconditions;
 import com.google.gson.annotations.Expose;
 import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.models.Warp;
+import it.multicoredev.aio.api.IWarpStorage;
+import it.multicoredev.aio.api.models.Warp;
 import it.multicoredev.mbcore.spigot.Chat;
 import it.multicoredev.mclib.json.JsonConfig;
 import org.bukkit.Bukkit;
@@ -36,12 +37,11 @@ import java.util.List;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class WarpStorage extends JsonConfig {
+public class WarpStorage extends JsonConfig implements IWarpStorage {
     @Expose(serialize = false, deserialize = false)
     private final AIO aio;
     @Expose(serialize = false, deserialize = false)
     private final File file;
-    @Expose(serialize = true, deserialize = true)
     private List<Warp> warps;
 
     public WarpStorage(@NotNull AIO aio, @NotNull File file) {
@@ -56,14 +56,8 @@ public class WarpStorage extends JsonConfig {
         if (warps == null) warps = new ArrayList<>();
     }
 
-    public void addWarp(@NotNull Location location, @NotNull String name, boolean global) {
-        Preconditions.checkNotNull(location);
-        Preconditions.checkNotNull(name);
-
-        warps.add(new Warp(location, name, global));
-    }
-
-    public void save() {
+    @Override
+    public void saveWarps() {
         Bukkit.getScheduler().runTaskAsynchronously(aio, () -> {
             try {
                 AIO.serialize(file, this);
@@ -74,6 +68,7 @@ public class WarpStorage extends JsonConfig {
         });
     }
 
+    @Override
     public boolean existsWarp(String warpName) {
         for (Warp warp : warps) {
             if (warp.getName().equalsIgnoreCase(warpName)) return true;
@@ -82,6 +77,7 @@ public class WarpStorage extends JsonConfig {
         return false;
     }
 
+    @Override
     public Warp getWarp(String warpName) {
         for (Warp warp : warps) {
             if (warp.getName().equalsIgnoreCase(warpName)) return warp;
@@ -90,8 +86,8 @@ public class WarpStorage extends JsonConfig {
         return null;
     }
 
-
-    public List<String> warpList(CommandSender sender) {
+    @Override
+    public List<String> getWarpNames(CommandSender sender) {
         List<String> warpList = new ArrayList<>();
 
         for (Warp warp : warps) {
@@ -109,11 +105,22 @@ public class WarpStorage extends JsonConfig {
         return warpList;
     }
 
-    public void createWarp(String name, Location location, boolean global) {
+    @Override
+    public boolean createWarp(String name, Location location, boolean global) {
+        Preconditions.checkNotNull(location);
+        Preconditions.checkNotNull(name);
+
+        if (existsWarp(name)) return false;
         warps.add(new Warp(location, name, global));
+        return true;
     }
 
-    public void deleteWarp(String name) {
+    @Override
+    public boolean deleteWarp(String name) {
+        Preconditions.checkNotNull(name);
+
+        if (!existsWarp(name)) return false;
         warps.removeIf(warp -> warp.getName().equalsIgnoreCase(name));
+        return true;
     }
 }

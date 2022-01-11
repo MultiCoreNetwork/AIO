@@ -6,6 +6,7 @@ import it.multicoredev.aio.api.models.Home;
 import it.multicoredev.aio.api.tp.ITeleportManager;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.mbcore.spigot.Chat;
+import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -82,12 +83,13 @@ public class PlayerHomeCommand extends PluginCommand {
     public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
         if (!hasCommandPerm(sender)) return new ArrayList<>();
         if (!isPlayer(sender)) return new ArrayList<>();
-        if (args.length == 0) return new ArrayList<>();
-
-        Player player = Bukkit.getPlayer(args[0]);
-        if (player == null) return new ArrayList<>();
-        User user = storage.getUser(player);
-        if (user == null) return new ArrayList<>();
-        return user.getHomeNames();
+        if (args.length == 1) return TabCompleterUtil.getPlayers(args[0], sender.hasPermission("pv.see"));
+        else if (args.length == 2) {
+            Player player = Bukkit.getPlayer(args[0]);
+            if (player == null) return new ArrayList<>();
+            User user = storage.getUser(player);
+            if (user == null) return new ArrayList<>();
+            return user.getHomeNames();
+        } else return new ArrayList<>();
     }
 }

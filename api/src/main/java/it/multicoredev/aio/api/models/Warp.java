@@ -1,4 +1,6 @@
-package it.multicoredev.aio.commands.teleport.home;
+package it.multicoredev.aio.api.models;
+
+import org.bukkit.Location;
 
 /**
  * Copyright © 2021 - 2022 by Lorenzo Magni & Daniele Patella
@@ -20,5 +22,26 @@ package it.multicoredev.aio.commands.teleport.home;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class SetWaypointCommand {
+public class Warp {
+    public final String name;
+    public final Location location;
+    public final boolean global;
+
+    public Warp(Location location, String name, boolean global) {
+        this.name = name;
+        this.location = location;
+        this.global = global;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public boolean isGlobal() {
+        return global;
+    }
 }

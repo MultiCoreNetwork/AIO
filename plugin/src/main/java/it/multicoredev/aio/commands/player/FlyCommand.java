@@ -3,7 +3,6 @@ package it.multicoredev.aio.commands.player;
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.User;
 import it.multicoredev.aio.commands.PluginCommand;
-import it.multicoredev.aio.models.User;
 import it.multicoredev.mbcore.spigot.Chat;
 import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
 import org.bukkit.Bukkit;

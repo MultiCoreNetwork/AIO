@@ -1,10 +1,12 @@
-package it.multicoredev.aio.commands.player.kits;
+package it.multicoredev.aio.commands.utilities;
 
 import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.api.utils.PlaceholderUtils;
+import it.multicoredev.aio.api.User;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.mbcore.spigot.Chat;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -27,17 +29,53 @@ import org.jetbrains.annotations.NotNull;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class KitsCommand extends PluginCommand {
-    private static final String CMD = "kits";
+public class LightningCommand extends PluginCommand {
+    private static final String CMD = "lightning";
 
-    public KitsCommand(AIO aio) {
+    public LightningCommand(AIO aio) {
         super(aio, CMD);
     }
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!preprocessCheck(sender)) return true;
-        Chat.send(PlaceholderUtils.replacePlaceholders(localization.availableWarps, "{KITS}", String.join(", ", aio.getKitStorage().getKitNames(sender))), sender);
+
+        if (!(sender instanceof Player) && args.length < 1) {
+            incorrectUsage(sender);
+            return true;
+        }
+
+        Player target;
+
+        if (isPlayer(sender)) {
+            if (args.length < 1) {
+                target = (Player) sender;
+            } else {
+                if (!hasSubPerm(sender, "other")) {
+                    insufficientPerms(sender);
+                    return true;
+                }
+
+                target = Bukkit.getPlayer(args[0]);
+            }
+        } else {
+            if (args.length < 1) {
+                Chat.send(localization.notPlayer, sender);
+                return true;
+            }
+
+            target = Bukkit.getPlayer(args[0]);
+        }
+
+        if (target == null || !target.isOnline()) {
+            Chat.send(localization.playerNotFound, sender);
+            return true;
+        }
+
+        User user = aio.getStorage().getUser(target);
+
+        target.getWorld().strikeLightningEffect(target.getLocation());
+        if (!user.hasGod()) target.damage(3);
         return true;
     }
 }

@@ -1,5 +1,25 @@
 package it.multicoredev.aio.commands.player.kits;
 
+import it.multicoredev.aio.AIO;
+import it.multicoredev.aio.api.utils.PlaceholderUtils;
+import it.multicoredev.aio.commands.PluginCommand;
+import it.multicoredev.aio.models.ItemObject;
+import it.multicoredev.aio.models.Kit;
+import it.multicoredev.aio.storage.data.KitStorage;
+import it.multicoredev.mbcore.spigot.Chat;
+import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Copyright © 2021 - 2022 by Lorenzo Magni & Daniele Patella
  * This file is part of AIO.
@@ -20,5 +40,123 @@ package it.multicoredev.aio.commands.player.kits;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class KitCommand {
+public class KitCommand extends PluginCommand {
+    private static final String CMD = "kit";
+
+    public KitCommand(AIO aio) {
+        super(aio, CMD);
+    }
+
+    @Override
+    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
+        if (!preprocessCheck(sender)) return true;
+
+        if (!(sender instanceof Player) && args.length < 2) {
+            incorrectUsage(sender);
+            return true;
+        }
+
+        if (args.length == 0) {
+            incorrectUsage(sender);
+            return true;
+        }
+
+        Player target;
+
+        if (isPlayer(sender)) {
+            if (args.length < 2) {
+                target = (Player) sender;
+            } else {
+                if (!hasSubPerm(sender, "other")) {
+                    insufficientPerms(sender);
+                    return true;
+                }
+
+                target = Bukkit.getPlayer(args[1]);
+            }
+        } else {
+            if (args.length < 2) {
+                Chat.send(localization.notPlayer, sender);
+                return true;
+            }
+
+            target = Bukkit.getPlayer(args[1]);
+        }
+
+        if (target == null || !target.isOnline()) {
+            Chat.send(localization.playerNotFound, sender);
+            return true;
+        }
+
+        String kitName = args[0];
+        KitStorage kitStorage = aio.getKitStorage();
+        Kit kit = kitStorage.getKitByName(kitName);
+
+        if (kit == null) {
+            Chat.send(localization.kitNotFound, sender);
+            return true;
+        }
+
+        if (!hasSubPerm(sender, kitName)) {
+            Chat.send(localization.kitNoPerms, sender);
+            return true;
+        }
+
+        List<ItemObject> itemObjects = kit.getItems();
+
+        if (itemObjects.isEmpty()) {
+            Chat.send(localization.kitEmpty, sender);
+            return true;
+        }
+
+        List<ItemStack> itemStacks = new ArrayList<>();
+        List<String> invalidMaterials = new ArrayList<>();
+
+        for (ItemObject itemObject : itemObjects) {
+            String materialName = itemObject.getMaterial();
+            Material material = Material.matchMaterial(materialName);
+
+            if (material == null) {
+                invalidMaterials.add(materialName);
+                continue;
+            }
+
+            if (material == Material.AIR) continue;
+
+            ItemStack itemStack = new ItemStack(material, itemObject.getAmount());
+            String nbt = itemObject.getNbtString();
+
+            //TODO Try
+            if (!nbt.isEmpty()) itemStack = Bukkit.getUnsafe().modifyItemStack(itemStack, itemObject.getNbtString());
+            itemStacks.add(itemStack);
+        }
+
+        if (!invalidMaterials.isEmpty()) {
+            //TODO Try
+            Chat.severe(PlaceholderUtils.replacePlaceholders(localization.invalidKit, new String[]{"{KIT}", "{INVALID}"}, new String[]{kit.getName(), String.join(", ", invalidMaterials)}));
+            return true;
+        }
+
+        int amount = itemStacks.size();
+        PlayerInventory playerInventory = target.getInventory();
+
+        if (Arrays.stream(playerInventory.getContents()).filter(itemStack -> itemStack.getType().equals(Material.AIR)).count() < amount) {
+            Chat.send(localization.kitNoSpace, sender);
+            return true;
+        }
+
+        for (ItemStack itemStack : itemStacks) {
+            playerInventory.addItem(itemStack);
+        }
+
+        Chat.send(localization.kitSuccess, sender);
+        return true;
+    }
+
+    @Override
+    public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
+        if (args.length == 1) return aio.getKitStorage().getKitNames(sender);
+        else if (args.length == 2) return TabCompleterUtil.getPlayers(args[1], sender.hasPermission("pv.see"));
+        else return new ArrayList<>();
+    }
 }

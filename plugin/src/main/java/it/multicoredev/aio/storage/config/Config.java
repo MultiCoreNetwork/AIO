@@ -95,6 +95,9 @@ public class Config extends JsonConfig {
         if (!commands.containsKey("helpbook")) commands.put("helpbook", new CommandData(true, "hbook", "hb"));
         if (!commands.containsKey("home")) commands.put("home", CommandData.TRUE);
         if (!commands.containsKey("homes")) commands.put("homes", CommandData.TRUE);
+        if (!commands.containsKey("kit")) commands.put("kit", CommandData.TRUE);
+        if (!commands.containsKey("kits")) commands.put("kits", CommandData.TRUE);
+        if (!commands.containsKey("lightning")) commands.put("lightning", new CommandData(true, "zeus", "thor", "zap"));
         if (!commands.containsKey("nickname")) commands.put("nickname", new CommandData(true, "nick"));
         if (!commands.containsKey("night")) commands.put("night", CommandData.TRUE);
         if (!commands.containsKey("playerhome")) commands.put("playerhome", CommandData.TRUE);
