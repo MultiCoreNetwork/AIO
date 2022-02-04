@@ -1,11 +1,12 @@
 package it.multicoredev.aio.api.tp;
 
-import it.multicoredev.aio.api.models.tp.TeleportRequest;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -206,9 +207,129 @@ public interface ITeleportManager {
     Map<Player, Teleport> getPendingTeleports();
 
     /**
-     * Send a new teleport request.
+     * Request teleport for a player.
      *
-     * @param request the request to send.
+     * @param request the request to be made.
      */
-    void sendTeleportRequest(TeleportRequest request);
+    void requestTeleport(@NotNull TeleportRequest request);
+
+    /**
+     * Request a teleport for a player.
+     *
+     * @param type      the type of the request.
+     * @param requester the requester.
+     * @param target    the target of the request.
+     */
+    void requestTeleport(@NotNull TeleportRequestType type, @NotNull Player requester, @NotNull Player target);
+
+    /**
+     * Cancel a teleport request.
+     *
+     * @param request the request to be cancelled.
+     * @param reason  the reason of the cancellation.
+     * @param notify  if the player should be notified.
+     */
+    void cancelTeleportRequest(@NotNull TeleportRequest request, String reason, boolean notify);
+
+    /**
+     * Cancel a teleport request.
+     *
+     * @param request the request to be cancelled.
+     * @param reason  the reason of the cancellation.
+     */
+    void cancelTeleportRequest(@NotNull TeleportRequest request, String reason);
+
+    /**
+     * Cancel a teleport request.
+     *
+     * @param request the request to be cancelled.
+     * @param notify  if the player should be notified.
+     */
+    void cancelTeleportRequest(@NotNull TeleportRequest request, boolean notify);
+
+    /**
+     * Cancel a teleport request.
+     *
+     * @param request the request to be cancelled.
+     */
+    void cancelTeleportRequest(@NotNull TeleportRequest request);
+
+    /**
+     * Cancel a teleport request.
+     *
+     * @param requester the requester.
+     * @param reason    the reason of the cancellation.
+     * @param notify    if the player should be notified.
+     */
+    void cancelTeleportRequest(@NotNull Player requester, String reason, boolean notify);
+
+    /**
+     * Cancel a teleport request.
+     *
+     * @param requester the requester.
+     * @param reason    the reason of the cancellation.
+     */
+    void cancelTeleportRequest(@NotNull Player requester, String reason);
+
+    /**
+     * Cancel a teleport request.
+     *
+     * @param requester the requester.
+     * @param notify    if the player should be notified.
+     */
+    void cancelTeleportRequest(@NotNull Player requester, boolean notify);
+
+    /**
+     * Cancel a teleport request.
+     *
+     * @param requester the requester.
+     */
+    void cancelTeleportRequest(@NotNull Player requester);
+
+    /**
+     * Get the teleport requests of a requester.
+     *
+     * @param requester the requester.
+     * @return the teleport requests of the requester.
+     */
+    boolean hasRequesterTeleportRequest(@NotNull Player requester);
+
+    /**
+     * Get the teleport requests of a requester.
+     *
+     * @param target the target.
+     * @return the teleport requests of the target.
+     */
+    boolean hasTargetTeleportRequest(@NotNull Player target);
+
+    /**
+     * Get the teleport requests of a requester.
+     *
+     * @param requester the requester.
+     * @return the teleport requests of the requester.
+     */
+    @Nullable TeleportRequest getRequesterTeleportRequest(@NotNull Player requester);
+
+    /**
+     * Get the teleport requests of a target.
+     *
+     * @param target the target.
+     * @return the teleport requests of the target.
+     */
+    List<TeleportRequest> getTargetTeleportRequests(@NotNull Player target);
+
+    /**
+     * Get the teleport requests of a requester.
+     *
+     * @return the teleport requests of the requester.
+     */
+    Map<TeleportRequest, Date> getTeleportRequests();
+
+    /**
+     * Get the teleport requests of a requester.
+     *
+     * @param request the request.
+     * @return the teleport requests of the requester.
+     */
+    @Nullable Date getTeleportRequestTimestamp(@NotNull TeleportRequest request);
 }

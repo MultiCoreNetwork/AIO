@@ -47,6 +47,9 @@ public class Teleport {
      * @param timer  the time in ticks before the teleport.
      */
     public Teleport(@NotNull Player player, @NotNull Location to, long timer) {
+        Preconditions.checkNotNull(player);
+        Preconditions.checkNotNull(to);
+
         this.player = player;
         this.from = player.getLocation();
         this.to = to;

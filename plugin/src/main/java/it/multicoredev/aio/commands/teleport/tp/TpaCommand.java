@@ -2,8 +2,8 @@ package it.multicoredev.aio.commands.teleport.tp;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.commands.PluginCommand;
-import it.multicoredev.aio.api.models.tp.TeleportRequest;
-import it.multicoredev.aio.api.models.tp.TeleportRequestType;
+import it.multicoredev.aio.api.tp.TeleportRequest;
+import it.multicoredev.aio.api.tp.TeleportRequestType;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;

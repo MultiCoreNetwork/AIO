@@ -1,6 +1,8 @@
-package it.multicoredev.aio.api.models.tp;
+package it.multicoredev.aio.api.tp;
 
+import com.google.common.base.Preconditions;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Copyright © 2022 by Daniele Patella. All rights reserved.
@@ -19,20 +21,46 @@ public class TeleportRequest {
     private final Player requester;
     private final Player target;
 
-    public TeleportRequest(TeleportRequestType type, Player requester, Player target) {
+    /**
+     * Create a new teleport request.
+     *
+     * @param type      the type of the request.
+     * @param requester the requester.
+     * @param target    the target.
+     */
+    public TeleportRequest(@NotNull TeleportRequestType type, @NotNull Player requester, @NotNull Player target) {
+        Preconditions.checkNotNull(type);
+        Preconditions.checkNotNull(requester);
+        Preconditions.checkNotNull(target);
+
         this.type = type;
         this.requester = requester;
         this.target = target;
     }
 
+    /**
+     * Get the type of the request.
+     *
+     * @return the type of the request.
+     */
     public TeleportRequestType getType() {
         return type;
     }
 
+    /**
+     * Get the requester.
+     *
+     * @return the requester.
+     */
     public Player getRequester() {
         return requester;
     }
 
+    /**
+     * Get the target.
+     *
+     * @return the target.
+     */
     public Player getTarget() {
         return target;
     }

@@ -1,4 +1,4 @@
-package it.multicoredev.aio.api.models.tp;
+package it.multicoredev.aio.api.tp;
 
 /**
  * Copyright © 2022 by Daniele Patella. All rights reserved.

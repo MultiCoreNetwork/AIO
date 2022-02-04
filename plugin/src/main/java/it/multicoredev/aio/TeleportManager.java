@@ -3,7 +3,8 @@ package it.multicoredev.aio;
 import com.google.common.base.Preconditions;
 import it.multicoredev.aio.api.tp.ITeleportManager;
 import it.multicoredev.aio.api.tp.Teleport;
-import it.multicoredev.aio.api.models.tp.TeleportRequest;
+import it.multicoredev.aio.api.tp.TeleportRequest;
+import it.multicoredev.aio.api.tp.TeleportRequestType;
 import it.multicoredev.aio.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -11,10 +12,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Copyright © 2021 - 2022 by Lorenzo Magni & Daniele Patella
@@ -38,7 +36,7 @@ import java.util.Map;
  */
 public class TeleportManager implements ITeleportManager {
     private final Map<Player, Teleport> pendingTeleports = new HashMap<>();
-    private final Map<TeleportRequest, Date> requests = new HashMap<>();
+    private final Map<TeleportRequest, Date> teleportRequests = new HashMap<>();
 
     @Override
     public void teleport(@NotNull Player player, @NotNull Location to, long timer) {
@@ -190,7 +188,158 @@ public class TeleportManager implements ITeleportManager {
     }
 
     @Override
-    public void sendTeleportRequest(TeleportRequest request) {
-        requests.put(request, new Date());
+    public void requestTeleport(@NotNull TeleportRequest request) {
+        Preconditions.checkNotNull(request);
+
+        TeleportRequest previousRequest = getRequesterTeleportRequest(request.getRequester());
+        if (previousRequest != null) {
+            cancelTeleportRequest(previousRequest); //TODO notify
+        } else {
+            if (previousRequest.getTarget().equals(request.getTarget()) && previousRequest.getType().equals(request.getType())) return;
+
+            teleportRequests.put(request, new Date());
+        }
+    }
+
+    @Override
+    public void requestTeleport(@NotNull TeleportRequestType type, @NotNull Player requester, @NotNull Player target) {
+        Preconditions.checkNotNull(type);
+        Preconditions.checkNotNull(requester);
+        Preconditions.checkNotNull(target);
+
+        TeleportRequest previousRequest = getRequesterTeleportRequest(requester);
+        if (previousRequest != null) {
+            cancelTeleportRequest(previousRequest); //TODO notify
+        } else {
+            if (previousRequest.getTarget().equals(target) && previousRequest.getType().equals(type)) return;
+
+            teleportRequests.put(new TeleportRequest(type, requester, target), new Date());
+        }
+    }
+
+    @Override
+    public void cancelTeleportRequest(@NotNull TeleportRequest request, String reason, boolean notify) {
+        Preconditions.checkNotNull(request);
+
+        teleportRequests.remove(request);
+        //TODO notify
+    }
+
+    @Override
+    public void cancelTeleportRequest(@NotNull TeleportRequest request, String reason) {
+        Preconditions.checkNotNull(request);
+
+        teleportRequests.remove(request);
+        //TODO notify
+    }
+
+    @Override
+    public void cancelTeleportRequest(@NotNull TeleportRequest request, boolean notify) {
+        Preconditions.checkNotNull(request);
+
+        teleportRequests.remove(request);
+        //TODO notify
+    }
+
+    @Override
+    public void cancelTeleportRequest(@NotNull TeleportRequest request) {
+        Preconditions.checkNotNull(request);
+
+        teleportRequests.remove(request);
+        //TODO notify
+    }
+
+    @Override
+    public void cancelTeleportRequest(@NotNull Player requester, String reason, boolean notify) {
+        Preconditions.checkNotNull(requester);
+
+        TeleportRequest request = getRequesterTeleportRequest(requester);
+        if (request != null) {
+            teleportRequests.remove(request);
+            //TODO notify
+        }
+    }
+
+    @Override
+    public void cancelTeleportRequest(@NotNull Player requester, String reason) {
+        Preconditions.checkNotNull(requester);
+
+        TeleportRequest request = getRequesterTeleportRequest(requester);
+        if (request != null) {
+            teleportRequests.remove(request);
+            //TODO notify
+        }
+    }
+
+    @Override
+    public void cancelTeleportRequest(@NotNull Player requester, boolean notify) {
+        Preconditions.checkNotNull(requester);
+
+        TeleportRequest request = getRequesterTeleportRequest(requester);
+        if (request != null) {
+            teleportRequests.remove(request);
+            //TODO notify
+        }
+    }
+
+    @Override
+    public void cancelTeleportRequest(@NotNull Player requester) {
+        Preconditions.checkNotNull(requester);
+
+        TeleportRequest request = getRequesterTeleportRequest(requester);
+        if (request != null) {
+            teleportRequests.remove(request);
+            //TODO notify
+        }
+    }
+
+    @Override
+    public boolean hasRequesterTeleportRequest(@NotNull Player requester) {
+        return getRequesterTeleportRequest(requester) != null;
+    }
+
+    @Override
+    public boolean hasTargetTeleportRequest(@NotNull Player target) {
+        return !getTargetTeleportRequests(target).isEmpty();
+    }
+
+    @Override
+    public @Nullable TeleportRequest getRequesterTeleportRequest(@NotNull Player requester) {
+        Preconditions.checkNotNull(requester);
+
+        for (TeleportRequest request : teleportRequests.keySet()) {
+            if (request.getRequester().equals(requester)) {
+                return request;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<TeleportRequest> getTargetTeleportRequests(@NotNull Player target) {
+        Preconditions.checkNotNull(target);
+
+        List<TeleportRequest> requests = new ArrayList<>();
+
+        for (TeleportRequest request : teleportRequests.keySet()) {
+            if (request.getTarget().equals(target)) {
+                requests.add(request);
+            }
+        }
+
+        return requests;
+    }
+
+    @Override
+    public Map<TeleportRequest, Date> getTeleportRequests() {
+        return Collections.unmodifiableMap(teleportRequests);
+    }
+
+    @Override
+    public @Nullable Date getTeleportRequestTimestamp(@NotNull TeleportRequest request) {
+        Preconditions.checkNotNull(request);
+
+        return teleportRequests.get(request);
     }
 }
