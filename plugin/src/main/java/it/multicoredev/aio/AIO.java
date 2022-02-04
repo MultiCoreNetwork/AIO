@@ -97,8 +97,8 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
     private final File root = getDataFolder();
     private final File modulesDir = new File(root, "modules");
-    private final File configFile = new File(root, "config.yml");
-    private final File localizationFile = new File(root, "localization.yml");
+    private final File configFile = new File(root, "config.json");
+    private final File localizationFile = new File(root, "localization.json");
     private final File userMapFile = new File(root, "usermap.json");
     private final File kitsFile = new File(root, "kits.json");
     private final File warpsFile = new File(root, "warps.json");

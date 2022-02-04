@@ -106,7 +106,7 @@ public abstract class PluginCommand extends BasePluginCommand {
     protected void incorrectUsage(CommandSender sender) {
         Chat.send(localization.incorrectUsage
                 .replace("{USAGE}", usageMessage)
-                .replace("{ALIAS}", Arrays.toString(getAliases().toArray())), sender);
+                .replace("{ALIAS}", Arrays.toString(getAliases().toArray())), sender); //TODO Use Placeholders Utils
     }
 
     protected void insufficientPerms(CommandSender sender) {
