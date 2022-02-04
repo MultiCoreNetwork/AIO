@@ -18,10 +18,11 @@ import it.multicoredev.aio.commands.player.kits.KitsCommand;
 import it.multicoredev.aio.commands.staff.CleanChatCommand;
 import it.multicoredev.aio.commands.teleport.BackCommand;
 import it.multicoredev.aio.commands.teleport.RTPCommand;
-import it.multicoredev.aio.commands.teleport.TpallCommand;
 import it.multicoredev.aio.commands.teleport.home.*;
 import it.multicoredev.aio.commands.teleport.spawn.SetSpawnCommand;
 import it.multicoredev.aio.commands.teleport.spawn.SpawnCommand;
+import it.multicoredev.aio.commands.teleport.tp.TpaCommand;
+import it.multicoredev.aio.commands.teleport.tp.TpallCommand;
 import it.multicoredev.aio.commands.teleport.warp.DelWarpCommand;
 import it.multicoredev.aio.commands.teleport.warp.SetWarpCommand;
 import it.multicoredev.aio.commands.teleport.warp.WarpCommand;
@@ -763,6 +764,8 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             commandRegistry.registerCommand(new SunCommand(this), this);
         if (config.getCommandData("thunder").enabled)
             commandRegistry.registerCommand(new ThunderCommand(this), this);
+        if (config.getCommandData("tpa").enabled)
+            commandRegistry.registerCommand(new TpaCommand(this), this);
         if (config.getCommandData("tpall").enabled)
             commandRegistry.registerCommand(new TpallCommand(this), this);
         if (config.getCommandData("trash").enabled)

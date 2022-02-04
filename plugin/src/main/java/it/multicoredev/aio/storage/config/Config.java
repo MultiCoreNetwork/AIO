@@ -113,6 +113,7 @@ public class Config extends JsonConfig {
         if (!commands.containsKey("sudo")) commands.put("sudo", CommandData.TRUE);
         if (!commands.containsKey("sun")) commands.put("sun", CommandData.TRUE);
         if (!commands.containsKey("thunder")) commands.put("thunder", CommandData.TRUE);
+        if (!commands.containsKey("tpa")) commands.put("tpa", CommandData.TRUE);
         if (!commands.containsKey("tpall")) commands.put("tpall", CommandData.TRUE);
         if (!commands.containsKey("trash")) commands.put("trash", new CommandData(true, "disposal"));
         if (!commands.containsKey("warp")) commands.put("warp", new CommandData(true, "wp"));

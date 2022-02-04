@@ -1,5 +1,6 @@
 package it.multicoredev.aio.api.tp;
 
+import it.multicoredev.aio.api.models.tp.TeleportRequest;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -203,4 +204,11 @@ public interface ITeleportManager {
      * @return the map of all the pending teleports.
      */
     Map<Player, Teleport> getPendingTeleports();
+
+    /**
+     * Send a new teleport request.
+     *
+     * @param request the request to send.
+     */
+    void sendTeleportRequest(TeleportRequest request);
 }

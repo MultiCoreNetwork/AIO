@@ -3,6 +3,7 @@ package it.multicoredev.aio;
 import com.google.common.base.Preconditions;
 import it.multicoredev.aio.api.tp.ITeleportManager;
 import it.multicoredev.aio.api.tp.Teleport;
+import it.multicoredev.aio.api.models.tp.TeleportRequest;
 import it.multicoredev.aio.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +38,7 @@ import java.util.Map;
  */
 public class TeleportManager implements ITeleportManager {
     private final Map<Player, Teleport> pendingTeleports = new HashMap<>();
+    private final Map<TeleportRequest, Date> requests = new HashMap<>();
 
     @Override
     public void teleport(@NotNull Player player, @NotNull Location to, long timer) {
@@ -184,5 +187,10 @@ public class TeleportManager implements ITeleportManager {
 
     public void removeTeleport(Player player) {
         pendingTeleports.remove(player);
+    }
+
+    @Override
+    public void sendTeleportRequest(TeleportRequest request) {
+        requests.put(request, new Date());
     }
 }
