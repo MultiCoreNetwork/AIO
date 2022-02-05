@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 public class Config extends JsonConfig {
     private String help;
     public Map<String, Boolean> modules;
-    public Map<String, CommandData> commands;
     @SerializedName("event_priorities")
     public Map<String, String> eventPriorities;
 
@@ -77,48 +76,6 @@ public class Config extends JsonConfig {
 
         if (modules == null) modules = ModuleManager.DEF_MODULES.values().stream().collect(Collectors.toMap(s -> s, s -> true));
 
-        if (commands == null) commands = new HashMap<>();
-        if (!commands.containsKey("back")) commands.put("back", CommandData.TRUE);
-        if (!commands.containsKey("cleanchat")) commands.put("cleanchat", new CommandData(true, "cchat", "cc"));
-        if (!commands.containsKey("day")) commands.put("day", CommandData.TRUE);
-        if (!commands.containsKey("delhome")) commands.put("delhome", CommandData.TRUE);
-        if (!commands.containsKey("delwarp")) commands.put("delwarp", CommandData.TRUE);
-        if (!commands.containsKey("diesnchant")) commands.put("disenchant", new CommandData(true, "denchant"));
-        if (!commands.containsKey("economy")) commands.put("economy", new CommandData(true, "eco"));
-        if (!commands.containsKey("enchant")) commands.put("enchant", CommandData.TRUE);
-        if (!commands.containsKey("feed")) commands.put("feed", CommandData.TRUE);
-        if (!commands.containsKey("fly")) commands.put("fly", CommandData.TRUE);
-        if (!commands.containsKey("entitylist")) commands.put("entitylist", new CommandData(true, "el"));
-        if (!commands.containsKey("gamemode")) commands.put("gamemode", new CommandData(true, "gm"));
-        if (!commands.containsKey("god")) commands.put("god", CommandData.TRUE);
-        if (!commands.containsKey("heal")) commands.put("heal", CommandData.TRUE);
-        if (!commands.containsKey("helpbook")) commands.put("helpbook", new CommandData(true, "hbook", "hb"));
-        if (!commands.containsKey("home")) commands.put("home", CommandData.TRUE);
-        if (!commands.containsKey("homes")) commands.put("homes", CommandData.TRUE);
-        if (!commands.containsKey("kit")) commands.put("kit", CommandData.TRUE);
-        if (!commands.containsKey("kits")) commands.put("kits", CommandData.TRUE);
-        if (!commands.containsKey("lightning")) commands.put("lightning", new CommandData(true, "zeus", "thor", "zap"));
-        if (!commands.containsKey("nickname")) commands.put("nickname", new CommandData(true, "nick"));
-        if (!commands.containsKey("night")) commands.put("night", CommandData.TRUE);
-        if (!commands.containsKey("playerhome")) commands.put("playerhome", CommandData.TRUE);
-        if (!commands.containsKey("rain")) commands.put("rain", CommandData.TRUE);
-        if (!commands.containsKey("repair")) commands.put("repair", CommandData.TRUE);
-        if (!commands.containsKey("rtp")) commands.put("rtp", new CommandData(true, "randomteleport"));
-        if (!commands.containsKey("runlater")) commands.put("runlater", new CommandData(true, "rlater", "rl"));
-        if (!commands.containsKey("sethome")) commands.put("sethome", CommandData.TRUE);
-        if (!commands.containsKey("setspawn")) commands.put("setspawn", CommandData.TRUE);
-        if (!commands.containsKey("setwarp")) commands.put("setwarp", CommandData.TRUE);
-        if (!commands.containsKey("spawn")) commands.put("spawn", CommandData.TRUE);
-        if (!commands.containsKey("speed")) commands.put("speed", CommandData.TRUE);
-        if (!commands.containsKey("sudo")) commands.put("sudo", CommandData.TRUE);
-        if (!commands.containsKey("sun")) commands.put("sun", CommandData.TRUE);
-        if (!commands.containsKey("thunder")) commands.put("thunder", CommandData.TRUE);
-        if (!commands.containsKey("tpa")) commands.put("tpa", CommandData.TRUE);
-        if (!commands.containsKey("tpall")) commands.put("tpall", CommandData.TRUE);
-        if (!commands.containsKey("trash")) commands.put("trash", new CommandData(true, "disposal"));
-        if (!commands.containsKey("warp")) commands.put("warp", new CommandData(true, "wp"));
-        if (!commands.containsKey("warps")) commands.put("warps", new CommandData(true, "wps"));
-
         if (eventPriorities == null) eventPriorities = new HashMap<>();
         if (!eventPriorities.containsKey("PlayerPostTeleportEvent")) eventPriorities.put("PlayerPostTeleportEvent", "LOWEST");
         if (!eventPriorities.containsKey("PlayerTeleportCancelledEvent")) eventPriorities.put("PlayerTeleportCancelledEvent", "NORMAL");
@@ -156,10 +113,6 @@ public class Config extends JsonConfig {
         if (savePlayersData == null) savePlayersData = 6000L;
 
         if (debug == null) debug = false;
-    }
-
-    public CommandData getCommandData(String command) {
-        return commands.get(command);
     }
 
     public EventPriority getEventPriority(String event) {

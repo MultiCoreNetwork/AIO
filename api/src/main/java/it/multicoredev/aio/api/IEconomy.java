@@ -129,6 +129,14 @@ public interface IEconomy {
     boolean hasAccount(OfflinePlayer player, String worldName);
 
     /**
+     * Gets balance of a player
+     *
+     * @param uuid of the player
+     * @return Amount currently held in players account
+     */
+    double getBalance(UUID uuid);
+
+    /**
      * @deprecated As of VaultAPI 1.4 use {@link #getBalance(OfflinePlayer)} instead.
      */
     @Deprecated
@@ -202,6 +210,15 @@ public interface IEconomy {
     /**
      * Withdraw an amount from a player - DO NOT USE NEGATIVE AMOUNTS
      *
+     * @param user   of the player to withdraw from
+     * @param amount Amount to withdraw
+     * @return Detailed response of transaction
+     */
+    EconomyResponse withdrawPlayer(User user, double amount);
+
+    /**
+     * Withdraw an amount from a player - DO NOT USE NEGATIVE AMOUNTS
+     *
      * @param uuid   of the player to withdraw from
      * @param amount Amount to withdraw
      * @return Detailed response of transaction
@@ -239,6 +256,15 @@ public interface IEconomy {
      * @return Detailed response of transaction
      */
     EconomyResponse withdrawPlayer(OfflinePlayer player, String worldName, double amount);
+
+    /**
+     * Deposit an amount to a player - DO NOT USE NEGATIVE AMOUNTS
+     *
+     * @param user   of the player to deposit to
+     * @param amount Amount to deposit
+     * @return Detailed response of transaction
+     */
+    EconomyResponse depositPlayer(User user, double amount);
 
     /**
      * Deposit an amount to a player - DO NOT USE NEGATIVE AMOUNTS

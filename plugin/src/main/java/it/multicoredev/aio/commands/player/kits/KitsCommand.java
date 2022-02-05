@@ -30,6 +30,8 @@ import org.jetbrains.annotations.NotNull;
 public class KitsCommand extends PluginCommand {
     private static final String CMD = "kits";
 
+    //TODO Divide in pages if needed
+
     public KitsCommand(AIO aio) {
         super(aio, CMD);
     }

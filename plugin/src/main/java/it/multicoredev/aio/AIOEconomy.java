@@ -36,7 +36,7 @@ import java.util.UUID;
 public class AIOEconomy implements IEconomy {
     private final AIO aio;
     private final IStorage storage;
-    private EconomyModule economyModule;
+    private final EconomyModule economyModule;
     private NumberFormat numberFormat;
 
     public AIOEconomy(AIO aio) {
@@ -116,6 +116,7 @@ public class AIOEconomy implements IEconomy {
         return storage.userExists(offlinePlayer);
     }
 
+    @Override
     public double getBalance(UUID uuid) {
         return storage.getUser(uuid).getMoney();
     }
@@ -169,7 +170,8 @@ public class AIOEconomy implements IEconomy {
         else return new EconomyResponse(amount, user.getMoney(), EconomyResponse.ResponseType.FAILURE, aio.getLocalization().moneyNotSet);
     }
 
-    private EconomyResponse withdrawPlayer(User user, double amount) {
+    @Override
+    public EconomyResponse withdrawPlayer(User user, double amount) {
         double newMoney = user.getMoney() - amount;
 
         if (newMoney < economyModule.minMoney) return new EconomyResponse(
@@ -209,7 +211,8 @@ public class AIOEconomy implements IEconomy {
         return withdrawPlayer(storage.getUser(offlinePlayer), amount);
     }
 
-    private EconomyResponse depositPlayer(User user, double amount) {
+    @Override
+    public EconomyResponse depositPlayer(User user, double amount) {
         double newMoney = user.getMoney() + amount;
 
         if (newMoney > economyModule.maxMoney) return new EconomyResponse(

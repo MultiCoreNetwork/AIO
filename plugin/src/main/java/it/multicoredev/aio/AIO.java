@@ -4,10 +4,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import it.multicoredev.aio.api.Module;
 import it.multicoredev.aio.api.*;
 import it.multicoredev.aio.api.listeners.IListenerRegistry;
 import it.multicoredev.aio.api.listeners.ListenerCompound;
+import it.multicoredev.aio.api.models.CommandData;
 import it.multicoredev.aio.api.tp.ITeleportManager;
 import it.multicoredev.aio.commands.AIOCommand;
 import it.multicoredev.aio.commands.AliasCommand;
@@ -32,6 +32,7 @@ import it.multicoredev.aio.listeners.aio.PlayerPostTeleportListener;
 import it.multicoredev.aio.listeners.aio.PlayerTeleportCancelledListener;
 import it.multicoredev.aio.listeners.entity.EntityDamageListener;
 import it.multicoredev.aio.listeners.player.*;
+import it.multicoredev.aio.storage.config.Commands;
 import it.multicoredev.aio.storage.config.Config;
 import it.multicoredev.aio.storage.config.Localization;
 import it.multicoredev.aio.storage.config.ModuleManager;
@@ -84,11 +85,7 @@ import java.util.stream.Collectors;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class AIO extends it.multicoredev.aio.api.AIO {
-    private static final Gson gson = new GsonBuilder()
-            .setPrettyPrinting()
-            .disableHtmlEscaping()
-            .registerTypeAdapter(Location.class, new LocationAdapter())
-            .create();
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().registerTypeAdapter(Location.class, new LocationAdapter()).create();
 
     private static final Map<Module, File> modules = new HashMap<>();
     public static boolean VAULT;
@@ -99,6 +96,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     private final File modulesDir = new File(root, "modules");
     private final File configFile = new File(root, "config.json");
     private final File localizationFile = new File(root, "localization.json");
+    private final File commandsFile = new File(root, "commands.json");
     private final File userMapFile = new File(root, "usermap.json");
     private final File kitsFile = new File(root, "kits.json");
     private final File warpsFile = new File(root, "warps.json");
@@ -106,6 +104,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     private Config config;
     private Localization localization;
     private ModuleManager moduleManager;
+    private Commands commands;
     private IStorage storage;
     private Map<String, UUID> usermap;
     private KitStorage kitStorage;
@@ -254,6 +253,10 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
     public Localization getLocalization() {
         return localization;
+    }
+
+    public CommandData getCommandData(@NotNull String command) {
+        return commands.getCommand(command);
     }
 
     public static <T> T deserialize(File file, Type type) throws Exception {
@@ -422,6 +425,49 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             if (localization.completeMissing()) {
                 try {
                     serialize(localizationFile, localization);
+                } catch (Exception e) {
+                    Chat.severe("&4" + e.getMessage());
+                    if (debug) e.printStackTrace();
+                    return false;
+                }
+            }
+        }
+
+        if (!commandsFile.exists() || !commandsFile.isFile()) {
+            commands = new Commands();
+
+            try {
+                serialize(commandsFile, commands);
+            } catch (Exception e) {
+                Chat.severe("&4" + e.getMessage());
+                if (debug) e.printStackTrace();
+                return false;
+            }
+        } else {
+            try {
+                commands = deserialize(commandsFile, Commands.class);
+                if (commands == null) throw new NullPointerException("commands is null");
+            } catch (Exception e) {
+                Chat.severe("&4" + e.getMessage());
+                if (debug) e.printStackTrace();
+
+                if (!backupFile(commandsFile)) return false;
+                Chat.warning("&4commands file is corrupted, creating new one");
+
+                commands = new Commands();
+
+                try {
+                    serialize(commandsFile, commands);
+                } catch (Exception e1) {
+                    Chat.severe("&4" + e.getMessage());
+                    if (debug) e1.printStackTrace();
+                    return false;
+                }
+            }
+
+            if (commands.completeMissing()) {
+                try {
+                    serialize(commandsFile, commands);
                 } catch (Exception e) {
                     Chat.severe("&4" + e.getMessage());
                     if (debug) e.printStackTrace();
@@ -694,86 +740,48 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     private void registerCommands() {
         commandRegistry.registerCommand(new AIOCommand(this), this);
 
-        if (config.getCommandData("back").enabled)
-            commandRegistry.registerCommand(new BackCommand(this), this);
-        if (config.getCommandData("cleanchat").enabled)
-            commandRegistry.registerCommand(new CleanChatCommand(this), this);
-        if (config.getCommandData("day").enabled)
-            commandRegistry.registerCommand(new DayCommand(this), this);
-        if (config.getCommandData("delhome").enabled)
-            commandRegistry.registerCommand(new DelHomeCommand(this), this);
-        if (config.getCommandData("delwarp").enabled)
-            commandRegistry.registerCommand(new DelWarpCommand(this), this);
-        if (config.getCommandData("disenchant").enabled)
-            commandRegistry.registerCommand(new DisenchantCommand(this), this);
-        if (config.getCommandData("economy").enabled && VAULT)
-            commandRegistry.registerCommand(new EconomyCommand(this), this);
-        if (config.getCommandData("enchant").enabled)
-            commandRegistry.registerCommand(new EnchantCommand(this), this);
-        if (config.getCommandData("feed").enabled)
-            commandRegistry.registerCommand(new FeedCommand(this), this);
-        if (config.getCommandData("fly").enabled)
-            commandRegistry.registerCommand(new FlyCommand(this), this);
-        if (config.getCommandData("gamemode").enabled)
-            commandRegistry.registerCommand(new GamemodeCommand(this), this);
-        if (config.getCommandData("god").enabled)
-            commandRegistry.registerCommand(new GodCommand(this), this);
-        if (config.getCommandData("hat").enabled)
-            commandRegistry.registerCommand(new HatCommand(this), this);
-        if (config.getCommandData("heal").enabled)
-            commandRegistry.registerCommand(new HealCommand(this), this);
-        if (config.getCommandData("helpbook").enabled)
-            commandRegistry.registerCommand(new HelpBookCommand(this), this);
-        if (config.getCommandData("home").enabled)
-            commandRegistry.registerCommand(new HomeCommand(this), this);
-        if (config.getCommandData("homes").enabled)
-            commandRegistry.registerCommand(new HomesCommand(this), this);
-        if (config.getCommandData("kit").enabled)
-            commandRegistry.registerCommand(new KitCommand(this), this);
-        if (config.getCommandData("kits").enabled)
-            commandRegistry.registerCommand(new KitsCommand(this), this);
-        if (config.getCommandData("lightning").enabled)
-            commandRegistry.registerCommand(new LightningCommand(this), this);
-        if (config.getCommandData("nickname").enabled)
-            commandRegistry.registerCommand(new NicknameCommand(this), this);
-        if (config.getCommandData("night").enabled)
-            commandRegistry.registerCommand(new NightCommand(this), this);
-        if (config.getCommandData("playerhome").enabled)
-            commandRegistry.registerCommand(new PlayerHomeCommand(this), this);
-        if (config.getCommandData("rain").enabled)
-            commandRegistry.registerCommand(new RainCommand(this), this);
-        if (config.getCommandData("repair").enabled)
-            commandRegistry.registerCommand(new RepairCommand(this), this);
-        if (config.getCommandData("rtp").enabled)
-            commandRegistry.registerCommand(new RTPCommand(this), this);
-        if (config.getCommandData("runlater").enabled)
-            commandRegistry.registerCommand(new RunLaterCommand(this), this);
-        if (config.getCommandData("sethome").enabled)
-            commandRegistry.registerCommand(new SetHomeCommand(this), this);
-        if (config.getCommandData("setspawn").enabled && moduleManager.isModuleEnabled(SpawnModule.class))
+        if (commands.isEnabled("back")) commandRegistry.registerCommand(new BackCommand(this), this);
+        if (commands.isEnabled("cleanchat")) commandRegistry.registerCommand(new CleanChatCommand(this), this);
+        if (commands.isEnabled("day")) commandRegistry.registerCommand(new DayCommand(this), this);
+        if (commands.isEnabled("delhome")) commandRegistry.registerCommand(new DelHomeCommand(this), this);
+        if (commands.isEnabled("delwarp")) commandRegistry.registerCommand(new DelWarpCommand(this), this);
+        if (commands.isEnabled("disenchant")) commandRegistry.registerCommand(new DisenchantCommand(this), this);
+        if (commands.isEnabled("economy") && VAULT) commandRegistry.registerCommand(new EconomyCommand(this), this);
+        if (commands.isEnabled("enchant")) commandRegistry.registerCommand(new EnchantCommand(this), this);
+        if (commands.isEnabled("feed")) commandRegistry.registerCommand(new FeedCommand(this), this);
+        if (commands.isEnabled("fly")) commandRegistry.registerCommand(new FlyCommand(this), this);
+        if (commands.isEnabled("gamemode")) commandRegistry.registerCommand(new GamemodeCommand(this), this);
+        if (commands.isEnabled("god")) commandRegistry.registerCommand(new GodCommand(this), this);
+        if (commands.isEnabled("hat")) commandRegistry.registerCommand(new HatCommand(this), this);
+        if (commands.isEnabled("heal")) commandRegistry.registerCommand(new HealCommand(this), this);
+        if (commands.isEnabled("helpbook")) commandRegistry.registerCommand(new HelpBookCommand(this), this);
+        if (commands.isEnabled("home")) commandRegistry.registerCommand(new HomeCommand(this), this);
+        if (commands.isEnabled("homes")) commandRegistry.registerCommand(new HomesCommand(this), this);
+        if (commands.isEnabled("kit")) commandRegistry.registerCommand(new KitCommand(this), this);
+        if (commands.isEnabled("kits")) commandRegistry.registerCommand(new KitsCommand(this), this);
+        if (commands.isEnabled("lightning")) commandRegistry.registerCommand(new LightningCommand(this), this);
+        if (commands.isEnabled("nickname")) commandRegistry.registerCommand(new NicknameCommand(this), this);
+        if (commands.isEnabled("night")) commandRegistry.registerCommand(new NightCommand(this), this);
+        if (commands.isEnabled("playerhome")) commandRegistry.registerCommand(new PlayerHomeCommand(this), this);
+        if (commands.isEnabled("rain")) commandRegistry.registerCommand(new RainCommand(this), this);
+        if (commands.isEnabled("repair")) commandRegistry.registerCommand(new RepairCommand(this), this);
+        if (commands.isEnabled("rtp")) commandRegistry.registerCommand(new RTPCommand(this), this);
+        if (commands.isEnabled("runlater")) commandRegistry.registerCommand(new RunLaterCommand(this), this);
+        if (commands.isEnabled("sethome")) commandRegistry.registerCommand(new SetHomeCommand(this), this);
+        if (commands.isEnabled("setspawn") && moduleManager.isModuleEnabled(SpawnModule.class))
             commandRegistry.registerCommand(new SetSpawnCommand(this), this);
-        if (config.getCommandData("setwarp").enabled)
-            commandRegistry.registerCommand(new SetWarpCommand(this), this);
-        if (config.getCommandData("spawn").enabled && moduleManager.isModuleEnabled(SpawnModule.class))
+        if (commands.isEnabled("setwarp")) commandRegistry.registerCommand(new SetWarpCommand(this), this);
+        if (commands.isEnabled("spawn") && moduleManager.isModuleEnabled(SpawnModule.class))
             commandRegistry.registerCommand(new SpawnCommand(this), this);
-        if (config.getCommandData("speed").enabled)
-            commandRegistry.registerCommand(new SpeedCommand(this), this);
-        if (config.getCommandData("sudo").enabled)
-            commandRegistry.registerCommand(new SudoCommand(this), this);
-        if (config.getCommandData("sun").enabled)
-            commandRegistry.registerCommand(new SunCommand(this), this);
-        if (config.getCommandData("thunder").enabled)
-            commandRegistry.registerCommand(new ThunderCommand(this), this);
-        if (config.getCommandData("tpa").enabled)
-            commandRegistry.registerCommand(new TpaCommand(this), this);
-        if (config.getCommandData("tpall").enabled)
-            commandRegistry.registerCommand(new TpallCommand(this), this);
-        if (config.getCommandData("trash").enabled)
-            commandRegistry.registerCommand(new TrashCommand(this), this);
-        if (config.getCommandData("warp").enabled)
-            commandRegistry.registerCommand(new WarpCommand(this), this);
-        if (config.getCommandData("warps").enabled)
-            commandRegistry.registerCommand(new WarpsCommand(this), this);
+        if (commands.isEnabled("speed")) commandRegistry.registerCommand(new SpeedCommand(this), this);
+        if (commands.isEnabled("sudo")) commandRegistry.registerCommand(new SudoCommand(this), this);
+        if (commands.isEnabled("sun")) commandRegistry.registerCommand(new SunCommand(this), this);
+        if (commands.isEnabled("thunder")) commandRegistry.registerCommand(new ThunderCommand(this), this);
+        if (commands.isEnabled("tpa")) commandRegistry.registerCommand(new TpaCommand(this), this);
+        if (commands.isEnabled("tpall")) commandRegistry.registerCommand(new TpallCommand(this), this);
+        if (commands.isEnabled("trash")) commandRegistry.registerCommand(new TrashCommand(this), this);
+        if (commands.isEnabled("warp")) commandRegistry.registerCommand(new WarpCommand(this), this);
+        if (commands.isEnabled("warps")) commandRegistry.registerCommand(new WarpsCommand(this), this);
 
         if (moduleManager.isModuleEnabled(CommandAliasesModule.class)) {
             CommandAliasesModule aliasesModule = moduleManager.getModule(CommandAliasesModule.class);
@@ -783,13 +791,11 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                 if (alias.aliases.isEmpty()) return;
                 if (alias.command.trim().isEmpty()) return;
                 commandRegistry.registerCommand(new AliasCommand(
-                        this,
-                        alias.aliases.stream().map(a -> a.toLowerCase(Locale.ROOT)).collect(Collectors.toList()),
-                        alias.command.toLowerCase(Locale.ROOT),
-                        alias.permission != null ? alias.permission.toLowerCase(Locale.ROOT) : null,
-                        alias.description,
-                        alias.usage,
-                        alias.addCompletions), this);
+                                this,
+                                alias.aliases.stream().map(a -> a.toLowerCase(Locale.ROOT)).collect(Collectors.toList()),
+                                alias.command.toLowerCase(Locale.ROOT), alias.permission != null ? alias.permission.toLowerCase(Locale.ROOT) : null, alias.description, alias.usage, alias.addCompletions),
+                        this
+                );
             });
         }
     }

@@ -297,11 +297,6 @@ public class Localization extends JsonConfig {
     @SerializedName("weather_set_thunder")
     public String weatherSetThunder;
 
-    @SerializedName("command_usages")
-    public Map<String, String> commandUsages;
-    @SerializedName("command_descriptions")
-    public Map<String, String> commandDescriptions;
-
     @SerializedName("join_message")
     public String joinMsg;
     @SerializedName("quit_message")
@@ -472,93 +467,6 @@ public class Localization extends JsonConfig {
         if (weatherSetRain == null) weatherSetRain = "&gWeather set to rain in world {WORLD}.";
         if (weatherSetSun == null) weatherSetSun = "&eWeather set to sunny in world {WORLD}.";
         if (weatherSetThunder == null) weatherSetThunder = "&hWeather set to storm in world {WORLD}.";
-
-        if (commandUsages == null) commandUsages = new HashMap<>();
-        if (!commandUsages.containsKey("aio")) commandUsages.put("aio", "/aio <subcommand>");
-        if (!commandUsages.containsKey("back")) commandUsages.put("back", "/back [player]");
-        if (!commandUsages.containsKey("cleanchat")) commandUsages.put("cleanchat", "/cleanchat");
-        if (!commandUsages.containsKey("day")) commandUsages.put("day", "/day [world]");
-        if (!commandUsages.containsKey("delhome")) commandUsages.put("delhome", "/delhome <home>");
-        if (!commandUsages.containsKey("delwarp")) commandUsages.put("delwarp", "/delwarp <warp>");
-        if (!commandUsages.containsKey("diesnchant")) commandUsages.put("disenchant", "/disenchant <player> <enchantment>");
-        if (!commandUsages.containsKey("economy")) commandUsages.put("economy", "/economy <subcommand>");
-        if (!commandUsages.containsKey("enchant")) commandUsages.put("enchant", "/enchant <player> <enchantment> [level]");
-        if (!commandUsages.containsKey("entitylist")) commandUsages.put("entitylist", "/entitylist [world]");
-        if (!commandUsages.containsKey("feed")) commandUsages.put("feed", "/feed [player]");
-        if (!commandUsages.containsKey("fly")) commandUsages.put("fly", "/fly [player] [mode]");
-        if (!commandUsages.containsKey("gamemode")) commandUsages.put("gamemode", "/gamemode <mode> [player]");
-        if (!commandUsages.containsKey("god")) commandUsages.put("god", "/god [player] [mode]");
-        if (!commandUsages.containsKey("hat")) commandUsages.put("hat", "/hat");
-        if (!commandUsages.containsKey("heal")) commandUsages.put("heal", "/heal [player]");
-        if (!commandUsages.containsKey("helpbook")) commandUsages.put("helpbook", "/helpbook [book] [player]");
-        if (!commandUsages.containsKey("home")) commandUsages.put("home", "/home <name>");
-        if (!commandUsages.containsKey("homes")) commandUsages.put("homes", "/homes");
-        if (!commandUsages.containsKey("kit")) commandUsages.put("kit", "/kit <name> [player]");
-        if (!commandUsages.containsKey("kits")) commandUsages.put("kits", "/kits");
-        if (!commandUsages.containsKey("lightning")) commandUsages.put("lightning", "/lightning [player]");
-        if (!commandUsages.containsKey("nickname")) commandUsages.put("nickname", "/nickname [player] <nickname>");
-        if (!commandUsages.containsKey("night")) commandUsages.put("night", "/night [world]");
-        if (!commandUsages.containsKey("rain")) commandUsages.put("rain", "/rain [world]");
-        if (!commandUsages.containsKey("repair")) commandUsages.put("repair", "/repair [player] [type]");
-        if (!commandUsages.containsKey("rtp")) commandUsages.put("rtp", "/rtp");
-        if (!commandUsages.containsKey("runlater")) commandUsages.put("runlater", "/runlater <delay> <command>");
-        if (!commandUsages.containsKey("playerhome")) commandUsages.put("playerhome", "/playerhome <player> <home>");
-        if (!commandUsages.containsKey("setspawn")) commandUsages.put("setspawn", "/setspawn");
-        if (!commandUsages.containsKey("sethome")) commandUsages.put("sethome", "/sethome <home>");
-        if (!commandUsages.containsKey("setwarp")) commandUsages.put("setwarp", "/setwarp <warp>");
-        if (!commandUsages.containsKey("spawn")) commandUsages.put("spawn", "/spawn [player]");
-        if (!commandUsages.containsKey("speed")) commandUsages.put("speed", "/speed [player] [type]");
-        if (!commandUsages.containsKey("sudo")) commandUsages.put("sudo", "/sudo <player> <command/message>");
-        if (!commandUsages.containsKey("sun")) commandUsages.put("sun", "/sun [world]");
-        if (!commandUsages.containsKey("thunder")) commandUsages.put("thunder", "/thunder [world]");
-        if (!commandUsages.containsKey("tpall")) commandUsages.put("tpall", "/tpall");
-        if (!commandUsages.containsKey("trash")) commandUsages.put("trash", "/trash");
-        if (!commandUsages.containsKey("warp")) commandUsages.put("warp", "/warp [warp]");
-        if (!commandUsages.containsKey("warps")) commandUsages.put("warps", "/warps");
-
-        if (commandDescriptions == null) commandDescriptions = new HashMap<>();
-        if (!commandDescriptions.containsKey("aio")) commandDescriptions.put("aio", "Main plugin command");
-        if (!commandDescriptions.containsKey("back")) commandDescriptions.put("back", "Go back to previous location");
-        if (!commandDescriptions.containsKey("cleanchat")) commandDescriptions.put("cleanchat", "Clean every player chat");
-        if (!commandDescriptions.containsKey("day")) commandDescriptions.put("day", "Set world time to day");
-        if (!commandDescriptions.containsKey("delhome")) commandDescriptions.put("delhome", "Remove an home");
-        if (!commandDescriptions.containsKey("delwarp")) commandDescriptions.put("delwarp", "Delete a warp");
-        if (!commandDescriptions.containsKey("disenchant")) commandDescriptions.put("disenchant", "Remove an enchantment from an item");
-        if (!commandDescriptions.containsKey("economy")) commandDescriptions.put("economy", "Manage players' money");
-        if (!commandDescriptions.containsKey("enchant")) commandDescriptions.put("enchant", "Enchant an item without level limitations");
-        if (!commandDescriptions.containsKey("entitylist")) commandDescriptions.put("entitylist", "Get a list of entities in loaded chunks");
-        if (!commandDescriptions.containsKey("feed")) commandDescriptions.put("feed", "Feed a player");
-        if (!commandDescriptions.containsKey("fly")) commandDescriptions.put("fly", "Toggle fly for a player");
-        if (!commandDescriptions.containsKey("gamemode")) commandDescriptions.put("gamemode", "Change gamemode of a player");
-        if (!commandDescriptions.containsKey("god")) commandDescriptions.put("god", "Toggle god mode for a player");
-        if (!commandDescriptions.containsKey("hat")) commandDescriptions.put("hat", "Wear an item as hat");
-        if (!commandDescriptions.containsKey("heal")) commandDescriptions.put("heal", "Restore the health of a player");
-        if (!commandDescriptions.containsKey("helpbook")) commandDescriptions.put("helpbook", "Get a book with some useful information");
-        if (!commandDescriptions.containsKey("home")) commandDescriptions.put("helpbook", "Teleport to an home");
-        if (!commandDescriptions.containsKey("homes")) commandDescriptions.put("homes", "Get homes available");
-        if (!commandDescriptions.containsKey("kit")) commandDescriptions.put("kit", "Give a kit");
-        if (!commandDescriptions.containsKey("kits")) commandDescriptions.put("kits", "Get kit list");
-        if (!commandDescriptions.containsKey("lightning")) commandDescriptions.put("lightning", "Throw a lightning on a player");
-        if (!commandDescriptions.containsKey("nickname")) commandDescriptions.put("nickname", "Change the nickname of a player");
-        if (!commandDescriptions.containsKey("night")) commandDescriptions.put("night", "Set world time to night");
-        if (!commandDescriptions.containsKey("playerhome")) commandDescriptions.put("playerhome", "Teleport to another player home");
-        if (!commandDescriptions.containsKey("rain")) commandDescriptions.put("rain", "Set weather to rain");
-        if (!commandDescriptions.containsKey("repair")) commandDescriptions.put("repair", "Repair one or mor items");
-        if (!commandDescriptions.containsKey("rtp")) commandDescriptions.put("rtp", "Teleport to a random location in the world");
-        if (!commandDescriptions.containsKey("runlater"))
-            commandDescriptions.put("runlater", "Make the console run a command after a certain amount of time");
-        if (!commandDescriptions.containsKey("sethome")) commandDescriptions.put("sethome", "Set a new home");
-        if (!commandDescriptions.containsKey("setspawn")) commandDescriptions.put("setspawn", "Configure the spawn point of the server");
-        if (!commandDescriptions.containsKey("setwarp")) commandDescriptions.put("setwarp", "Create a new warp");
-        if (!commandDescriptions.containsKey("spawn")) commandDescriptions.put("spawn", "Send a player to the spawn");
-        if (!commandDescriptions.containsKey("speed")) commandDescriptions.put("speed", "Change the speed of a player");
-        if (!commandDescriptions.containsKey("sudo")) commandDescriptions.put("sudo", "Perform a command or send a message as another player");
-        if (!commandDescriptions.containsKey("sun")) commandDescriptions.put("sun", "Set weather to sun");
-        if (!commandDescriptions.containsKey("thunder")) commandDescriptions.put("thunder", "Set weather to thunder");
-        if (!commandDescriptions.containsKey("tpall")) commandDescriptions.put("tpall", "Teleport all players to your position");
-        if (!commandDescriptions.containsKey("trash")) commandDescriptions.put("trash", "Open a trash inventory");
-        if (!commandDescriptions.containsKey("warp")) commandDescriptions.put("warp", "Teleport to a warp");
-        if (!commandDescriptions.containsKey("warps")) commandDescriptions.put("warps", "Get warps available");
 
         if (joinMsg == null) joinMsg = "&2{DISPLAYNAME}&2 joined the game!";
         if (quitMsg == null) quitMsg = "&4{DISPLAYNAME}&4 left the game!";

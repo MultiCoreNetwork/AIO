@@ -2,6 +2,7 @@ package it.multicoredev.aio.commands.economy;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.AIOEconomy;
+import it.multicoredev.aio.api.IEconomy;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.aio.storage.config.modules.EconomyModule;
 import it.multicoredev.mbcore.spigot.Chat;
@@ -38,14 +39,14 @@ import java.util.UUID;
  */
 public class EconomyCommand extends PluginCommand {
     private static final String CMD = "economy";
-    private final AIOEconomy economy;
+    private final IEconomy economy;
     private final EconomyModule economyModule;
 
     public EconomyCommand(AIO aio) {
         super(aio, CMD);
 
         economy = aio.getEconomy();
-        economyModule = (EconomyModule) aio.getModule("economy");
+        economyModule = aio.getModuleManager().getModule(EconomyModule.class);
     }
 
     @Override
@@ -53,7 +54,6 @@ public class EconomyCommand extends PluginCommand {
         if (!preprocessCheck(sender)) return true;
 
         if (args.length < 1) {
-            //TODO Send command usage
             incorrectUsage(sender);
             return true;
         }
