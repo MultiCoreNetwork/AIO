@@ -1,10 +1,12 @@
 package it.multicoredev.aio.commands.utilities;
 
 import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.api.User;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.Bukkit;
+import org.bukkit.FluidCollisionMode;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -38,44 +40,34 @@ public class LightningCommand extends PluginCommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preprocessCheck(sender)) return true;
+        if (!super.execute(sender, label, args)) return true;
 
-        if (!(sender instanceof Player) && args.length < 1) {
-            incorrectUsage(sender);
+        if (!isPlayer(sender) && args.length < 1) {
+            Chat.send(localization.notPlayer, sender);
             return true;
         }
 
-        Player target;
-
-        if (isPlayer(sender)) {
-            if (args.length < 1) {
-                target = (Player) sender;
-            } else {
-                if (!hasSubPerm(sender, "other")) {
-                    insufficientPerms(sender);
-                    return true;
-                }
-
-                target = Bukkit.getPlayer(args[0]);
-            }
-        } else {
-            if (args.length < 1) {
-                Chat.send(localization.notPlayer, sender);
+        Location target = null;
+        if (args.length > 0) {
+            Player player = Bukkit.getPlayer(args[0]);
+            if (player == null || !player.isOnline()) {
+                Chat.send(localization.playerNotFound, sender);
                 return true;
             }
 
-            target = Bukkit.getPlayer(args[0]);
+            target = player.getLocation();
+        } else {
+            Player player = (Player) sender;
+            Block block = player.getTargetBlockExact(16, FluidCollisionMode.ALWAYS);
+            if (block != null) target = block.getLocation();
         }
 
-        if (target == null || !target.isOnline()) {
-            Chat.send(localization.playerNotFound, sender);
+        if (target == null || target.getWorld() == null) {
+            Chat.send(localization.lightningSummonFailed, sender);
             return true;
         }
 
-        User user = aio.getStorage().getUser(target);
-
-        target.getWorld().strikeLightningEffect(target.getLocation());
-        if (!user.hasGod()) target.damage(3);
+        target.getWorld().strikeLightning(target);
         return true;
     }
 }

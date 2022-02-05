@@ -15,7 +15,7 @@ import it.multicoredev.aio.commands.economy.EconomyCommand;
 import it.multicoredev.aio.commands.player.*;
 import it.multicoredev.aio.commands.player.kits.KitCommand;
 import it.multicoredev.aio.commands.player.kits.KitsCommand;
-import it.multicoredev.aio.commands.staff.CleanChatCommand;
+import it.multicoredev.aio.commands.utilities.CleanChatCommand;
 import it.multicoredev.aio.commands.teleport.BackCommand;
 import it.multicoredev.aio.commands.teleport.RTPCommand;
 import it.multicoredev.aio.commands.teleport.home.*;
@@ -28,6 +28,7 @@ import it.multicoredev.aio.commands.teleport.warp.SetWarpCommand;
 import it.multicoredev.aio.commands.teleport.warp.WarpCommand;
 import it.multicoredev.aio.commands.teleport.warp.WarpsCommand;
 import it.multicoredev.aio.commands.utilities.*;
+import it.multicoredev.aio.commands.utilities.time_and_weather.*;
 import it.multicoredev.aio.listeners.aio.PlayerPostTeleportListener;
 import it.multicoredev.aio.listeners.aio.PlayerTeleportCancelledListener;
 import it.multicoredev.aio.listeners.entity.EntityDamageListener;
@@ -49,7 +50,9 @@ import it.multicoredev.aio.utils.ReflectionUtils;
 import it.multicoredev.mbcore.spigot.Chat;
 import net.luckperms.api.LuckPerms;
 import net.milkbowl.vault.permission.Permission;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
@@ -62,7 +65,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Copyright © 2021 - 2022 by Lorenzo Magni & Daniele Patella
@@ -112,11 +114,12 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     private final Map<UUID, User> usersCache = new HashMap<>();
 
     private final Map<String, BukkitTask> tasks = new HashMap<>();
+    private final Map<Integer, BukkitTask> deferredCommands = new HashMap<>();
 
     private CommandRegistry commandRegistry;
     private ListenerRegistry listenerRegistry;
     private TeleportManager tpManager;
-    private Map<UUID, Map<String, Date>> commandsCooldown;
+    //private Map<UUID, Map<String, Date>> commandsCooldown;
     private AIOEconomy economy;
 
     public static Permission vaultPerms;
@@ -173,7 +176,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         listenerRegistry = new ListenerRegistry();
         tpManager = new TeleportManager();
 
-        if (config.commandsCooldown.cooldownEnabled) commandsCooldown = new HashMap<>();
+        //if (config.commandsCooldown.cooldownEnabled) commandsCooldown = new HashMap<>();
 
         initDependencies();
 
@@ -194,11 +197,11 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
     @Override
     public void onDisable() {
+        stopDeferredCommands();
         stopTasks();
 
         modules.clear();
         usersCache.clear();
-        tasks.clear();
 
         HandlerList.unregisterAll(this);
 
@@ -337,6 +340,14 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
     public void addToUsermap(String name, UUID uuid) {
         usermap.put(name, uuid);
+    }
+
+    public void addDeferredCommand(CommandSender sender, String command, long delay) {
+        int id = deferredCommands.size();
+        deferredCommands.put(id, Bukkit.getScheduler().runTaskLater(this, () -> {
+            Bukkit.dispatchCommand(sender, command);
+            removeCompletedCommand(id);
+        }, delay));
     }
 
     private boolean initConfigs() {
@@ -722,6 +733,10 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         }
     }
 
+    private void removeCompletedCommand(int id) {
+        deferredCommands.remove(id);
+    }
+
     private void registerListeners() {
         listenerRegistry.registerListener(new ListenerCompound<>(new PlayerPostTeleportListener(this)), config.getEventPriority("PlayerPostTeleportEvent"), this);
         listenerRegistry.registerListener(new ListenerCompound<>(new PlayerTeleportCancelledListener(this)), config.getEventPriority("PlayerTeleportCancelledEvent"), this);
@@ -790,12 +805,21 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             aliasesModule.aliases.forEach(alias -> {
                 if (alias.aliases.isEmpty()) return;
                 if (alias.command.trim().isEmpty()) return;
-                commandRegistry.registerCommand(new AliasCommand(
-                                this,
-                                alias.aliases.stream().map(a -> a.toLowerCase(Locale.ROOT)).collect(Collectors.toList()),
-                                alias.command.toLowerCase(Locale.ROOT), alias.permission != null ? alias.permission.toLowerCase(Locale.ROOT) : null, alias.description, alias.usage, alias.addCompletions),
-                        this
+                CommandData commandData = new CommandData(
+                        alias.description,
+                        alias.usages,
+                        alias.aliases.toArray(new String[0])
                 );
+
+                commandRegistry.registerCommand(
+                        new AliasCommand(
+                                this,
+                                commandData.getAlias().get(0),
+                                commandData,
+                                alias.command,
+                                alias.permission,
+                                alias.addCompletions
+                        ), this);
             });
         }
     }
@@ -807,6 +831,14 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
     private void stopTasks() {
         tasks.forEach((name, task) -> task.cancel());
+        tasks.clear();
+    }
+
+    private void stopDeferredCommands() {
+        deferredCommands.values().forEach(task -> {
+            if (!task.isCancelled()) task.cancel();
+        });
+        deferredCommands.clear();
     }
 
     private void logPluginSettings() {

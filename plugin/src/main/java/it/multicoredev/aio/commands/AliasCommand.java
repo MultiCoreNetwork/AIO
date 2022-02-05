@@ -1,10 +1,10 @@
 package it.multicoredev.aio.commands;
 
 import it.multicoredev.aio.AIO;
+import it.multicoredev.aio.api.models.CommandData;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -37,14 +37,8 @@ public class AliasCommand extends PluginCommand {
     private final String registeredCommand;
     private final boolean addCompletions;
 
-    public AliasCommand(AIO aio, List<String> alias, String command, String permission, String description, String usage, boolean addCompletions) {
-        super(
-                aio,
-                alias.get(0),
-                description,
-                usage,
-                alias.size() > 1 ? alias.subList(0, alias.size()) : null
-        );
+    public AliasCommand(AIO aio, String name, CommandData commandData, String command, String permission, boolean addCompletions) {
+        super(aio, name, commandData);
 
         this.command = command;
         this.permission = permission;
@@ -61,11 +55,9 @@ public class AliasCommand extends PluginCommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preprocessCheck(sender)) return true;
-
-        if (!sender.hasPermission(permission)) {
+        if (permission != null && !sender.hasPermission(permission)) {
             insufficientPerms(sender);
-            return true;
+            return false;
         }
 
         Bukkit.dispatchCommand(sender, command);
@@ -86,24 +78,5 @@ public class AliasCommand extends PluginCommand {
         } else {
             return new ArrayList<>();
         }
-    }
-
-    @Override
-    protected boolean preprocessCheck(CommandSender sender) {
-        if (!(sender instanceof Player)) return true;
-
-        Player player = (Player) sender;
-
-        if (permission != null && !player.hasPermission(permission)) {
-            insufficientPerms(player);
-            return false;
-        }
-
-        if (config.commandsCooldown.hasCommandCooldown(getName())) {
-            if (aio.hasCommandCooldown(player, getName())) return false;
-            else aio.addCommandCooldown(player, getName());
-        }
-
-        return true;
     }
 }

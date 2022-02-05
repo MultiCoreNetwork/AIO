@@ -38,7 +38,8 @@ public class HatCommand extends PluginCommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preprocessCheck(sender)) return true;
+        if (!super.execute(sender, label, args)) return true;
+
         if (!isPlayer(sender)) {
             Chat.send(localization.notPlayer, sender);
             return true;
@@ -48,7 +49,7 @@ public class HatCommand extends PluginCommand {
         PlayerInventory inventory = player.getInventory();
         ItemStack item = inventory.getItemInMainHand();
 
-        if (hasSubPerm(player, "prevent." + item.getType().name().toLowerCase())) {
+        if (hasSubPerm(player, "prevent." + item.getType().getKey().getKey())) {
             Chat.send(localization.preventHat, sender);
             return true;
         }

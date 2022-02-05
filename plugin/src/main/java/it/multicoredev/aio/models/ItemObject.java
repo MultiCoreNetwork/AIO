@@ -1,7 +1,5 @@
 package it.multicoredev.aio.models;
 
-import org.bukkit.Material;
-
 /**
  * Copyright © 2022 by Daniele Patella. All rights reserved.
  * This file is part of AIO.

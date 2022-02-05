@@ -4,6 +4,7 @@ import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.BasePluginCommand;
 import it.multicoredev.aio.api.IStorage;
 import it.multicoredev.aio.api.models.CommandData;
+import it.multicoredev.aio.api.utils.PlaceholderUtils;
 import it.multicoredev.aio.storage.config.Config;
 import it.multicoredev.aio.storage.config.Localization;
 import it.multicoredev.mbcore.spigot.Chat;
@@ -55,29 +56,17 @@ public abstract class PluginCommand extends BasePluginCommand {
         this(aio, name, aio.getCommandData(name));
     }
 
-    public abstract boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args);
-
-    public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
-        return new ArrayList<>();
-    }
-
-    protected boolean preprocessCheck(CommandSender sender) {
-        if (!isPlayer(sender)) return true;
-
-        Player player = (Player) sender;
-
-        if (!hasCommandPerm(player)) {
-            insufficientPerms(player);
+    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
+        if (!hasCommandPerm(sender)) {
+            insufficientPerms(sender);
             return false;
         }
 
-        /*if (config.commandsCooldown.hasCommandCooldown(getName())) {
-            if (aio.hasCommandCooldown(player, getName())) return false;
-            else aio.addCommandCooldown(player, getName());
-            //TODO Possibly move this to event listener
-        }*/
-
         return true;
+    }
+
+    public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
+        return new ArrayList<>();
     }
 
     protected boolean hasCommandPerm(CommandSender sender) {
@@ -88,14 +77,25 @@ public abstract class PluginCommand extends BasePluginCommand {
         return sender.hasPermission("aio." + getName() + "." + subperm) || sender.hasPermission("aio." + getName() + "." + "*");
     }
 
+    protected void incorrectUsage(CommandSender sender, String key) {
+        sendIncorrectUsage(sender, commandData.getUsages(key));
+    }
+
     protected void incorrectUsage(CommandSender sender) {
-        //TODO Edit this
-        Chat.send(localization.incorrectUsage
-                .replace("{USAGE}", usageMessage)
-                .replace("{ALIAS}", Arrays.toString(getAliases().toArray())), sender); //TODO Use Placeholders Utils
+        sendIncorrectUsage(sender, commandData.getUsages());
     }
 
     protected void insufficientPerms(CommandSender sender) {
         Chat.send(localization.insufficientPerms, sender);
+    }
+
+    protected void notImplemented(CommandSender sender) {
+        Chat.send(localization.notImplemented, sender);
+    }
+
+    private void sendIncorrectUsage(CommandSender sender, List<String> usages) {
+        StringBuilder builder = new StringBuilder();
+        for (String usage : usages) builder.append(usage).append("\n");
+        Chat.send(PlaceholderUtils.replacePlaceholders(localization.incorrectUsage, new String[]{"{USAGE}", "{ALIAS}"}, new String[]{builder.toString(), Arrays.toString(commandData.getAlias().toArray())}), sender);
     }
 }

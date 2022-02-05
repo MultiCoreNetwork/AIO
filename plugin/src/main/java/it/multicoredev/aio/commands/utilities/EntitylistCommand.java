@@ -1,4 +1,4 @@
-package it.multicoredev.aio.commands.staff;
+package it.multicoredev.aio.commands.utilities;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.commands.PluginCommand;
@@ -43,7 +43,7 @@ public class EntitylistCommand extends PluginCommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preprocessCheck(sender)) return true;
+        if (!super.execute(sender, label, args)) return true;
 
         if (!(sender instanceof Player) && args.length < 1) {
             incorrectUsage(sender);

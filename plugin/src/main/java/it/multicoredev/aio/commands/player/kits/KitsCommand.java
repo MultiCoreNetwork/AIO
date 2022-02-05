@@ -38,7 +38,8 @@ public class KitsCommand extends PluginCommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preprocessCheck(sender)) return true;
+        if (!super.execute(sender, label, args)) return true;
+
         Chat.send(PlaceholderUtils.replacePlaceholders(localization.availableWarps, "{KITS}", String.join(", ", aio.getKitStorage().getKitNames(sender))), sender);
         return true;
     }

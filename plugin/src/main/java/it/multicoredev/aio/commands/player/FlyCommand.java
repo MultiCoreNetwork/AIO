@@ -42,7 +42,7 @@ public class FlyCommand extends PluginCommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preprocessCheck(sender)) return true;
+        if (!super.execute(sender, label, args)) return true;
 
         Player target;
         int offset = 0;

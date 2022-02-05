@@ -1,4 +1,4 @@
-package it.multicoredev.aio.commands.utilities;
+package it.multicoredev.aio.commands.utilities.time_and_weather;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.commands.PluginCommand;
@@ -12,9 +12,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
- * Copyright © 2021 - 2022 by Lorenzo Magni & Daniele Patella
+ * Copyright © 2021 - 2022 by Lorenzo Magni
  * This file is part of AIO.
  * AIO is under "The 3-Clause BSD License", you can find a copy <a href="https://opensource.org/licenses/BSD-3-Clause">here</a>.
  * <p>
@@ -33,16 +34,16 @@ import java.util.List;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class SunCommand extends PluginCommand {
-    private static final String CMD = "sun";
+public class ThunderCommand extends PluginCommand {
+    private static final String CMD = "thunder";
 
-    public SunCommand(AIO aio) {
+    public ThunderCommand(AIO aio) {
         super(aio, CMD);
     }
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preprocessCheck(sender)) return true;
+        if (!super.execute(sender, label, args)) return true;
 
         World world = null;
 
@@ -67,10 +68,12 @@ public class SunCommand extends PluginCommand {
             return true;
         }
 
-        world.setStorm(false);
-        world.setThundering(false);
-        world.setClearWeatherDuration(180000);
-        Chat.send(localization.weatherSetSun.replace("{WORLD}", world.getName()), sender);
+        world.setStorm(true);
+        int duration = (int) (new Random().nextFloat() * (0.5) + 0.5) * 24000;
+        world.setWeatherDuration(duration);
+        world.setThundering(true);
+        world.setWeatherDuration(duration);
+        Chat.send(localization.weatherSetThunder.replace("{WORLD}", world.getName()), sender);
         return true;
     }
 

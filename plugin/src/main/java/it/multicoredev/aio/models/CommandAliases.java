@@ -5,6 +5,7 @@ import it.multicoredev.mclib.json.JsonConfig;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Copyright © 2021 - 2022 by Lorenzo Magni & Daniele Patella
@@ -31,7 +32,7 @@ public class CommandAliases extends JsonConfig {
     public String command;
     public String permission;
     public String description;
-    public String usage;
+    public Map<String, List<String>> usages;
     @SerializedName("add_completions")
     public Boolean addCompletions;
 

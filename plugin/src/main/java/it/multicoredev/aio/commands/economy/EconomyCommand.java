@@ -1,7 +1,6 @@
 package it.multicoredev.aio.commands.economy;
 
 import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.AIOEconomy;
 import it.multicoredev.aio.api.IEconomy;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.aio.storage.config.modules.EconomyModule;
@@ -51,7 +50,7 @@ public class EconomyCommand extends PluginCommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preprocessCheck(sender)) return true;
+        if (!super.execute(sender, label, args)) return true;
 
         if (args.length < 1) {
             incorrectUsage(sender);
@@ -107,8 +106,8 @@ public class EconomyCommand extends PluginCommand {
         if (response.type.equals(EconomyResponse.ResponseType.SUCCESS)) {
             if (isPlayer(sender) && ((Player) sender).getUniqueId().equals(targetUuid)) {
                 Chat.send(localization.moneyDepositedReceiver
-                        .replace("{MONEY}", economy.formatMoney(amount))
-                        .replace("{BALANCE}", economy.formatMoney(economy.getBalance(targetUuid))), sender);
+                        .replace("{MONEY}", economy.format(amount))
+                        .replace("{BALANCE}", economy.format(economy.getBalance(targetUuid))), sender);
             } else {
                 Chat.send(localization.moneyDepositedSender, sender);
                 Player receiver = Bukkit.getPlayer(targetUuid);

@@ -1,4 +1,4 @@
-package it.multicoredev.aio.commands.utilities;
+package it.multicoredev.aio.commands.utilities.time_and_weather;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.commands.PluginCommand;
@@ -42,7 +42,7 @@ public class DayCommand extends PluginCommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preprocessCheck(sender)) return true;
+        if (!super.execute(sender, label, args)) return true;
 
         World world = null;
 

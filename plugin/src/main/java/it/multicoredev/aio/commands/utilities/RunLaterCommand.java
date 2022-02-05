@@ -1,16 +1,16 @@
 package it.multicoredev.aio.commands.utilities;
 
 import it.multicoredev.aio.AIO;
+import it.multicoredev.aio.CommandRegistry;
+import it.multicoredev.aio.api.utils.PlaceholderUtils;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.aio.utils.Utils;
 import it.multicoredev.mbcore.spigot.Chat;
 import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -42,7 +42,7 @@ public class RunLaterCommand extends PluginCommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preprocessCheck(sender)) return true;
+        if (!super.execute(sender, label, args)) return true;
 
         if (args.length < 2) {
             incorrectUsage(sender);
@@ -56,10 +56,9 @@ public class RunLaterCommand extends PluginCommand {
         }
 
         String command = Chat.builder(args, 1);
+        aio.addDeferredCommand(sender, command, delay);
 
-        Bukkit.getScheduler().runTaskLater(aio, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command), delay * 20);
-
-        Chat.send(localization.runLaterScheduled.replace("{DELAY}", Utils.formatDelay(delay, localization)), sender);
+        Chat.send(PlaceholderUtils.replacePlaceholders(localization.runLaterScheduled, "{DELAY}", Utils.formatDelay(delay, localization)), sender);
         return true;
     }
 
@@ -68,16 +67,15 @@ public class RunLaterCommand extends PluginCommand {
         if (!hasCommandPerm(sender)) return new ArrayList<>();
 
         if (args.length == 1) {
-            return TabCompleterUtil.getCompletions(args[0], "1s", "5m", "2h", "6M", "1y");
+            return TabCompleterUtil.getCompletions(args[0], "1s", "1m", "10m", "30m", "1h", "2h");
         } else if (args.length == 2) {
-            return TabCompleterUtil.getCompletions(args[1], new ArrayList<>(aio.getAllCommands()));
+            return TabCompleterUtil.getCompletions(args[1], ((CommandRegistry) aio.getCommandRegistry()).getAllCommandNames());
         } else if (args.length > 2) {
-            String cmd = args[1];
-            org.bukkit.command.PluginCommand command = aio.getCommand(cmd);
-            if (command == null) return new ArrayList<>();
-            if (command.getTabCompleter() == null) return new ArrayList<>();
+            org.bukkit.command.PluginCommand cmd = aio.getCommand(args[1]);
+            if (cmd == null) return new ArrayList<>();
+            if (cmd.getTabCompleter() == null) return new ArrayList<>();
 
-            List<String> completions = command.getTabCompleter().onTabComplete(Bukkit.getConsoleSender(), command, command.getName(), Arrays.copyOfRange(args, 3, args.length));
+            List<String> completions = cmd.getTabCompleter().onTabComplete(sender, cmd, alias, args);
             if (completions == null) return new ArrayList<>();
             return completions;
         }

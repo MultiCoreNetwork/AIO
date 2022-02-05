@@ -1,6 +1,7 @@
 package it.multicoredev.aio.commands;
 
 import it.multicoredev.aio.AIO;
+import it.multicoredev.mbcore.spigot.Chat;
 import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
@@ -32,15 +33,20 @@ public class AIOCommand extends PluginCommand {
     private static final String CMD = "aio";
 
     public AIOCommand(AIO aio) {
-        super(aio, CMD, new ArrayList<>());
+        super(aio, CMD);
     }
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preprocessCheck(sender)) return true;
+        if (!super.execute(sender, label, args)) return true;
 
         if (args.length < 1) {
-            incorrectUsage(sender);
+            Chat.send("&6&lAIO &f(&eAll In One&f) &bby &g&lMultiCore &h&lNetwork", sender);
+
+            StringBuilder builder = new StringBuilder();
+            for (String usage : commandData.getUsages()) builder.append("&b").append(usage).append("\n");
+            Chat.send(builder.toString(), sender);
+
             return true;
         }
 

@@ -38,7 +38,7 @@ public class WarpsCommand extends PluginCommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preprocessCheck(sender)) return true;
+        if (!super.execute(sender, label, args)) return true;
         Chat.send(PlaceholderUtils.replacePlaceholders(localization.availableWarps, "{WARPS}", Arrays.toString(aio.getWarpStorage().getWarpNames(sender).toArray())), sender);
         return true;
     }

@@ -40,7 +40,7 @@ public class HomesCommand extends PluginCommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preprocessCheck(sender)) return true;
+        if (!super.execute(sender, label, args)) return true;
         //TODO Add homes [player]
         //TODO Use format to display home list to allow custom formatting and coords
         //TODO Divide in pages

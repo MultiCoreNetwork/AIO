@@ -1,18 +1,18 @@
 package it.multicoredev.aio.commands.utilities;
 
 import it.multicoredev.aio.AIO;
+import it.multicoredev.aio.CommandRegistry;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.mbcore.spigot.Chat;
 import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
-import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Copyright © 2021 - 2022 by Lorenzo Magni & Daniele Patella
@@ -43,29 +43,46 @@ public class SudoCommand extends PluginCommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preprocessCheck(sender)) return true;
+        if (!super.execute(sender, label, args)) return true;
 
         if (args.length < 2) {
             incorrectUsage(sender);
             return true;
         }
 
-        Player player = Bukkit.getPlayer(args[0]);
+        CommandSender target;
+        if (args[0].equalsIgnoreCase("console")) {
+            if (!hasSubPerm(sender, "console")) {
+                insufficientPerms(sender);
+                return true;
+            }
 
-        if (player == null || !player.isOnline()) {
-            Chat.send(localization.playerNotFound, sender);
-            return true;
+            target = Bukkit.getConsoleSender();
+        } else {
+            target = Bukkit.getPlayer(args[0]);
+
+            if (target == null || !((Player) target).isOnline()) {
+                Chat.send(localization.playerNotFound, sender);
+                return true;
+            }
+
+            if (hasSubPerm(target, "prevent")) {
+                Chat.send(localization.sudoPrevent, sender);
+                return true;
+            }
         }
 
-        if (hasSubPerm(player, "prevent")) {
-            Chat.send(localization.sudoPrevent, sender);
-            return true;
+        String input = Chat.builder(args, 1);
+        if (input.startsWith("/")) {
+            Bukkit.dispatchCommand(target, input.substring(1));
+        } else {
+            if (isPlayer(target)) {
+                ((Player) target).chat(input);
+            } else {
+                Chat.send(localization.sudoFailed, sender);
+                return true;
+            }
         }
-
-        String input = String.join(" ", Arrays.toString(ArrayUtils.remove(args, 0)));
-
-        if (input.startsWith("/")) player.performCommand(input);
-        else player.chat(input);
 
         Chat.send(localization.sudoSuccess, sender);
         return true;
@@ -77,6 +94,19 @@ public class SudoCommand extends PluginCommand {
 
         if (args.length == 1) {
             return TabCompleterUtil.getPlayers(args[0], sender.hasPermission("pv.see"));
+        } else if (args.length == 2) {
+            String arg = args[1];
+            if (arg.startsWith("/")) {
+                return TabCompleterUtil.getCompletions(arg.substring(1), ((CommandRegistry) aio.getCommandRegistry()).getAllCommandNames());
+            }
+        } else if (args.length > 2 && args[1].startsWith("/")) {
+            org.bukkit.command.PluginCommand cmd = aio.getCommand(args[1].substring(1));
+            if (cmd == null) return new ArrayList<>();
+            if (cmd.getTabCompleter() == null) return new ArrayList<>();
+
+            List<String> completions = cmd.getTabCompleter().onTabComplete(sender, cmd, alias, args);
+            if (completions == null) return new ArrayList<>();
+            return completions;
         }
 
         return new ArrayList<>();

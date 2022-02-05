@@ -59,6 +59,9 @@ public class Localization extends JsonConfig {
     public String month;
     public String months;
     public String motd;
+    @SerializedName("not_implemented")
+    public String notImplemented;
+    @SerializedName("no_item_in_hand")
     public String noItemInHand;
     @SerializedName("not_a_player")
     public String notPlayer;
@@ -233,6 +236,9 @@ public class Localization extends JsonConfig {
     @SerializedName("items_not_repaired_self")
     public String itemsNotRepairedSelf;
 
+    @SerializedName("lightning_summon_failed")
+    public String lightningSummonFailed;
+
     @SerializedName("max_rtp_exceeded")
     public String maxRtpExceeded;
     @SerializedName("rtp_teleport")
@@ -252,6 +258,8 @@ public class Localization extends JsonConfig {
     @SerializedName("spawn_teleport_self")
     public String spawnTeleportSelf;
 
+    @SerializedName("sudo_failed")
+    public String sudoFailed;
     @SerializedName("sudo_prevent")
     public String sudoPrevent;
     @SerializedName("sudo_success")
@@ -321,7 +329,7 @@ public class Localization extends JsonConfig {
         if (days == null) days = "days";
         if (hour == null) hour = "hour";
         if (hours == null) hours = "hours";
-        if (incorrectUsage == null) incorrectUsage = "&cIncorrect usage! Usage: &e{USAGE} &cAlias: &e{ALIAS}";
+        if (incorrectUsage == null) incorrectUsage = "&cIncorrect usage! Usage:\n&e{USAGE}\n&cAlias: &e{ALIAS}";
         if (insufficientPerms == null) insufficientPerms = "&cInsufficient permissions!";
         if (invalidEnchant == null) invalidEnchant = "&cEnchantment not found.";
         if (invalidNumber == null) invalidNumber = "&cInvalid number!";
@@ -332,6 +340,7 @@ public class Localization extends JsonConfig {
         if (month == null) month = "month";
         if (months == null) months = "months";
         if (motd == null) motd = "&hWelcome {DISPLAYNAME} to the server!";
+        if (notImplemented == null) notImplemented = "&4This command is not implemented yet!";
         if (noItemInHand == null) noItemInHand = "&cYou must hold an item in your main hand.";
         if (notPlayer == null) notPlayer = "&cYou must be a player to execute this command!";
         if (playerNotFound == null) playerNotFound = "&cPlayer not found.";
@@ -417,6 +426,8 @@ public class Localization extends JsonConfig {
         if (kitNoSpace == null) kitNoSpace = "&cThere is not enough inventory space.";
         if (kitSuccess == null) kitSuccess = "&hKit given.";
 
+        if (lightningSummonFailed == null) lightningSummonFailed = "&cLightning summon failed.";
+
         if (invalidNickname == null) invalidNickname = "&cThis nickname is not allowed.";
         if (nicknameSet == null) nicknameSet = "&h{NAME}'s nickname is now {DISPLAYNAME}.";
         if (nicknameSetSelf == null) nicknameSetSelf = "&hYour nickname is now {DISPLAYNAME}.";
@@ -442,6 +453,7 @@ public class Localization extends JsonConfig {
         if (spawnTeleport == null) spawnTeleport = "&h{DISPLAYNAME} has been teleported to the spawn.";
         if (spawnTeleportSelf == null) spawnTeleportSelf = "&hYou have been teleported to the spawn.";
 
+        if (sudoFailed == null) sudoFailed = "&cSudo failed!";
         if (sudoPrevent == null) sudoPrevent = "&cYou can't use sudo as this player.";
         if (sudoSuccess == null) sudoSuccess = "&hSudo success!";
 

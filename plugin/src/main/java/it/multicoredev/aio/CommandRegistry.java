@@ -123,4 +123,15 @@ public class CommandRegistry implements ICommandRegistry {
     public List<String> getCommandNames() {
         return getRegisteredCommands().stream().map(BasePluginCommand::getName).collect(Collectors.toList());
     }
+
+    public List<String> getAllCommandNames() {
+        Collection<Command> commands = commandMap.getCommands();
+        List<String> names = new ArrayList<>();
+        commands.forEach(cmd -> {
+            names.add(cmd.getName());
+            names.addAll(cmd.getAliases());
+        });
+
+        return names;
+    }
 }

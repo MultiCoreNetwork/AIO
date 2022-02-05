@@ -37,7 +37,7 @@ public class TrashCommand extends PluginCommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preprocessCheck(sender)) return true;
+        if (!super.execute(sender, label, args)) return true;
 
         if (!isPlayer(sender)) {
             Chat.send(localization.notPlayer, sender);
@@ -45,7 +45,6 @@ public class TrashCommand extends PluginCommand {
         }
 
         Player player = (Player) sender;
-
         player.openInventory(Bukkit.createInventory(player, 54, Chat.getTranslated(localization.trash)));
 
         return true;

@@ -44,26 +44,30 @@ public class HelpBookCommand extends PluginCommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preprocessCheck(sender)) return true;
+        if (!super.execute(sender, label, args)) return true;
 
-        String id = config.helpBookSection.defBook;
-        Player target = null;
+        String id;
+        Player target;
 
-        if (!isPlayer(sender) && args.length < 2) {
+        if (!isPlayer(sender) && args.length < 1) {
             Chat.send(localization.notPlayer, sender);
             return true;
         }
 
-        if (args.length > 0) {
+        if (args.length > 1) {
+            id = args[0];
+            target = Bukkit.getPlayer(args[1]);
+
+            if (!hasSubPerm(sender, "other") && target != sender) {
+                insufficientPerms(sender);
+                return true;
+            }
+        } else if (args.length == 1) {
             id = args[0];
 
-            if (args.length > 1) {
-                target = Bukkit.getPlayer(args[1]);
-
-                if (!hasSubPerm(sender, "other") && target != sender) {
-                    insufficientPerms(sender);
-                    return true;
-                }
+            if (!config.helpBookSection.containsBook(id)) {
+                target = Bukkit.getPlayer(id);
+                id = config.helpBookSection.defBook;
             } else {
                 target = (Player) sender;
             }

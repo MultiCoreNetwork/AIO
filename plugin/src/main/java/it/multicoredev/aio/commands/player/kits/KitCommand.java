@@ -49,10 +49,10 @@ public class KitCommand extends PluginCommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preprocessCheck(sender)) return true;
+        if (!super.execute(sender, label, args)) return true;
 
-        if (!(sender instanceof Player) && args.length < 2) {
-            incorrectUsage(sender);
+        if (!isPlayer(sender) && args.length < 2) {
+            Chat.send(localization.notPlayer, sender);
             return true;
         }
 
@@ -62,6 +62,11 @@ public class KitCommand extends PluginCommand {
         }
 
         Player target;
+
+        if (args.length > 1) {
+            target = Bukkit.getPlayer(args[1]);
+            //TODO continue
+        }
 
         if (isPlayer(sender)) {
             if (args.length < 2) {
