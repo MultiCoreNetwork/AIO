@@ -3,6 +3,7 @@ package it.multicoredev.aio.commands;
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.BasePluginCommand;
 import it.multicoredev.aio.api.IStorage;
+import it.multicoredev.aio.api.models.CommandData;
 import it.multicoredev.aio.storage.config.Config;
 import it.multicoredev.aio.storage.config.Localization;
 import it.multicoredev.mbcore.spigot.Chat;
@@ -13,8 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
 
 /**
  * Copyright © 2021 - 2022 by Lorenzo Magni & Daniele Patella
@@ -41,33 +40,19 @@ public abstract class PluginCommand extends BasePluginCommand {
     protected final Config config;
     protected final Localization localization;
     protected final IStorage storage;
+    protected final CommandData commandData;
 
-    public PluginCommand(AIO aio, String name, String description, String usageMessage, List<String> alias) {
-        super(name, description, usageMessage, alias != null ? alias.stream().map(a -> a.toLowerCase(Locale.ROOT)).collect(Collectors.toList()) : new ArrayList<>());
+    public PluginCommand(AIO aio, String name, CommandData commandData) {
+        super(name, commandData);
         this.aio = aio;
         this.config = aio.getConfiguration();
         this.localization = aio.getLocalization();
         this.storage = aio.getStorage();
-    }
-
-    public PluginCommand(AIO aio, String name, List<String> alias) {
-        this(
-                aio,
-                name,
-                aio.getLocalization().commandDescriptions.get(name),
-                aio.getLocalization().commandUsages.get(name),
-                alias
-        );
+        this.commandData = commandData;
     }
 
     public PluginCommand(AIO aio, String name) {
-        this(
-                aio,
-                name,
-                aio.getLocalization().commandDescriptions.get(name),
-                aio.getLocalization().commandUsages.get(name),
-                aio.getConfiguration().commands.get(name).alias
-        );
+        this(aio, name, aio.getCommandData(name));
     }
 
     public abstract boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args);
@@ -86,11 +71,11 @@ public abstract class PluginCommand extends BasePluginCommand {
             return false;
         }
 
-        if (config.commandsCooldown.hasCommandCooldown(getName())) {
+        /*if (config.commandsCooldown.hasCommandCooldown(getName())) {
             if (aio.hasCommandCooldown(player, getName())) return false;
             else aio.addCommandCooldown(player, getName());
             //TODO Possibly move this to event listener
-        }
+        }*/
 
         return true;
     }
@@ -104,6 +89,7 @@ public abstract class PluginCommand extends BasePluginCommand {
     }
 
     protected void incorrectUsage(CommandSender sender) {
+        //TODO Edit this
         Chat.send(localization.incorrectUsage
                 .replace("{USAGE}", usageMessage)
                 .replace("{ALIAS}", Arrays.toString(getAliases().toArray())), sender); //TODO Use Placeholders Utils

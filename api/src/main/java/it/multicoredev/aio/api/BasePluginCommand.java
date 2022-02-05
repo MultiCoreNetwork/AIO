@@ -1,5 +1,6 @@
 package it.multicoredev.aio.api;
 
+import it.multicoredev.aio.api.models.CommandData;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -60,6 +61,16 @@ public abstract class BasePluginCommand extends Command {
      */
     public BasePluginCommand(@NotNull String name, @NotNull String description, String usageMessage, String[] alias) {
         this(name, description, usageMessage, Arrays.asList(alias));
+    }
+
+    /**
+     * Create a new command.
+     *
+     * @param name         The base command.
+     * @param commandData  The command data.
+     */
+    public BasePluginCommand(@NotNull String name, @NotNull CommandData commandData) {
+        this(name, commandData.description, commandData.getUsages("default").isEmpty() ? "" : commandData.getUsages("default").get(0), commandData.alias);
     }
 
     /**

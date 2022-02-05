@@ -45,7 +45,7 @@ public class Commands extends JsonConfig {
 
     public boolean isEnabled(@NotNull String command) {
         Preconditions.checkNotNull(command);
-        return commands.containsKey(command) && commands.get(command).enabled;
+        return commands.containsKey(command) && commands.get(command).isEnabled();
     }
 
     @Override

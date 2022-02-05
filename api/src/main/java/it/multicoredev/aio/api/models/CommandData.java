@@ -27,9 +27,9 @@ import java.util.*;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class CommandData extends JsonConfig {
-    public Boolean enabled;
-    public List<String> alias;
-    public String description;
+    private Boolean enabled;
+    private List<String> alias;
+    private String description;
     private Map<String, List<String>> usages;
 
     public CommandData(boolean enabled, @NotNull String description, @NotNull Map<String, List<String>> usages, String... alias) {
@@ -53,6 +53,41 @@ public class CommandData extends JsonConfig {
         this.description = description;
         this.usages = usages;
         this.alias = Arrays.asList(alias);
+    }
+
+    public CommandData(@NotNull String description, @NotNull Map<String, List<String>> usages, String... alias) {
+        this(true, description, usages, alias);
+    }
+
+    public CommandData(@NotNull String description, @NotNull String usage, String... alias) {
+        this(true, description, usage, alias);
+    }
+
+    /**
+     * Check if the command is enabled.
+     *
+     * @return true if the command is enabled, false otherwise.
+     */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * Get the aliases of the command.
+     *
+     * @return the aliases of the command.
+     */
+    public List<String> getAlias() {
+        return Collections.unmodifiableList(alias);
+    }
+
+    /**
+     * Get the description of the command.
+     *
+     * @return the description of the command.
+     */
+    public String getDescription() {
+        return description;
     }
 
     /**
