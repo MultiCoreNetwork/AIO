@@ -1,14 +1,17 @@
 package it.multicoredev.aio.commands.teleport.tp;
 
 import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.commands.PluginCommand;
-import it.multicoredev.aio.api.tp.TeleportRequest;
 import it.multicoredev.aio.api.tp.TeleportRequestType;
+import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.mbcore.spigot.Chat;
+import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Copyright © 2022 by Daniele Patella. All rights reserved.
@@ -53,11 +56,18 @@ public class TpaCommand extends PluginCommand {
         }
 
         //TODO Implement Economy Chance
-
-        TeleportRequest teleportRequest = new TeleportRequest(TeleportRequestType.TPA, requester, target);
-        aio.getTeleportManager().sendTeleportRequest(teleportRequest);
+        aio.getTeleportManager().requestTeleport(TeleportRequestType.TPA, requester, target);
 
         Chat.send(localization.tpaRequestSent, sender);
         return true;
+    }
+
+    @Override
+    public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
+        if (hasCommandPerm(sender) && args.length == 1) {
+            return TabCompleterUtil.getPlayers(args[0], sender.hasPermission("pv.see"));
+        }
+
+        return new ArrayList<>();
     }
 }

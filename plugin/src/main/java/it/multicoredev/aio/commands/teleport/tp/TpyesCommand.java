@@ -1,9 +1,16 @@
 package it.multicoredev.aio.commands.teleport.tp;
 
 import it.multicoredev.aio.AIO;
+import it.multicoredev.aio.api.tp.ITeleportManager;
+import it.multicoredev.aio.api.tp.TeleportRequest;
 import it.multicoredev.aio.commands.PluginCommand;
+import it.multicoredev.mbcore.spigot.Chat;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 /**
  * Copyright © 2022 by Daniele Patella. All rights reserved.
@@ -26,6 +33,60 @@ public class TpyesCommand extends PluginCommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
+        if (!super.execute(sender, label, args)) return true;
 
+        if (!isPlayer(sender)) {
+            Chat.send(localization.notPlayer, sender);
+            return true;
+        }
+
+        Player target = (Player) sender;
+
+        if (args.length > 1) {
+            incorrectUsage(sender);
+            return true;
+        }
+
+        ITeleportManager teleportManager = aio.getTeleportManager();
+
+        if (!teleportManager.hasTargetTeleportRequest(target)) {
+            Chat.send(localization.noPendingTeleportRequest, target);
+            return true;
+        }
+
+        TeleportRequest request;
+        Player requester;
+
+        if (args.length == 0) {
+            List<TeleportRequest> targetList = teleportManager.getTargetTeleportRequests(target);
+            request = targetList.get(targetList.size() - 1);
+        } else {
+            requester = Bukkit.getPlayer(args[0]);
+
+            if (requester == null) {
+                Chat.send(localization.playerNotFound, sender);
+                return true;
+            }
+
+            TeleportRequest requesterRequest = teleportManager.getRequesterTeleportRequest(requester);
+
+            if (requesterRequest == null) {
+                Chat.send(localization.requesterRequestExpired, sender);
+                return true;
+            }
+
+            Player requestTarget = requesterRequest.getTarget();
+
+            if (requestTarget != target) {
+                Chat.send(localization.requesterRequestToAnotherTarget);
+                return true;
+            }
+
+            request = requesterRequest;
+        }
+
+        //TODO Execute Teleport
+        teleportManager.executeTeleport(request);
+        return true;
     }
 }

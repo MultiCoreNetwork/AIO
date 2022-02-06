@@ -50,7 +50,8 @@ public class TpallCommand extends PluginCommand {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.equals(sender)) continue;
 
-            aio.getTeleportManager().teleport(player, target, () -> Chat.send(localization.tpall, player));
+            //TODO Add Notify boolean to TeleportManager.teleport()
+            aio.getTeleportManager().teleport(player, target, Chat.send(localization.tpall, player));
         }
 
         Chat.send(localization.tpallSelf, sender);
