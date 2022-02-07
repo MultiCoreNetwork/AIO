@@ -3,11 +3,8 @@ package it.multicoredev.aio.storage.config;
 import com.google.gson.annotations.SerializedName;
 import it.multicoredev.mclib.json.JsonConfig;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * Copyright © 2021 - 2022 by Lorenzo Magni & Daniele Patella
+ * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
  * This file is part of AIO.
  * AIO is under "The 3-Clause BSD License", you can find a copy <a href="https://opensource.org/licenses/BSD-3-Clause">here</a>.
  * <p>

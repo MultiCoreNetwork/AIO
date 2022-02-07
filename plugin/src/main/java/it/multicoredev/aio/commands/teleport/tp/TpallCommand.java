@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Copyright © 2021 - 2022 by Lorenzo Magni & Daniele Patella
+ * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
  * This file is part of AIO.
  * AIO is under "The 3-Clause BSD License", you can find a copy <a href="https://opensource.org/licenses/BSD-3-Clause">here</a>.
  * <p>
@@ -51,7 +51,7 @@ public class TpallCommand extends PluginCommand {
             if (player.equals(sender)) continue;
 
             //TODO Add Notify boolean to TeleportManager.teleport()
-            aio.getTeleportManager().teleport(player, target, Chat.send(localization.tpall, player));
+            aio.getTeleportManager().teleport(player, target);
         }
 
         Chat.send(localization.tpallSelf, sender);

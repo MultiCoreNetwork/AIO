@@ -5,7 +5,6 @@ import it.multicoredev.aio.api.utils.PlaceholderUtils;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.aio.models.ItemObject;
 import it.multicoredev.aio.models.Kit;
-import it.multicoredev.aio.storage.data.KitStorage;
 import it.multicoredev.mbcore.spigot.Chat;
 import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
 import org.bukkit.Bukkit;
@@ -21,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Copyright © 2021 - 2022 by Lorenzo Magni & Daniele Patella
+ * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
  * This file is part of AIO.
  * AIO is under "The 3-Clause BSD License", you can find a copy <a href="https://opensource.org/licenses/BSD-3-Clause">here</a>.
  * <p>
@@ -61,31 +60,20 @@ public class KitCommand extends PluginCommand {
             return true;
         }
 
+        String id;
         Player target;
 
         if (args.length > 1) {
+            id = args[0];
             target = Bukkit.getPlayer(args[1]);
-            //TODO continue
-        }
 
-        if (isPlayer(sender)) {
-            if (args.length < 2) {
-                target = (Player) sender;
-            } else {
-                if (!hasSubPerm(sender, "other")) {
-                    insufficientPerms(sender);
-                    return true;
-                }
-
-                target = Bukkit.getPlayer(args[1]);
-            }
-        } else {
-            if (args.length < 2) {
-                Chat.send(localization.notPlayer, sender);
+            if (!hasSubPerm(sender, "other")) {
+                insufficientPerms(sender);
                 return true;
             }
-
-            target = Bukkit.getPlayer(args[1]);
+        } else {
+            id = args[0];
+            target = (Player) sender;
         }
 
         if (target == null || !target.isOnline()) {
@@ -93,16 +81,14 @@ public class KitCommand extends PluginCommand {
             return true;
         }
 
-        String kitName = args[0];
-        KitStorage kitStorage = aio.getKitStorage();
-        Kit kit = kitStorage.getKitByName(kitName);
+        Kit kit = aio.getKitStorage().getKitByName(id);
 
         if (kit == null) {
             Chat.send(localization.kitNotFound, sender);
             return true;
         }
 
-        if (!hasSubPerm(sender, kitName)) {
+        if (!hasSubPerm(sender, id)) {
             Chat.send(localization.kitNoPerms, sender);
             return true;
         }

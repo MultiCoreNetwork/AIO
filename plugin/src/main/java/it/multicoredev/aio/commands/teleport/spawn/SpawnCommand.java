@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Copyright © 2021 - 2022 by Lorenzo Magni & Daniele Patella
+ * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
  * This file is part of AIO.
  * AIO is under "The 3-Clause BSD License", you can find a copy <a href="https://opensource.org/licenses/BSD-3-Clause">here</a>.
  * <p>
@@ -41,7 +41,7 @@ public class SpawnCommand extends PluginCommand {
     public SpawnCommand(AIO aio) {
         super(aio, CMD);
 
-        spawnModule = (SpawnModule) aio.getModule("spawn");
+        spawnModule = aio.getModuleManager().getModule(SpawnModule.class);
     }
 
     @Override
@@ -83,12 +83,7 @@ public class SpawnCommand extends PluginCommand {
             return true;
         }
 
-        aio.getTeleportManager().teleport(target, spawn, spawnModule.teleportDelay, () -> {
-            Chat.send(localization.spawnTeleportSelf, target);
-            if (target != sender) Chat.send(localization.spawnTeleport
-                    .replace("{NAME}", target.getName())
-                    .replace("{DISPLAYNAME}", target.getDisplayName()), sender);
-        });
+        aio.getTeleportManager().teleport(target, spawn, spawnModule.teleportDelay);
 
         return true;
     }

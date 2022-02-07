@@ -58,7 +58,7 @@ public class TpaCommand extends PluginCommand {
         //TODO Implement Economy Chance
         aio.getTeleportManager().requestTeleport(TeleportRequestType.TPA, requester, target);
 
-        Chat.send(localization.tpaRequestSent, sender);
+        //Chat.send(localization.tpaRequestSent, sender);
         return true;
     }
 

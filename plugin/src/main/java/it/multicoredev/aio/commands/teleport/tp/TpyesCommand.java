@@ -50,7 +50,7 @@ public class TpyesCommand extends PluginCommand {
         ITeleportManager teleportManager = aio.getTeleportManager();
 
         if (!teleportManager.hasTargetTeleportRequest(target)) {
-            Chat.send(localization.noPendingTeleportRequest, target);
+            //Chat.send(localization.noPendingTeleportRequest, target);
             return true;
         }
 
@@ -71,14 +71,14 @@ public class TpyesCommand extends PluginCommand {
             TeleportRequest requesterRequest = teleportManager.getRequesterTeleportRequest(requester);
 
             if (requesterRequest == null) {
-                Chat.send(localization.requesterRequestExpired, sender);
+                //Chat.send(localization.requesterRequestExpired, sender);
                 return true;
             }
 
             Player requestTarget = requesterRequest.getTarget();
 
             if (requestTarget != target) {
-                Chat.send(localization.requesterRequestToAnotherTarget);
+                //Chat.send(localization.requesterRequestToAnotherTarget);
                 return true;
             }
 
@@ -86,7 +86,7 @@ public class TpyesCommand extends PluginCommand {
         }
 
         //TODO Execute Teleport
-        teleportManager.executeTeleport(request);
+        //teleportManager.executeTeleport(request);
         return true;
     }
 }

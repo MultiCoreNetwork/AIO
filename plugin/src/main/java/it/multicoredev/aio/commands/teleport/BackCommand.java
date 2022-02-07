@@ -1,8 +1,8 @@
 package it.multicoredev.aio.commands.teleport;
 
 import it.multicoredev.aio.AIO;
+import it.multicoredev.aio.api.User;
 import it.multicoredev.aio.commands.PluginCommand;
-import it.multicoredev.aio.models.User;
 import it.multicoredev.mbcore.spigot.Chat;
 import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
 import org.bukkit.Bukkit;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Copyright © 2021 - 2022 by Lorenzo Magni & Daniele Patella
+ * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
  * This file is part of AIO.
  * AIO is under "The 3-Clause BSD License", you can find a copy <a href="https://opensource.org/licenses/BSD-3-Clause">here</a>.
  * <p>
@@ -77,12 +77,7 @@ public class BackCommand extends PluginCommand {
             return true;
         }
 
-        aio.getTeleportManager().teleport(target, user.getLastLocation(), () -> {
-            Chat.send(localization.backTeleportSelf, target);
-            if (target != sender) Chat.send(localization.backTeleport
-                    .replace("{NAME}", target.getName())
-                    .replace("{DISPLAYNAME}", target.getDisplayName()), sender);
-        });
+        aio.getTeleportManager().teleport(target, user.getLastLocation());
 
         return true;
     }

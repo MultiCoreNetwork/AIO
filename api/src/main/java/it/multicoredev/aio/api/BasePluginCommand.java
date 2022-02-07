@@ -13,7 +13,7 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
- * Copyright © 2021 - 2022 by Lorenzo Magni & Daniele Patella
+ * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
  * This file is part of AIO.
  * AIO is under "The 3-Clause BSD License", you can find a copy <a href="https://opensource.org/licenses/BSD-3-Clause">here</a>.
  * <p>
@@ -70,7 +70,7 @@ public abstract class BasePluginCommand extends Command {
      * @param commandData  The command data.
      */
     public BasePluginCommand(@NotNull String name, @NotNull CommandData commandData) {
-        this(name, commandData.description, commandData.getUsages("default").isEmpty() ? "" : commandData.getUsages("default").get(0), commandData.alias);
+        this(name, commandData.getDescription(), commandData.getUsages("default").isEmpty() ? "" : commandData.getUsages("default").get(0), commandData.getAlias());
     }
 
     /**

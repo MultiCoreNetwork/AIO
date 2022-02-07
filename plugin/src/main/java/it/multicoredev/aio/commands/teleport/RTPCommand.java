@@ -1,8 +1,8 @@
 package it.multicoredev.aio.commands.teleport;
 
 import it.multicoredev.aio.AIO;
+import it.multicoredev.aio.api.User;
 import it.multicoredev.aio.commands.PluginCommand;
-import it.multicoredev.aio.models.User;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Copyright © 2021 - 2022 by Lorenzo Magni & Daniele Patella
+ * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
  * This file is part of AIO.
  * AIO is under "The 3-Clause BSD License", you can find a copy <a href="https://opensource.org/licenses/BSD-3-Clause">here</a>.
  * <p>
@@ -88,13 +88,7 @@ public class RTPCommand extends PluginCommand {
                 config.rtpSection.centerZ,
                 config.rtpSection.spreadDistance,
                 config.rtpSection.maxRange,
-                config.rtpSection.rtpTeleportDelay,
-                () -> {
-                    Chat.send(localization.rtpTeleportSelf, target);
-                    if (target != sender) Chat.send(localization.rtpTeleport
-                            .replace("{NAME}", target.getName())
-                            .replace("{DISPLAYNAME}", target.getDisplayName()), sender);
-                }
+                config.rtpSection.rtpTeleportDelay
         );
 
         return true;

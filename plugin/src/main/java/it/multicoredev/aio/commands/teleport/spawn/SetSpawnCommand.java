@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Copyright © 2021 - 2022 by Lorenzo Magni & Daniele Patella
+ * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
  * This file is part of AIO.
  * AIO is under "The 3-Clause BSD License", you can find a copy <a href="https://opensource.org/licenses/BSD-3-Clause">here</a>.
  * <p>
@@ -36,7 +36,7 @@ public class SetSpawnCommand extends PluginCommand {
     public SetSpawnCommand(AIO aio) {
         super(aio, CMD);
 
-        spawnModule = (SpawnModule) aio.getModule("spawn");
+        spawnModule = aio.getModuleManager().getModule(SpawnModule.class);
     }
 
     @Override
@@ -54,8 +54,8 @@ public class SetSpawnCommand extends PluginCommand {
         spawnModule.spawnLocation = location;
         if (location.getWorld() != null) location.getWorld().setSpawnLocation(location);
 
-        if (aio.saveModule("spawn")) Chat.send(localization.spawnSet, player);
-        else Chat.send(localization.commandException, player);
+        //if (aio.saveModule("spawn")) Chat.send(localization.spawnSet, player); TODO Readd save
+        //else Chat.send(localization.commandException, player);
 
         return true;
     }

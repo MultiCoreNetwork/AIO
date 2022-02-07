@@ -1,7 +1,6 @@
 package it.multicoredev.aio.storage.config.sections;
 
 import com.google.gson.annotations.SerializedName;
-import it.multicoredev.aio.storage.config.modules.Module;
 import it.multicoredev.mclib.json.JsonConfig;
 
 /**
