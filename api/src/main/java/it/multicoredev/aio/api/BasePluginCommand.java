@@ -1,15 +1,17 @@
 package it.multicoredev.aio.api;
 
 import it.multicoredev.aio.api.models.CommandData;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -66,8 +68,8 @@ public abstract class BasePluginCommand extends Command {
     /**
      * Create a new command.
      *
-     * @param name         The base command.
-     * @param commandData  The command data.
+     * @param name        The base command.
+     * @param commandData The command data.
      */
     public BasePluginCommand(@NotNull String name, @NotNull CommandData commandData) {
         this(name, commandData.getDescription(), commandData.getUsages("default").isEmpty() ? "" : commandData.getUsages("default").get(0), commandData.getAlias());
@@ -105,5 +107,136 @@ public abstract class BasePluginCommand extends Command {
      */
     protected boolean isPlayer(CommandSender sender) {
         return sender instanceof Player;
+    }
+
+    /**
+     * Get a player from an argument.
+     *
+     * @param sender         The source of the command.
+     * @param arg            The argument.
+     * @param allowSelectors Allow the use of Minecraft selectors.
+     * @param allowOffline   Allow the return of offline players.
+     * @return The player.
+     */
+    protected Player parsePlayer(CommandSender sender, String arg, boolean allowSelectors, boolean allowOffline) {
+        Player player = Bukkit.getPlayer(arg);
+        if (player != null) {
+            if (!allowOffline && !player.isOnline()) return null;
+
+            return player;
+        }
+
+        if (allowSelectors) {
+            if (arg.equalsIgnoreCase("@p")) {
+                if (isPlayer(sender)) return (Player) sender;
+                else return null;
+            } else if (arg.equalsIgnoreCase("@r")) {
+                List<Player> onlinePlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
+                return onlinePlayers.get(new Random().nextInt(onlinePlayers.size()));
+            } else if (arg.equalsIgnoreCase("@s")) {
+                if (isPlayer(sender)) return (Player) sender;
+                else return null;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get a player from an argument.
+     *
+     * @param sender         The source of the command.
+     * @param arg            The argument.
+     * @param allowSelectors Allow the use of Minecraft selectors.
+     * @return The player.
+     */
+    protected Player parsePlayer(CommandSender sender, String arg, boolean allowSelectors) {
+        return parsePlayer(sender, arg, allowSelectors, false);
+    }
+
+    /**
+     * Get a player from an argument.
+     *
+     * @param sender The source of the command.
+     * @param arg    The argument.
+     * @return The player.
+     */
+    protected Player parsePlayer(CommandSender sender, String arg) {
+        return parsePlayer(sender, arg, true, false);
+    }
+
+    /**
+     * Get a list of players from an argument.
+     *
+     * @param sender       The source of the command.
+     * @param arg          The argument.
+     * @param allowOffline Allow the use of offline players.
+     * @return The list of players.
+     */
+    protected List<Player> parsePlayers(CommandSender sender, String arg, boolean allowOffline) {
+        Player player = Bukkit.getPlayer(arg);
+        if (player != null) {
+            if (!allowOffline && !player.isOnline()) return new ArrayList<>();
+            else return Collections.singletonList(player);
+        }
+
+        if (arg.equalsIgnoreCase("@p")) {
+            if (isPlayer(sender)) return Collections.singletonList((Player) sender);
+            else return new ArrayList<>();
+        } else if (arg.equalsIgnoreCase("@r")) {
+            List<Player> onlinePlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
+            return Collections.singletonList(onlinePlayers.get(new Random().nextInt(onlinePlayers.size())));
+        } else if (arg.equalsIgnoreCase("@s")) {
+            if (isPlayer(sender)) return Collections.singletonList((Player) sender);
+            else return new ArrayList<>();
+        } else if (arg.startsWith("@a")) {
+            return new ArrayList<>(Bukkit.getOnlinePlayers());
+        }
+
+        return new ArrayList<>();
+    }
+
+    /**
+     * Get a list of players from an argument.
+     *
+     * @param sender The source of the command.
+     * @param arg    The argument.
+     * @return The list of players.
+     */
+    protected List<Player> parsePlayers(CommandSender sender, String arg) {
+        return parsePlayers(sender, arg, false);
+    }
+
+    /**
+     * Get material from an argument.
+     *
+     * @param arg The argument.
+     * @return The material.
+     */
+    protected Material parseMaterial(String arg) {
+        arg = arg.toLowerCase(Locale.ROOT);
+        return Material.matchMaterial(arg.startsWith("minecraft:") ? arg : "minecraft:" + arg);
+    }
+
+    /**
+     * Get an enchantment from an argument.
+     *
+     * @param arg The argument.
+     * @return The enchantment.
+     */
+    protected Enchantment parseEnchantment(String arg) {
+        arg = arg.toLowerCase(Locale.ROOT);
+        return Enchantment.getByKey(arg.startsWith("minecraft:") ? NamespacedKey.fromString(arg) : NamespacedKey.minecraft(arg));
+    }
+
+    /**
+     * Get an effect from an argument.
+     *
+     * @param arg the argument.
+     * @return the effect.
+     */
+    protected PotionEffectType parseEffect(String arg) {
+        arg = arg.toLowerCase(Locale.ROOT);
+        return PotionEffectType.getByKey(arg.startsWith("minecraft:") ? NamespacedKey.fromString(arg) : NamespacedKey.minecraft(arg));
     }
 }

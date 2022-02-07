@@ -50,7 +50,7 @@ public class JoinQuitModule extends Module {
     public Float jingleVolume;
 
     public JoinQuitModule() {
-        super("join_and_quit");
+        super("join_quit");
     }
 
     @Override

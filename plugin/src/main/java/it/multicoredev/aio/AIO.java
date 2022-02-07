@@ -131,6 +131,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     //TODO Fly speed (Save also walk speed and set on Join)
     //TODO Add to commands like heal or feed... the ability to user selectors
     //TODO Add error to preconditions
+    //TODO Reset module name when loading
 
     @Override
     public void onEnable() {

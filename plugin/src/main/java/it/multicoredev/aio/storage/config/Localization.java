@@ -50,7 +50,6 @@ public class Localization extends JsonConfig {
     public String inventoryFull;
     @SerializedName("inventory_full_self")
     public String inventoryFullSelf;
-    @SerializedName("no_item_in_hand")
     public String minute;
     public String minutes;
     public String month;

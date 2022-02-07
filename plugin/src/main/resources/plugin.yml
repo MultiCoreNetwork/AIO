@@ -1,6 +1,6 @@
-name: ${project.name}
+name: AIO
 version: ${project.version}
-main: ${project.groupId}.${project.name}
+main: it.multicoredev.aio.AIO
 api-version: ${apiVersion}
 authors: ["LoreSchaeffer", "DanTTV"]
 description: ${project.description}
