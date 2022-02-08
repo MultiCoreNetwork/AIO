@@ -36,8 +36,8 @@ import java.util.Date;
 public class PlayerQuitListener extends PluginListenerExecutor<PlayerQuitEvent> {
     private final JoinQuitModule joinAndQuitModule;
 
-    public PlayerQuitListener(AIO aio) {
-        super(aio);
+    public PlayerQuitListener(Class<PlayerQuitEvent> eventClass, AIO aio) {
+        super(eventClass, aio);
         this.joinAndQuitModule = aio.getModuleManager().getModule(JoinQuitModule.class);
     }
 
@@ -55,7 +55,7 @@ public class PlayerQuitListener extends PluginListenerExecutor<PlayerQuitEvent> 
             storage.updateUserAsync(user);
         }
 
-        if (config.modules.get("join_and_quit")) {
+        if (config.modules.get("join_quit")) {
             if (!joinAndQuitModule(event)) return;
         }
     }

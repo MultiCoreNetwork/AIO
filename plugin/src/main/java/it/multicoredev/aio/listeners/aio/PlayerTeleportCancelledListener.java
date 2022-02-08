@@ -30,8 +30,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public class PlayerTeleportCancelledListener extends PluginListenerExecutor<PlayerTeleportCancelledEvent> {
 
-    public PlayerTeleportCancelledListener(AIO aio) {
-        super(aio);
+    public PlayerTeleportCancelledListener(Class<PlayerTeleportCancelledEvent> eventClass, AIO aio) {
+        super(eventClass, aio);
     }
 
     @Override

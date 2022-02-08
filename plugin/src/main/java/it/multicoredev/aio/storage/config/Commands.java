@@ -119,7 +119,7 @@ public class Commands extends JsonConfig {
         if (!commands.containsKey("fly")) commands.put("fly", new CommandData(
                 true,
                 "Toggle fly for a player",
-                "/fly [player]"
+                "/fly <on|off|toggle> [player]"
         ));
         if (!commands.containsKey("gamemode")) commands.put("gamemode", new CommandData(
                 true,

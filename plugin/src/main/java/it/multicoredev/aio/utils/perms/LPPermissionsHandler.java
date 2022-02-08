@@ -1,21 +1,24 @@
-package it.multicoredev.aio.utils;
+package it.multicoredev.aio.utils.perms;
 
 import it.multicoredev.aio.AIO;
+import it.multicoredev.mbcore.spigot.Chat;
+import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.group.GroupManager;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.NodeType;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 
-import static it.multicoredev.aio.AIO.lp;
-import static it.multicoredev.aio.AIO.vaultPerms;
-
 /**
- * Copyright © 2021 - 2022 by Lorenzo Magni
+ * Copyright © 2022 by Lorenzo Magni
  * This file is part of AIO.
  * AIO is under "The 3-Clause BSD License", you can find a copy <a href="https://opensource.org/licenses/BSD-3-Clause">here</a>.
  * <p>
@@ -34,37 +37,41 @@ import static it.multicoredev.aio.AIO.vaultPerms;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class PermissionUtils {
-    public static List<String> getGroups() {
-        if (AIO.LUCKPERMS) {
-            return getLPGroups(false).stream().map(Group::getName).collect(Collectors.toList());
-        } else if (AIO.VAULT) {
-            return getVaultGroups();
-        } else {
-            return new ArrayList<>();
-        }
-    }
+public class LPPermissionsHandler implements IPermissionsHandler {
+    private final LuckPerms lp;
 
-    public static List<String> getPlayerGroups(@NotNull Player player) {
-        if (AIO.LUCKPERMS) {
-            return getLPPlayerGroups(player).stream().map(Group::getName).collect(Collectors.toList());
-        } else if (AIO.VAULT) {
-            return getVaultPlayerGroups(player);
-        } else {
-            return new ArrayList<>();
-        }
-    }
-
-    public static boolean isInGroup(@NotNull Player player, @NotNull String group) {
-        List<String> playerGroups = getPlayerGroups(player);
-        for (String g : playerGroups) {
-            if (g.equalsIgnoreCase(group)) return true;
+    public LPPermissionsHandler(@NotNull AIO aio) {
+        RegisteredServiceProvider<LuckPerms> serviceProvider = aio.getServer().getServicesManager().getRegistration(LuckPerms.class);
+        if (serviceProvider == null) {
+            Chat.info("&eCannot establish hook in LuckPerms.");
+            throw new RuntimeException("Cannot establish hook in LuckPerms.");
         }
 
-        return false;
+        lp = serviceProvider.getProvider();
+        Chat.info("&aEstablished hook in LuckPerms.");
     }
 
-    private static List<Group> getLPPlayerGroups(@NotNull Player player) {
+    @Override
+    public List<String> getGroups() {
+        List<Group> groups = new ArrayList<>(lp.getGroupManager().getLoadedGroups());
+        groups.sort((g1, g2) -> {
+            OptionalInt w1 = g1.getWeight();
+            OptionalInt w2 = g2.getWeight();
+
+            if (w1.isPresent() && w2.isPresent()) {
+                return Integer.compare(w1.getAsInt(), w2.getAsInt());
+            } else {
+                if (w1.isPresent()) return 1;
+                else if (w2.isPresent()) return -1;
+                else return 0;
+            }
+        });
+
+        return groups.stream().map(Group::getName).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getPlayerGroups(@NotNull Player player) {
         User user = lp.getUserManager().getUser(player.getUniqueId());
         if (user == null) return new ArrayList<>();
 
@@ -93,34 +100,16 @@ public class PermissionUtils {
             }
         });
 
-        return groups;
+        return groups.stream().map(Group::getName).collect(Collectors.toList());
     }
 
-    private static List<String> getVaultGroups() {
-        return Arrays.asList(vaultPerms.getGroups());
-    }
-
-    private static List<Group> getLPGroups(boolean sort) {
-        List<Group> groups = new ArrayList<>(lp.getGroupManager().getLoadedGroups());
-        if (sort) {
-            groups.sort((o1, o2) -> {
-                OptionalInt w1 = o1.getWeight();
-                OptionalInt w2 = o2.getWeight();
-
-                if (w1.isPresent() && w2.isPresent()) {
-                    return Integer.compare(w1.getAsInt(), w2.getAsInt());
-                } else {
-                    if (w1.isPresent()) return 1;
-                    else if (w2.isPresent()) return -1;
-                    else return 0;
-                }
-            });
+    @Override
+    public boolean isInGroup(@NotNull Player player, @NotNull String group) {
+        List<String> playerGroups = getPlayerGroups(player);
+        for (String g : playerGroups) {
+            if (g.equalsIgnoreCase(group)) return true;
         }
 
-        return groups;
-    }
-
-    private static List<String> getVaultPlayerGroups(@NotNull Player player) {
-        return Arrays.stream(vaultPerms.getPlayerGroups(player)).map(group -> group.toLowerCase(Locale.ROOT)).collect(Collectors.toList());
+        return false;
     }
 }

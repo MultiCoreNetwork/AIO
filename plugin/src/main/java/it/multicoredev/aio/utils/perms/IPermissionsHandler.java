@@ -1,14 +1,12 @@
-package it.multicoredev.aio.api.listeners;
+package it.multicoredev.aio.utils.perms;
 
-import com.google.common.base.Preconditions;
-import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 /**
- * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
+ * Copyright © 2022 by Lorenzo Magni
  * This file is part of AIO.
  * AIO is under "The 3-Clause BSD License", you can find a copy <a href="https://opensource.org/licenses/BSD-3-Clause">here</a>.
  * <p>
@@ -27,17 +25,11 @@ import org.jetbrains.annotations.NotNull;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class ListenerLow<T extends Event> implements Listener {
-    private final ListenerExecutor<T> listener;
+public interface IPermissionsHandler {
 
-    ListenerLow(@NotNull ListenerExecutor<T> listener) {
-        Preconditions.checkNotNull(listener);
+    List<String> getGroups();
 
-        this.listener = listener;
-    }
+    List<String> getPlayerGroups(@NotNull Player player);
 
-    @EventHandler(priority = EventPriority.LOW)
-    public void onEvent(T event) {
-        listener.onEvent(event);
-    }
+    boolean isInGroup(@NotNull Player player, @NotNull String group);
 }

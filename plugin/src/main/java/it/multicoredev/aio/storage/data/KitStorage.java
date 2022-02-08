@@ -1,14 +1,10 @@
 package it.multicoredev.aio.storage.data;
 
-import com.google.gson.annotations.Expose;
-import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.models.Kit;
 import it.multicoredev.mclib.json.JsonConfig;
 import org.bukkit.command.CommandSender;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,16 +21,9 @@ import java.util.List;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class KitStorage extends JsonConfig {
-    @Expose(serialize = false, deserialize = false)
-    private final AIO aio;
-    @Expose(serialize = false, deserialize = false)
-    private final File file;
     private List<Kit> kits;
 
-    public KitStorage(@NotNull AIO aio, @NotNull File file) {
-        this.aio = aio;
-        this.file = file;
-
+    public KitStorage() {
         init();
     }
 

@@ -1,14 +1,17 @@
-package it.multicoredev.aio.api.listeners;
+package it.multicoredev.aio.utils.perms;
 
-import com.google.common.base.Preconditions;
-import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
+import it.multicoredev.aio.AIO;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static it.multicoredev.aio.AIO.LUCKPERMS;
+import static it.multicoredev.aio.AIO.VAULT;
+
 /**
- * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
+ * Copyright © 2022 by Lorenzo Magni
  * This file is part of AIO.
  * AIO is under "The 3-Clause BSD License", you can find a copy <a href="https://opensource.org/licenses/BSD-3-Clause">here</a>.
  * <p>
@@ -27,17 +30,29 @@ import org.jetbrains.annotations.NotNull;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class ListenerNormal<T extends Event> implements Listener {
-    private final ListenerExecutor<T> listener;
+public class PermissionHandler implements IPermissionsHandler {
+    private final List<IPermissionsHandler> handlers = new ArrayList<>();
 
-    ListenerNormal(@NotNull ListenerExecutor<T> listener) {
-        Preconditions.checkNotNull(listener);
-
-        this.listener = listener;
+    public PermissionHandler(@NotNull AIO aio) {
+        if (LUCKPERMS) handlers.add(new LPPermissionsHandler(aio));
+        if (VAULT) handlers.add(new VaultPermissionsHandler(aio));
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void onEvent(T event) {
-        listener.onEvent(event);
+    @Override
+    public List<String> getGroups() {
+        for (IPermissionsHandler handler : handlers) return handler.getGroups();
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<String> getPlayerGroups(@NotNull Player player) {
+        for (IPermissionsHandler handler : handlers) return handler.getPlayerGroups(player);
+        return new ArrayList<>();
+    }
+
+    @Override
+    public boolean isInGroup(@NotNull Player player, @NotNull String group) {
+        for (IPermissionsHandler handler : handlers) return handler.isInGroup(player, group);
+        return false;
     }
 }

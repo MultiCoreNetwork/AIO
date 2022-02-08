@@ -48,8 +48,8 @@ public class PlayerJoinListener extends PluginListenerExecutor<PlayerJoinEvent> 
     private final SpawnModule spawnModule;
     private final JoinQuitModule joinAndQuitModule;
 
-    public PlayerJoinListener(AIO aio) {
-        super(aio);
+    public PlayerJoinListener(Class<PlayerJoinEvent> eventClass, AIO aio) {
+        super(eventClass, aio);
 
         this.spawnModule = aio.getModuleManager().getModule(SpawnModule.class);
         this.joinAndQuitModule = aio.getModuleManager().getModule(JoinQuitModule.class);
@@ -103,7 +103,7 @@ public class PlayerJoinListener extends PluginListenerExecutor<PlayerJoinEvent> 
             if (!spawnModule(event, isNew)) return;
         }
 
-        if (config.modules.get("join_and_quit")) {
+        if (config.modules.get("join_quit")) {
             if (!joinAndQuitModule(event, isNew)) return;
         }
     }

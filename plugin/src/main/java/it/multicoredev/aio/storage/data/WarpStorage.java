@@ -38,15 +38,11 @@ import java.util.List;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class WarpStorage extends JsonConfig implements IWarpStorage {
-    @Expose(serialize = false, deserialize = false)
-    private final AIO aio;
-    @Expose(serialize = false, deserialize = false)
-    private final File file;
+    private final transient AIO aio;
     private List<Warp> warps;
 
-    public WarpStorage(@NotNull AIO aio, @NotNull File file) {
+    public WarpStorage(@NotNull AIO aio) {
         this.aio = aio;
-        this.file = file;
 
         init();
     }
@@ -58,14 +54,12 @@ public class WarpStorage extends JsonConfig implements IWarpStorage {
 
     @Override
     public void saveWarps() {
-        Bukkit.getScheduler().runTaskAsynchronously(aio, () -> {
-            try {
-                AIO.serialize(file, this);
-            } catch (Exception e) {
-                Chat.severe("&4" + e.getMessage());
-                if (AIO.debug) e.printStackTrace();
-            }
-        });
+        try {
+            aio.saveWarps();
+        } catch (Exception e) {
+            Chat.severe(e.getMessage());
+            if (AIO.debug) e.printStackTrace();
+        }
     }
 
     @Override

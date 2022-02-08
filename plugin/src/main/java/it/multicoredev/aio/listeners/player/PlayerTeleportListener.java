@@ -31,8 +31,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public class PlayerTeleportListener extends PluginListenerExecutor<PlayerTeleportEvent> {
 
-    public PlayerTeleportListener(AIO aio) {
-        super(aio);
+    public PlayerTeleportListener(Class<PlayerTeleportEvent> eventClass, AIO aio) {
+        super(eventClass, aio);
     }
 
 

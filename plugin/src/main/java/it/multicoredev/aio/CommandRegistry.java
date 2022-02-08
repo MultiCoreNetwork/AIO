@@ -91,14 +91,12 @@ public class CommandRegistry implements ICommandRegistry {
     public void unregisterCommands(@NotNull Plugin plugin) {
         if (!commands.containsKey(plugin)) return;
 
-        commands.get(plugin).forEach(this::unregisterCommand);
-        commands.remove(plugin);
+        while (commands.get(plugin) != null) unregisterCommand(commands.get(plugin).get(0));
     }
 
     @Override
     public void unregisterCommands() {
-        commands.values().forEach(cmds -> cmds.forEach(this::unregisterCommand));
-        commands.clear();
+        while (!commands.isEmpty()) unregisterCommands(commands.keySet().iterator().next());
     }
 
     @Override

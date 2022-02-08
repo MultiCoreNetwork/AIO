@@ -29,8 +29,8 @@ import java.util.Locale;
  */
 public class PlayerCommandPreprocessListener extends PluginListenerExecutor<PlayerCommandPreprocessEvent> {
 
-    public PlayerCommandPreprocessListener(AIO aio) {
-        super(aio);
+    public PlayerCommandPreprocessListener(Class<PlayerCommandPreprocessEvent> eventClass, AIO aio) {
+        super(eventClass, aio);
     }
 
     @Override

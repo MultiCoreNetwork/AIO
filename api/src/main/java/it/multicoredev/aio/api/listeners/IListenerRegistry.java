@@ -2,7 +2,6 @@ package it.multicoredev.aio.api.listeners;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,49 +30,49 @@ import java.util.List;
 public interface IListenerRegistry {
 
     /**
-     * Register a {@link ListenerCompound} in Spigot.
+     * Register a {@link ListenerExecutor} to the registry.
      *
-     * @param listener the listener to be registered.
-     * @param priority the priority of the listener.
-     * @param plugin   the plugin that register the listener.
+     * @param listener The listener to register.
+     * @param priority The priority of the listener.
+     * @param plugin   The plugin that registered the listener.
      */
-    void registerListener(@NotNull ListenerCompound<? extends Event> listener, @NotNull EventPriority priority, @NotNull Plugin plugin);
+    void registerListener(@NotNull ListenerExecutor<? extends Event> listener, @NotNull EventPriority priority, @NotNull Plugin plugin);
 
     /**
-     * Unregister a {@link ListenerCompound} from Spigot.
+     * Unregister a {@link ListenerExecutor} from Spigot.
      *
      * @param listener the listener to be unregistered.
      */
-    void unregisterListener(@NotNull ListenerCompound<? extends Event> listener);
+    void unregisterListener(@NotNull ListenerExecutor<? extends Event> listener);
 
     /**
-     * Unregister all the {@link ListenerCompound} from Spigot registered by a plugin.
+     * Unregister all the {@link ListenerExecutor} from Spigot registered by a plugin.
      *
      * @param plugin the plugin that register the listener.
      */
     void unregisterListeners(@NotNull Plugin plugin);
 
     /**
-     * Unregister all the {@link ListenerCompound} in the registry from Spigot;
+     * Unregister all the {@link ListenerExecutor} in the registry from Spigot;
      */
     void unregisterListeners();
 
     /**
-     * Get all the {@link ListenerCompound} registered in the registry by a plugin.
+     * Get all the {@link ListenerExecutor} registered in the registry by a plugin.
      *
      * @param plugin the plugin that registered the commands.
-     * @return a List of {@link ListenerCompound} registered by the plugin,
+     * @return a List of {@link ListenerExecutor} registered by the plugin,
      * empty List if no command is registered by that plugin
      */
-    List<ListenerCompound<? extends Event>> getRegisteredListeners(@NotNull Plugin plugin);
+    List<ListenerExecutor<? extends Event>> getRegisteredListeners(@NotNull Plugin plugin);
 
     /**
-     * Get all the {@link ListenerCompound} registered in the registry.
+     * Get all the {@link ListenerExecutor} registered in the registry.
      *
-     * @return a List of {@link ListenerCompound} registered,
+     * @return a List of {@link ListenerExecutor} registered,
      * empty List if no command is registered by that plugin
      */
-    List<ListenerCompound<? extends Event>> getRegisteredListeners();
+    List<ListenerExecutor<? extends Event>> getRegisteredListeners();
 
     /**
      * Change the priority of a listener.
@@ -82,5 +81,5 @@ public interface IListenerRegistry {
      * @param newPriority The new priority for the listener.
      * @return true if the priority was changed, false otherwise.
      */
-    boolean setListenerPriority(@NotNull ListenerCompound<? extends Event> listener, @NotNull EventPriority newPriority);
+    boolean setListenerPriority(@NotNull ListenerExecutor<? extends Event> listener, @NotNull EventPriority newPriority);
 }

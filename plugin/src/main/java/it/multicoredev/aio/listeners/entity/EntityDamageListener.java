@@ -29,8 +29,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public class EntityDamageListener extends PluginListenerExecutor<EntityDamageEvent> {
 
-    public EntityDamageListener(AIO aio) {
-        super(aio);
+    public EntityDamageListener(Class<EntityDamageEvent> eventClass, AIO aio) {
+        super(eventClass, aio);
     }
 
     @Override

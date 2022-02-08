@@ -33,7 +33,9 @@ public abstract class PluginListenerExecutor<T extends Event> extends ListenerEx
     protected final Localization localization;
     protected final IStorage storage;
 
-    public PluginListenerExecutor(AIO aio) {
+    public PluginListenerExecutor(Class<T> eventClass, AIO aio) {
+        super(eventClass);
+
         this.aio = aio;
         this.config = aio.getConfiguration();
         this.localization = aio.getLocalization();

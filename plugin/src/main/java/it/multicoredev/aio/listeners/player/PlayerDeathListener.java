@@ -30,8 +30,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public class PlayerDeathListener extends PluginListenerExecutor<PlayerDeathEvent> {
 
-    public PlayerDeathListener(AIO aio) {
-        super(aio);
+    public PlayerDeathListener(Class<PlayerDeathEvent> eventClass, AIO aio) {
+        super(eventClass, aio);
     }
 
     @Override

@@ -1,6 +1,9 @@
 package it.multicoredev.aio.api.listeners;
 
+import com.google.common.base.Preconditions;
 import org.bukkit.event.Event;
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.EventExecutor;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -23,6 +26,39 @@ import org.jetbrains.annotations.NotNull;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public abstract class ListenerExecutor<T extends Event> {
-    public abstract void onEvent(@NotNull T event);
+public abstract class ListenerExecutor<T extends Event> implements EventExecutor, Listener {
+    private final Class<T> eventClass;
+
+    public ListenerExecutor(@NotNull Class<T> eventClass) {
+        Preconditions.checkNotNull(eventClass);
+
+        this.eventClass = eventClass;
+    }
+
+    /**
+     * Get the event class.
+     *
+     * @return The event class.
+     */
+    public Class<T> getEventClass() {
+        return eventClass;
+    }
+
+    /**
+     * Call the onEvent method of the listener.
+     *
+     * @param listener The listener to call.
+     * @param event    The event that calls the listener.
+     */
+    @Override
+    public void execute(@NotNull Listener listener, @NotNull Event event) {
+        onEvent((T) event);
+    }
+
+    /**
+     * Called when the event is called.
+     *
+     * @param event The event that calls the listener.
+     */
+    public abstract void onEvent(T event);
 }

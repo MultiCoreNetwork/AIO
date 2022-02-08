@@ -98,8 +98,8 @@ public class CommandData extends JsonConfig {
      */
     public List<String> getUsages(@NotNull String key) {
         Preconditions.checkNotNull(key);
-
-        return usages.get(key);
+        if (usages.containsKey(key)) return usages.get(key);
+        else return new ArrayList<>();
     }
 
     /**

@@ -2,7 +2,8 @@ package it.multicoredev.aio;
 
 import com.google.common.base.Preconditions;
 import it.multicoredev.aio.api.listeners.IListenerRegistry;
-import it.multicoredev.aio.api.listeners.ListenerCompound;
+import it.multicoredev.aio.api.listeners.ListenerExecutor;
+import it.multicoredev.aio.api.listeners.ListenerExecutor;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
@@ -36,27 +37,26 @@ import static it.multicoredev.aio.AIO.debug;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class ListenerRegistry implements IListenerRegistry {
-    private final Map<Plugin, List<ListenerCompound<? extends Event>>> listeners = new HashMap<>();
+    private final Map<Plugin, List<ListenerExecutor<? extends Event>>> listeners = new HashMap<>();
 
-    @Override
-    public void registerListener(@NotNull ListenerCompound<? extends Event> listener, @NotNull EventPriority priority, @NotNull Plugin plugin) {
+    public void registerListener(@NotNull ListenerExecutor<? extends Event> listener, @NotNull EventPriority priority, @NotNull Plugin plugin) {
         Preconditions.checkNotNull(listener);
         Preconditions.checkNotNull(priority);
         Preconditions.checkNotNull(plugin);
 
-        Bukkit.getPluginManager().registerEvents(listener.getListener(priority), plugin);
+        Bukkit.getPluginManager().registerEvent(listener.getEventClass(), listener, priority, listener, plugin);
 
         if (listeners.containsKey(plugin)) listeners.get(plugin).add(listener);
         else listeners.put(plugin, new ArrayList<>(Collections.singleton(listener)));
 
         if (debug)
-            Chat.info(String.format("&aL&r Registered listener &a%s&r.", listener.getListener().getClass().getSimpleName()));
+            Chat.info(String.format("&aL&r Registered listener &a%s&r.", listener.getClass().getSimpleName()));
     }
 
     @Override
-    public void unregisterListener(@NotNull ListenerCompound<? extends Event> listener) {
+    public void unregisterListener(@NotNull ListenerExecutor<? extends Event> listener) {
         boolean listenerRegistered = false;
-        for (Map.Entry<Plugin, List<ListenerCompound<? extends Event>>> entry : listeners.entrySet()) {
+        for (Map.Entry<Plugin, List<ListenerExecutor<? extends Event>>> entry : listeners.entrySet()) {
             if (entry.getValue().contains(listener)) {
                 entry.getValue().remove(listener);
                 if (entry.getValue().isEmpty()) listeners.remove(entry.getKey());
@@ -66,48 +66,49 @@ public class ListenerRegistry implements IListenerRegistry {
         }
 
         if (!listenerRegistered) return;
-        if (listener.getListener() == null) return;
 
-        HandlerList.unregisterAll(listener.getListener());
+        HandlerList.unregisterAll(listener);
 
         if (debug)
-            Chat.info(String.format("&cL&r Registered listener &a%s&r.", listener.getListener().getClass().getSimpleName()));
+            Chat.info(String.format("&cL&r Registered listener &a%s&r.", listener.getClass().getSimpleName()));
     }
 
     @Override
     public void unregisterListeners(@NotNull Plugin plugin) {
-        if (plugin == null || !listeners.containsKey(plugin)) return;
+        Preconditions.checkNotNull(plugin);
 
-        listeners.get(plugin).forEach(this::unregisterListener);
-        listeners.remove(plugin);
+        if (!listeners.containsKey(plugin)) return;
+
+        while (listeners.get(plugin) != null) unregisterListener(listeners.get(plugin).get(0));
     }
 
     @Override
     public void unregisterListeners() {
-        listeners.values().forEach(listeners -> listeners.forEach(this::unregisterListener));
-        listeners.clear();
+        while (!listeners.isEmpty()) unregisterListeners(listeners.keySet().iterator().next());
     }
 
     @Override
-    public List<ListenerCompound<? extends Event>> getRegisteredListeners(@NotNull Plugin plugin) {
-        if (plugin != null && listeners.containsKey(plugin)) return listeners.get(plugin);
+    public List<ListenerExecutor<? extends Event>> getRegisteredListeners(@NotNull Plugin plugin) {
+        Preconditions.checkNotNull(plugin);
+
+        if (listeners.containsKey(plugin)) return listeners.get(plugin);
         else return new ArrayList<>();
     }
 
     @Override
-    public List<ListenerCompound<? extends Event>> getRegisteredListeners() {
-        List<ListenerCompound<? extends Event>> listeners = new ArrayList<>();
+    public List<ListenerExecutor<? extends Event>> getRegisteredListeners() {
+        List<ListenerExecutor<? extends Event>> listeners = new ArrayList<>();
         this.listeners.values().forEach(listeners::addAll);
         return listeners;
     }
 
     @Override
-    public boolean setListenerPriority(@NotNull ListenerCompound<? extends Event> listener, @NotNull EventPriority newPriority) {
+    public boolean setListenerPriority(@NotNull ListenerExecutor<? extends Event> listener, @NotNull EventPriority newPriority) {
         Preconditions.checkNotNull(listener);
         Preconditions.checkNotNull(newPriority);
 
         Plugin plugin = null;
-        for (Map.Entry<Plugin, List<ListenerCompound<? extends Event>>> entry : listeners.entrySet()) {
+        for (Map.Entry<Plugin, List<ListenerExecutor<? extends Event>>> entry : listeners.entrySet()) {
             if (entry.getValue().contains(listener)) {
                 plugin = entry.getKey();
                 break;

@@ -5,8 +5,9 @@ import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import it.multicoredev.aio.api.*;
+import it.multicoredev.aio.api.events.PlayerPostTeleportEvent;
+import it.multicoredev.aio.api.events.PlayerTeleportCancelledEvent;
 import it.multicoredev.aio.api.listeners.IListenerRegistry;
-import it.multicoredev.aio.api.listeners.ListenerCompound;
 import it.multicoredev.aio.api.models.CommandData;
 import it.multicoredev.aio.api.tp.ITeleportManager;
 import it.multicoredev.aio.commands.AIOCommand;
@@ -46,13 +47,16 @@ import it.multicoredev.aio.storage.data.WarpStorage;
 import it.multicoredev.aio.tasks.ClearCacheTask;
 import it.multicoredev.aio.tasks.SavePlayerDataTask;
 import it.multicoredev.aio.utils.ReflectionUtils;
+import it.multicoredev.aio.utils.perms.PermissionHandler;
 import it.multicoredev.mbcore.spigot.Chat;
-import net.luckperms.api.LuckPerms;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.scheduler.BukkitTask;
@@ -63,7 +67,10 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.UUID;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -120,9 +127,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     private TeleportManager tpManager;
     //private Map<UUID, Map<String, Date>> commandsCooldown;
     private AIOEconomy economy;
-
-    public static Permission vaultPerms;
-    public static LuckPerms lp;
+    private PermissionHandler permissionHandler;
 
     public static boolean debug = true;
 
@@ -132,6 +137,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     //TODO Add to commands like heal or feed... the ability to user selectors
     //TODO Add error to preconditions
     //TODO Reset module name when loading
+    //TODO Change command syntax to /command [on|off|toggle] [player]
 
     @Override
     public void onEnable() {
@@ -184,6 +190,8 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             economy = new AIOEconomy(this);
             getServer().getServicesManager().register(IEconomy.class, economy, this, ServicePriority.Highest);
         }
+
+        permissionHandler = new PermissionHandler(this);
 
         registerListeners();
         registerCommands();
@@ -248,6 +256,10 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     @Nullable
     public IEconomy getEconomy() {
         return economy;
+    }
+
+    public PermissionHandler getPermissionHandler() {
+        return permissionHandler;
     }
 
     public Config getConfiguration() {
@@ -340,6 +352,10 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
     public void addToUsermap(String name, UUID uuid) {
         usermap.put(name, uuid);
+    }
+
+    public void saveWarps() throws Exception {
+        serialize(warpsFile, warpStorage);
     }
 
     public void addDeferredCommand(CommandSender sender, String command, long delay) {
@@ -597,7 +613,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         }
 
         if (!warpsFile.exists() || !warpsFile.isFile()) {
-            warpStorage = new WarpStorage(this, warpsFile);
+            warpStorage = new WarpStorage(this);
 
             try {
                 serialize(warpsFile, warpStorage);
@@ -617,7 +633,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                 if (!backupFile(warpsFile)) return false;
                 Chat.warning("&4WarpStorage file is corrupted, creating new one");
 
-                warpStorage = new WarpStorage(this, warpsFile);
+                warpStorage = new WarpStorage(this);
 
                 try {
                     serialize(warpsFile, warpStorage);
@@ -640,7 +656,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         }
 
         if (!kitsFile.exists() || !kitsFile.isFile()) {
-            kitStorage = new KitStorage(this, kitsFile);
+            kitStorage = new KitStorage();
 
             try {
                 serialize(kitsFile, kitStorage);
@@ -660,7 +676,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                 if (!backupFile(kitsFile)) return false;
                 Chat.warning("&4KitStorage file is corrupted, creating new one");
 
-                kitStorage = new KitStorage(this, kitsFile);
+                kitStorage = new KitStorage();
 
                 try {
                     serialize(kitsFile, kitStorage);
@@ -717,20 +733,6 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             if (PAPI) Chat.info("&aPlaceholderAPI found.");
             else Chat.info("&ePlaceholderAPI not found.");
         }
-
-        if (VAULT) {
-            RegisteredServiceProvider<Permission> serviceProvider = getServer().getServicesManager().getRegistration(Permission.class);
-            if (serviceProvider != null) vaultPerms = serviceProvider.getProvider();
-            if (vaultPerms != null) Chat.info("&aEstablished hook in Vault Permissions.");
-            else Chat.info("&eCannot establish hook in Vault Permissions.");
-        }
-
-        if (LUCKPERMS) {
-            RegisteredServiceProvider<LuckPerms> serviceProvider = getServer().getServicesManager().getRegistration(LuckPerms.class);
-            if (serviceProvider != null) lp = serviceProvider.getProvider();
-            if (lp != null) Chat.info("&aEstablished hook in LuckPerms.");
-            else Chat.info("&eCannot establish hook in LuckPerms.");
-        }
     }
 
     private void removeCompletedCommand(int id) {
@@ -738,18 +740,20 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     }
 
     private void registerListeners() {
-        listenerRegistry.registerListener(new ListenerCompound<>(new PlayerPostTeleportListener(this)), config.getEventPriority("PlayerPostTeleportEvent"), this);
-        listenerRegistry.registerListener(new ListenerCompound<>(new PlayerTeleportCancelledListener(this)), config.getEventPriority("PlayerTeleportCancelledEvent"), this);
+        listenerRegistry.registerListener(new AsyncPlayerChatListener(AsyncPlayerChatEvent.class, this), config.getEventPriority("AsyncPlayerChatEvent"), this);
 
-        listenerRegistry.registerListener(new ListenerCompound<>(new EntityDamageListener(this)), config.getEventPriority("EntityDamageEvent"), this);
+        listenerRegistry.registerListener(new PlayerPostTeleportListener(PlayerPostTeleportEvent.class, this), config.getEventPriority("PlayerPostTeleportEvent"), this);
+        listenerRegistry.registerListener(new PlayerTeleportCancelledListener(PlayerTeleportCancelledEvent.class, this), config.getEventPriority("PlayerTeleportCancelledEvent"), this);
 
-        listenerRegistry.registerListener(new ListenerCompound<>(new AsyncPlayerChatListener(this)), config.getEventPriority("AsyncPlayerChatEvent"), this);
-        listenerRegistry.registerListener(new ListenerCompound<>(new PlayerCommandPreprocessListener(this)), config.getEventPriority("PlayerCommandPreprocessEvent"), this);
-        listenerRegistry.registerListener(new ListenerCompound<>(new PlayerDeathListener(this)), config.getEventPriority("PlayerDeathEvent"), this);
-        listenerRegistry.registerListener(new ListenerCompound<>(new PlayerJoinListener(this)), config.getEventPriority("PlayerJoinEvent"), this);
-        listenerRegistry.registerListener(new ListenerCompound<>(new PlayerQuitListener(this)), config.getEventPriority("PlayerQuitEvent"), this);
-        listenerRegistry.registerListener(new ListenerCompound<>(new PlayerRespawnListener(this)), config.getEventPriority("PlayerRespawnEvent"), this);
-        listenerRegistry.registerListener(new ListenerCompound<>(new PlayerTeleportListener(this)), config.getEventPriority("PlayerTeleportEvent"), this);
+        listenerRegistry.registerListener(new EntityDamageListener(EntityDamageEvent.class, this), config.getEventPriority("EntityDamageEvent"), this);
+
+        listenerRegistry.registerListener(new AsyncPlayerChatListener(AsyncPlayerChatEvent.class, this), config.getEventPriority("AsyncPlayerChatEvent"), this);
+        listenerRegistry.registerListener(new PlayerCommandPreprocessListener(PlayerCommandPreprocessEvent.class, this), config.getEventPriority("PlayerCommandPreprocessEvent"), this);
+        listenerRegistry.registerListener(new PlayerDeathListener(PlayerDeathEvent.class, this), config.getEventPriority("PlayerDeathEvent"), this);
+        listenerRegistry.registerListener(new PlayerJoinListener(PlayerJoinEvent.class, this), config.getEventPriority("PlayerJoinEvent"), this);
+        listenerRegistry.registerListener(new PlayerQuitListener(PlayerQuitEvent.class, this), config.getEventPriority("PlayerQuitEvent"), this);
+        listenerRegistry.registerListener(new PlayerRespawnListener(PlayerRespawnEvent.class, this), config.getEventPriority("PlayerRespawnEvent"), this);
+        listenerRegistry.registerListener(new PlayerTeleportListener(PlayerTeleportEvent.class, this), config.getEventPriority("PlayerTeleportEvent"), this);
     }
 
     private void registerCommands() {
@@ -846,9 +850,6 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         config.modules.forEach((module, enabled) -> Chat.info("&b" + module + (enabled ? " &2enabled" : " &4disabled") + "&b."));
 
         Chat.info("&eAIO listeners:");
-        config.eventPriorities.forEach((event, priority) -> Chat.info("&b" + event + "&e" + priority + "&b."));
-
-        Chat.info("&eAIO commands:");
-        commandRegistry.getRegisteredCommands().forEach(command -> Chat.info("&b" + command.getName() + " aliases &e" + Arrays.toString(command.getAliases().toArray()) + "&b."));
+        config.eventPriorities.forEach((event, priority) -> Chat.info("&b" + event + " &e" + priority + "&b priority."));
     }
 }

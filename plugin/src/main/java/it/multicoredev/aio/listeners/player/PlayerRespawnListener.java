@@ -30,8 +30,8 @@ import org.jetbrains.annotations.NotNull;
 public class PlayerRespawnListener extends PluginListenerExecutor<PlayerRespawnEvent> {
     private final SpawnModule spawnModule;
 
-    public PlayerRespawnListener(AIO aio) {
-        super(aio);
+    public PlayerRespawnListener(Class<PlayerRespawnEvent> eventClass, AIO aio) {
+        super(eventClass, aio);
         this.spawnModule = aio.getModuleManager().getModule(SpawnModule.class);
     }
 

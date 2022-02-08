@@ -5,7 +5,6 @@ import it.multicoredev.aio.api.utils.PlaceholderUtils;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
 import it.multicoredev.aio.storage.config.modules.ChatModule;
 import it.multicoredev.aio.storage.config.modules.PingModule;
-import it.multicoredev.aio.utils.PermissionUtils;
 import it.multicoredev.aio.utils.Utils;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.Bukkit;
@@ -44,8 +43,8 @@ public class AsyncPlayerChatListener extends PluginListenerExecutor<AsyncPlayerC
     private final ChatModule chatModule;
     private final PingModule pingModule;
 
-    public AsyncPlayerChatListener(AIO aio) {
-        super(aio);
+    public AsyncPlayerChatListener(Class<AsyncPlayerChatEvent> eventClass, AIO aio) {
+        super(eventClass, aio);
         chatModule = aio.getModuleManager().getModule(ChatModule.class);
         pingModule = aio.getModuleManager().getModule(PingModule.class);
     }
@@ -105,10 +104,10 @@ public class AsyncPlayerChatListener extends PluginListenerExecutor<AsyncPlayerC
             if (pingModule.pingGroups) {
                 if (!sender.hasPermission("aio.chat.ping.groups")) return;
 
-                for (String group : PermissionUtils.getGroups()) {
+                for (String group : aio.getPermissionHandler().getGroups()) {
                     if (msg.contains(group.toLowerCase(Locale.ROOT))) {
                         for (Player player : Bukkit.getOnlinePlayers()) {
-                            if (PermissionUtils.isInGroup(player, group)) {
+                            if (aio.getPermissionHandler().isInGroup(player, group)) {
                                 pendingPings.put(player, 2);
                             }
                         }
@@ -151,7 +150,7 @@ public class AsyncPlayerChatListener extends PluginListenerExecutor<AsyncPlayerC
         String group = "";
 
         if (VAULT || LUCKPERMS) {
-            List<String> groups = PermissionUtils.getPlayerGroups(player);
+            List<String> groups = aio.getPermissionHandler().getPlayerGroups(player);
 
             if (groups == null || groups.isEmpty()) {
                 format = chatModule.chatFormat;

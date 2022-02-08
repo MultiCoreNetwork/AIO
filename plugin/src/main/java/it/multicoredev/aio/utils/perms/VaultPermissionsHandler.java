@@ -1,14 +1,19 @@
-package it.multicoredev.aio.api.listeners;
+package it.multicoredev.aio.utils.perms;
 
-import com.google.common.base.Preconditions;
-import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
+import it.multicoredev.aio.AIO;
+import it.multicoredev.mbcore.spigot.Chat;
+import net.milkbowl.vault.permission.Permission;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+
 /**
- * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
+ * Copyright © 2022 by Lorenzo Magni
  * This file is part of AIO.
  * AIO is under "The 3-Clause BSD License", you can find a copy <a href="https://opensource.org/licenses/BSD-3-Clause">here</a>.
  * <p>
@@ -27,17 +32,37 @@ import org.jetbrains.annotations.NotNull;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class ListenerHigh<T extends Event> implements Listener {
-    private final ListenerExecutor<T> listener;
+public class VaultPermissionsHandler implements IPermissionsHandler {
+    private final Permission vaultPerms;
 
-    ListenerHigh(@NotNull ListenerExecutor<T> listener) {
-        Preconditions.checkNotNull(listener);
+    public VaultPermissionsHandler(@NotNull AIO aio) {
+        RegisteredServiceProvider<Permission> serviceProvider = aio.getServer().getServicesManager().getRegistration(Permission.class);
+        if (serviceProvider == null) {
+            Chat.info("&eCannot establish hook in Vault Permissions.");
+            throw new RuntimeException("Cannot establish hook in Vault Permissions.");
+        }
 
-        this.listener = listener;
+        vaultPerms = serviceProvider.getProvider();
+        Chat.info("&aEstablished hook in Vault Permissions.");
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onEvent(T event) {
-        listener.onEvent(event);
+    @Override
+    public List<String> getGroups() {
+        return Arrays.asList(vaultPerms.getGroups());
+    }
+
+    @Override
+    public List<String> getPlayerGroups(@NotNull Player player) {
+        return Arrays.stream(vaultPerms.getPlayerGroups(player)).map(group -> group.toLowerCase(Locale.ROOT)).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean isInGroup(@NotNull Player player, @NotNull String group) {
+        List<String> playerGroups = getPlayerGroups(player);
+        for (String g : playerGroups) {
+            if (g.equalsIgnoreCase(group)) return true;
+        }
+
+        return false;
     }
 }
