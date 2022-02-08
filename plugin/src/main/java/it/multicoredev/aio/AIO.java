@@ -138,6 +138,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     //TODO Add error to preconditions
     //TODO Reset module name when loading
     //TODO Change command syntax to /command [on|off|toggle] [player]
+    //TODO To fix usermap
 
     @Override
     public void onEnable() {
