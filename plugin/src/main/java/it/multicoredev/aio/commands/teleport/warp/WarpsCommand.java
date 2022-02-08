@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -39,7 +40,13 @@ public class WarpsCommand extends PluginCommand {
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!super.execute(sender, label, args)) return true;
-        Chat.send(PlaceholderUtils.replacePlaceholders(localization.availableWarps, "{WARPS}", Arrays.toString(aio.getWarpStorage().getWarpNames(sender).toArray())), sender);
+
+        List<String> warpNames = aio.getWarpStorage().getWarpNames(sender);
+
+        if (warpNames.isEmpty()) Chat.send(localization.noWarps, sender);
+        else
+            Chat.send(PlaceholderUtils.replacePlaceholders(localization.availableWarps, "{WARPS}", Arrays.toString(aio.getWarpStorage().getWarpNames(sender).toArray())), sender);
+
         return true;
     }
 }

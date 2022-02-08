@@ -282,6 +282,12 @@ public class Localization extends JsonConfig {
 
     public String trash;
 
+    @SerializedName("available_warps")
+    public String availableWarps;
+    @SerializedName("invalid_warp_mode")
+    public String invalidWarpMode;
+    @SerializedName("no_warps")
+    public String noWarps;
     @SerializedName("warp_already_existing")
     public String warpAlreadyExist;
     @SerializedName("warp_created")
@@ -292,8 +298,7 @@ public class Localization extends JsonConfig {
     public String warpNotFound;
     @SerializedName("warp_not_global")
     public String warpNotGlobal;
-    @SerializedName("available_warps")
-    public String availableWarps;
+
     @SerializedName("weather_set_rain")
     public String weatherSetRain;
     @SerializedName("weather_set_sun")
@@ -401,7 +406,7 @@ public class Localization extends JsonConfig {
         if (hatSuccess == null) hatSuccess = "&hYou wore your hat!";
         if (preventHat == null) preventHat = "&hYou can't wear as hat this item!";
 
-        if (availableHomes == null) availableHomes = "&hLe home disponibili sono: {HOMES}!";
+        if (availableHomes == null) availableHomes = "&hAvailable homes: {HOMES}";
         if (homeAlreadyExists == null) homeAlreadyExists = "&cAn home with this name already exists!";
         if (homeDeleted == null) homeDeleted = "&hHome deleted!";
         if (homeLimitExceeded == null) homeLimitExceeded = "&cYou can't set another home! Limit exceeded!";
@@ -466,12 +471,15 @@ public class Localization extends JsonConfig {
 
         if (trash == null) trash = "Trash Can";
 
+        if (availableWarps == null) availableWarps = "&hWarps available are: {WARPS}";
+        if (invalidWarpMode == null) invalidWarpMode ="&cInvalid warp mode! Only global or local are allowed!";
+        if (noWarps == null) noWarps = "&hNo warps available.";
         if (warpAlreadyExist == null) warpAlreadyExist = "&cWarp already exists!";
         if (warpCreated == null) warpCreated = "&hWarp created!";
         if (warpDeleted == null) warpDeleted = "&hWarp deleted!";
         if (warpNotFound == null) warpNotFound = "&cWarp not found!";
         if (warpNotGlobal == null) warpNotGlobal = "&cYou can teleport to this warp only from world: {WORLD}!";
-        if (availableWarps == null) availableWarps = "&hI warp disponibili sono: {WARPS}!";
+
         if (weatherSetRain == null) weatherSetRain = "&gWeather set to rain in world {WORLD}.";
         if (weatherSetSun == null) weatherSetSun = "&eWeather set to sunny in world {WORLD}.";
         if (weatherSetThunder == null) weatherSetThunder = "&hWeather set to storm in world {WORLD}.";

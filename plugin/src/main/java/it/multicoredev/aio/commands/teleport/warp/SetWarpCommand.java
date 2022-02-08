@@ -57,7 +57,15 @@ public class SetWarpCommand extends PluginCommand {
             incorrectUsage(sender);
             return true;
         } else {
-            if (args[1].equalsIgnoreCase("local")) global = false;
+            if (args.length > 1) {
+                String mode = args[1];
+
+                if (mode.equalsIgnoreCase("local")) global = false;
+                else if (!mode.equalsIgnoreCase("global")) {
+                    Chat.send(localization.invalidWarpMode, sender);
+                    return true;
+                }
+            }
         }
 
         String name = args[0];

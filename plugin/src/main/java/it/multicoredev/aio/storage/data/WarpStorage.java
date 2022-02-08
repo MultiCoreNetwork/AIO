@@ -1,19 +1,16 @@
 package it.multicoredev.aio.storage.data;
 
 import com.google.common.base.Preconditions;
-import com.google.gson.annotations.Expose;
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.IWarpStorage;
 import it.multicoredev.aio.api.models.Warp;
 import it.multicoredev.mbcore.spigot.Chat;
 import it.multicoredev.mclib.json.JsonConfig;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,6 +80,8 @@ public class WarpStorage extends JsonConfig implements IWarpStorage {
     @Override
     public List<String> getWarpNames(CommandSender sender) {
         List<String> warpList = new ArrayList<>();
+
+        if (warps.isEmpty()) return warpList;
 
         for (Warp warp : warps) {
             if (sender.hasPermission("aio.warp." + warp.getName())) warpList.add(warp.getName());

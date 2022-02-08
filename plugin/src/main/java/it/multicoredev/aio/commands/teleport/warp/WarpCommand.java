@@ -48,6 +48,11 @@ public class WarpCommand extends PluginCommand {
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!super.execute(sender, label, args)) return true;
 
+        if (args.length == 0) {
+            incorrectUsage(sender);
+            return true;
+        }
+
         Player target;
 
         if (isPlayer(sender)) {
@@ -116,5 +121,6 @@ public class WarpCommand extends PluginCommand {
     public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
         if (args.length == 1) return aio.getWarpStorage().getWarpNames(sender);
         else if (args.length == 2) return TabCompleterUtil.getPlayers(args[1], sender.hasPermission("pv.see"));
-        else return new ArrayList<>();    }
+        else return new ArrayList<>();
+    }
 }
