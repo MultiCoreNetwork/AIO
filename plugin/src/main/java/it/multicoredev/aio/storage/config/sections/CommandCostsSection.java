@@ -1,11 +1,10 @@
-package it.multicoredev.aio.listeners.player;
+package it.multicoredev.aio.storage.config.sections;
 
-import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.api.User;
-import it.multicoredev.aio.listeners.PluginListenerExecutor;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.jetbrains.annotations.NotNull;
+import com.google.gson.annotations.SerializedName;
+import it.multicoredev.mclib.json.JsonConfig;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -27,26 +26,35 @@ import org.jetbrains.annotations.NotNull;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class PlayerDeathListener extends PluginListenerExecutor<PlayerDeathEvent> {
+public class CommandCostsSection extends JsonConfig {
+    @SerializedName("command_costs_enabled")
+    public Boolean costsEnabled;
+    @SerializedName("commands_costs")
+    public Map<String, Integer> commandCosts;
 
-    public PlayerDeathListener(Class<PlayerDeathEvent> eventClass, AIO aio) {
-        super(eventClass, aio);
+    public CommandCostsSection() {
+        init();
     }
 
     @Override
-    public void onEvent(@NotNull PlayerDeathEvent event) {
-        Player player = event.getEntity();
+    protected void init() {
+        if (costsEnabled == null) costsEnabled = false;
+        if (commandCosts == null) commandCosts = new HashMap<>();
+    }
 
-        if (config.disablePlayerDeathMessages) event.setDeathMessage(null);
-
-        User user = storage.getUser(player);
-        if (user != null) {
-            user.setLastLocation(player.getLocation());
-            storage.updateUserAsync(user);
+    public int getCommandCost(String command) {
+        for (Map.Entry<String, Integer> cmd : commandCosts.entrySet()) {
+            if (cmd.getKey().equalsIgnoreCase(command) && cmd.getValue() > 0) return cmd.getValue();
         }
 
-        if (aio.getTeleportManager().hasPendingTeleport(player)) {
-            aio.getTeleportManager().cancelTeleport(player, localization.teleportCancelled);
+        return 0;
+    }
+
+    public boolean hasCommandCost(String command) {
+        for (Map.Entry<String, Integer> cmd : commandCosts.entrySet()) {
+            if (cmd.getKey().equalsIgnoreCase(command) && cmd.getValue() > 0) return true;
         }
+
+        return false;
     }
 }

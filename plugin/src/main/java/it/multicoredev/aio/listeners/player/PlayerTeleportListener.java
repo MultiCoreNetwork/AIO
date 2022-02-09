@@ -3,7 +3,6 @@ package it.multicoredev.aio.listeners.player;
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.User;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -49,12 +48,10 @@ public class PlayerTeleportListener extends PluginListenerExecutor<PlayerTelepor
                 event.getCause().equals(PlayerTeleportEvent.TeleportCause.CHORUS_FRUIT))
             return;
 
-        Bukkit.getScheduler().runTaskAsynchronously(aio, () -> {
-            User user = aio.getStorage().getUser(player.getUniqueId());
-            if (user != null) {
-                user.setLastLocation(from);
-                aio.getStorage().updateUser(user);
-            }
-        });
+        User user = aio.getStorage().getUser(player.getUniqueId());
+        if (user != null) {
+            user.setLastLocation(from);
+            aio.getStorage().updateUserAsync(user);
+        }
     }
 }

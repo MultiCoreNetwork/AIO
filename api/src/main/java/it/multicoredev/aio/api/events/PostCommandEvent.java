@@ -1,10 +1,8 @@
-package it.multicoredev.aio.commands.player.kits;
+package it.multicoredev.aio.api.events;
 
-import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.utils.PlaceholderUtils;
-import it.multicoredev.aio.commands.PluginCommand;
-import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -27,20 +25,71 @@ import org.jetbrains.annotations.NotNull;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class KitsCommand extends PluginCommand {
-    private static final String CMD = "kits";
+public class PostCommandEvent extends Event {
+    private static final HandlerList HANDLERS = new HandlerList();
 
-    //TODO Divide in pages if needed
+    private final CommandSender sender;
+    private final String command;
+    private final String[] args;
+    private final boolean success;
 
-    public KitsCommand(AIO aio) {
-        super(aio, CMD);
+    /**
+     * PostCommandEvent is called after a command registered is executed;
+     *
+     * @param sender  the sender of the command.
+     * @param command the command that was executed.
+     * @param args    the arguments of the command.
+     * @param success true if the command was executed successfully, false otherwise.
+     */
+    public PostCommandEvent(@NotNull CommandSender sender, @NotNull String command, @NotNull String[] args, boolean success) {
+        this.sender = sender;
+        this.command = command;
+        this.args = args;
+        this.success = success;
     }
 
     @Override
-    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preCommandProcess(sender, getName(), args)) return true;
+    public HandlerList getHandlers() {
+        return HANDLERS;
+    }
 
-        Chat.send(PlaceholderUtils.replacePlaceholders(localization.availableWarps, "{KITS}", String.join(", ", aio.getKitStorage().getKitNames(sender))), sender);
-        return true;
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
+    /**
+     * Get the sender of the command.
+     *
+     * @return the sender of the command.
+     */
+    public CommandSender getCommandSender() {
+        return sender;
+    }
+
+    /**
+     * Get the command that was executed.
+     *
+     * @return the command that was executed.
+     */
+    public String getCommand() {
+        return command;
+    }
+
+    /**
+     * Get the arguments of the command.
+     *
+     * @return the arguments of the command.
+     */
+    public String[] getArgs() {
+        return args;
+    }
+
+    /**
+     * Get if the command was successful.
+     *
+     * @return true if the command was successful, false otherwise.
+     */
+    public boolean isSuccess() {
+        return success;
     }
 }

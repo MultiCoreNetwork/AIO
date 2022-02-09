@@ -43,7 +43,7 @@ public class RainCommand extends PluginCommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!super.execute(sender, label, args)) return true;
+        if (!preCommandProcess(sender, getName(), args)) return true;
 
         World world = null;
 

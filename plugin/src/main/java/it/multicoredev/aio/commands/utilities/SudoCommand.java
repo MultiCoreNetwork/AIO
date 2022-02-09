@@ -42,10 +42,11 @@ public class SudoCommand extends PluginCommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!super.execute(sender, label, args)) return true;
+        if (!preCommandProcess(sender, getName(), args)) return true;
 
         if (args.length < 2) {
             incorrectUsage(sender);
+            postCommandProcess(sender, getName(), args, false);
             return true;
         }
 
@@ -53,6 +54,7 @@ public class SudoCommand extends PluginCommand {
         if (args[0].equalsIgnoreCase("console")) {
             if (!hasSubPerm(sender, "console")) {
                 insufficientPerms(sender);
+                postCommandProcess(sender, getName(), args, false);
                 return true;
             }
 
@@ -62,11 +64,13 @@ public class SudoCommand extends PluginCommand {
 
             if (target == null || !((Player) target).isOnline()) {
                 Chat.send(localization.playerNotFound, sender);
+                postCommandProcess(sender, getName(), args, false);
                 return true;
             }
 
             if (hasSubPerm(target, "prevent")) {
                 Chat.send(localization.sudoPrevent, sender);
+                postCommandProcess(sender, getName(), args, false);
                 return true;
             }
         }
@@ -79,11 +83,13 @@ public class SudoCommand extends PluginCommand {
                 ((Player) target).chat(input);
             } else {
                 Chat.send(localization.sudoFailed, sender);
+                postCommandProcess(sender, getName(), args, false);
                 return true;
             }
         }
 
         Chat.send(localization.sudoSuccess, sender);
+        postCommandProcess(sender, getName(), args, true);
         return true;
     }
 

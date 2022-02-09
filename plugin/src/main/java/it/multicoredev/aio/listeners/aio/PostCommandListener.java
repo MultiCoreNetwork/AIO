@@ -1,14 +1,13 @@
-package it.multicoredev.aio.listeners.player;
+package it.multicoredev.aio.listeners.aio;
 
 import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.api.User;
+import it.multicoredev.aio.api.events.PostCommandEvent;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
+ * Copyright © 2022 by Lorenzo Magni
  * This file is part of AIO.
  * AIO is under "The 3-Clause BSD License", you can find a copy <a href="https://opensource.org/licenses/BSD-3-Clause">here</a>.
  * <p>
@@ -27,26 +26,17 @@ import org.jetbrains.annotations.NotNull;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class PlayerDeathListener extends PluginListenerExecutor<PlayerDeathEvent> {
+public class PostCommandListener extends PluginListenerExecutor<PostCommandEvent> {
 
-    public PlayerDeathListener(Class<PlayerDeathEvent> eventClass, AIO aio) {
+    public PostCommandListener(Class<PostCommandEvent> eventClass, AIO aio) {
         super(eventClass, aio);
     }
 
     @Override
-    public void onEvent(@NotNull PlayerDeathEvent event) {
-        Player player = event.getEntity();
+    public void onEvent(@NotNull PostCommandEvent event) {
+        if (!(event.getCommandSender() instanceof Player)) return;
+        Player player = (Player) event.getCommandSender();
 
-        if (config.disablePlayerDeathMessages) event.setDeathMessage(null);
-
-        User user = storage.getUser(player);
-        if (user != null) {
-            user.setLastLocation(player.getLocation());
-            storage.updateUserAsync(user);
-        }
-
-        if (aio.getTeleportManager().hasPendingTeleport(player)) {
-            aio.getTeleportManager().cancelTeleport(player, localization.teleportCancelled);
-        }
+        if (config.commandsCooldown.cooldownEnabled && event.isSuccess()) aio.addCommandCooldown(player, event.getCommand());
     }
 }

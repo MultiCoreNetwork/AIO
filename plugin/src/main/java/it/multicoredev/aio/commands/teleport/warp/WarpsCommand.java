@@ -39,7 +39,7 @@ public class WarpsCommand extends PluginCommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!super.execute(sender, label, args)) return true;
+        if (!preCommandProcess(sender, getName(), args)) return true;
 
         List<String> warpNames = aio.getWarpStorage().getWarpNames(sender);
 

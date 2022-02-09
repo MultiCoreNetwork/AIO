@@ -4,10 +4,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import it.multicoredev.aio.api.Module;
 import it.multicoredev.aio.api.*;
 import it.multicoredev.aio.api.events.PlayerPostTeleportEvent;
 import it.multicoredev.aio.api.events.PlayerTeleportCancelledEvent;
+import it.multicoredev.aio.api.events.PostCommandEvent;
 import it.multicoredev.aio.api.listeners.IListenerRegistry;
 import it.multicoredev.aio.api.models.CommandData;
 import it.multicoredev.aio.api.tp.ITeleportManager;
@@ -33,6 +33,7 @@ import it.multicoredev.aio.commands.utilities.*;
 import it.multicoredev.aio.commands.utilities.time_and_weather.*;
 import it.multicoredev.aio.listeners.aio.PlayerPostTeleportListener;
 import it.multicoredev.aio.listeners.aio.PlayerTeleportCancelledListener;
+import it.multicoredev.aio.listeners.aio.PostCommandListener;
 import it.multicoredev.aio.listeners.entity.EntityDamageListener;
 import it.multicoredev.aio.listeners.player.*;
 import it.multicoredev.aio.storage.config.Commands;
@@ -56,6 +57,7 @@ import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -69,10 +71,7 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -127,7 +126,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     private CommandRegistry commandRegistry;
     private ListenerRegistry listenerRegistry;
     private TeleportManager tpManager;
-    //private Map<UUID, Map<String, Date>> commandsCooldown;
+    private Map<UUID, Map<String, Date>> commandCooldown;
     private AIOEconomy economy;
     private PermissionHandler permissionHandler;
     private IPlaceholdersUtils placeholdersUtils;
@@ -184,7 +183,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         listenerRegistry = new ListenerRegistry();
         tpManager = new TeleportManager();
 
-        //if (config.commandsCooldown.cooldownEnabled) commandsCooldown = new HashMap<>();
+        if (config.commandCooldown.cooldownEnabled) commandCooldown = new HashMap<>();
 
         initDependencies();
 
@@ -311,42 +310,41 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         }).start();
     }
 
-//    public void addCommandCooldown(Player player, String command) {
-//        if (!config.commandsCooldown.hasCommandCooldown(command)) return;
-//        if (player.hasPermission("aio.no-commands-cooldown")) return;
-//
-//        UUID uuid = player.getUniqueId();
-//        if (commandsCooldown.containsKey(uuid)) {
-//            Map<String, Date> commands = commandsCooldown.get(uuid);
-//            commands.put(command, new Date());
-//        } else {
-//            Map<String, Date> commands = new HashMap<>();
-//            commands.put(command, new Date());
-//            commandsCooldown.put(uuid, commands);
-//        }
-//    }
+    public void addCommandCooldown(Player player, String command) {
+        if (!config.commandCooldown.hasCommandCooldown(command)) return;
+        if (player.hasPermission("aio.no-commands-cooldown")) return;
 
-//    public boolean hasCommandCooldown(Player player, String command) {
-//        if (!config.commandsCooldown.cooldownEnabled) return false;
-//        UUID uuid = player.getUniqueId();
-//
-//        if (!commandsCooldown.containsKey(uuid)) return false;
-//
-//        Map<String, Date> commands = commandsCooldown.get(uuid);
-//        if (!commands.containsKey(command)) return false;
-//
-//        Date date = commands.get(command);
-//        int difference = (int) ((new Date().getTime() - date.getTime()) / 1000);
-//        int cooldown = config.commandsCooldown.getCommandCooldown(command);
-//
-//        if (difference > cooldown) {
-//            commands.remove(command);
-//            return false;
-//        }
-//
-//        Chat.send(localization.commandCooldown.replace("{TIME}", String.valueOf(cooldown - difference)), player);
-//        return true;
-//    }
+        UUID uuid = player.getUniqueId();
+        if (commandCooldown.containsKey(uuid)) {
+            Map<String, Date> commands = commandCooldown.get(uuid);
+            commands.put(command, new Date());
+        } else {
+            Map<String, Date> commands = new HashMap<>();
+            commands.put(command, new Date());
+            commandCooldown.put(uuid, commands);
+        }
+    }
+
+    public int hasCommandCooldown(Player player, String command) {
+        if (!config.commandCooldown.cooldownEnabled) return -1;
+        UUID uuid = player.getUniqueId();
+
+        if (!commandCooldown.containsKey(uuid)) return -1;
+
+        Map<String, Date> commands = commandCooldown.get(uuid);
+        if (!commands.containsKey(command)) return -1;
+
+        Date date = commands.get(command);
+        int difference = (int) ((new Date().getTime() - date.getTime()) / 1000);
+        int cooldown = config.commandCooldown.getCommandCooldown(command);
+
+        if (difference > cooldown) {
+            commands.remove(command);
+            return -1;
+        }
+
+        return cooldown - difference;
+    }
 
     public Map<UUID, User> getUsersCache() {
         return usersCache;
@@ -765,10 +763,9 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     }
 
     private void registerListeners() {
-        listenerRegistry.registerListener(new AsyncPlayerChatListener(AsyncPlayerChatEvent.class, this), config.getEventPriority("AsyncPlayerChatEvent"), this);
-
         listenerRegistry.registerListener(new PlayerPostTeleportListener(PlayerPostTeleportEvent.class, this), config.getEventPriority("PlayerPostTeleportEvent"), this);
         listenerRegistry.registerListener(new PlayerTeleportCancelledListener(PlayerTeleportCancelledEvent.class, this), config.getEventPriority("PlayerTeleportCancelledEvent"), this);
+        listenerRegistry.registerListener(new PostCommandListener(PostCommandEvent.class, this), config.getEventPriority("PostCommandEvent"), this);
 
         listenerRegistry.registerListener(new EntityDamageListener(EntityDamageEvent.class, this), config.getEventPriority("EntityDamageEvent"), this);
 

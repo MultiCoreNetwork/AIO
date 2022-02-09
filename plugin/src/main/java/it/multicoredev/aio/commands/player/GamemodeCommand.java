@@ -43,7 +43,7 @@ public class GamemodeCommand extends PluginCommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!super.execute(sender, label, args)) return true;
+        if (!preCommandProcess(sender, getName(), args)) return true;
 
         if (args.length < 1) {
             incorrectUsage(sender);

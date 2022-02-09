@@ -4,16 +4,18 @@ import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.BasePluginCommand;
 import it.multicoredev.aio.api.IStorage;
 import it.multicoredev.aio.api.models.CommandData;
-import it.multicoredev.aio.utils.PlaceholderUtils;
 import it.multicoredev.aio.storage.config.Config;
 import it.multicoredev.aio.storage.config.Localization;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static it.multicoredev.aio.AIO.VAULT;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -55,17 +57,46 @@ public abstract class PluginCommand extends BasePluginCommand {
         this(aio, name, aio.getCommandData(name));
     }
 
-    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
+    @Override
+    public abstract boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args);
+
+    @Override
+    public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
+        return new ArrayList<>();
+    }
+
+    public boolean preCommandProcess(@NotNull CommandSender sender, @NotNull String command, @NotNull String[] args) {
         if (!hasCommandPerm(sender)) {
             insufficientPerms(sender);
             return false;
         }
 
+        if (config.commandCosts.costsEnabled && VAULT && isPlayer(sender) && config.commandCosts.hasCommandCost(getName()) && !sender.hasPermission("aio.bypass.costs")) {
+            Player player = (Player) sender;
+
+            int cost = Math.abs(config.commandCosts.getCommandCost(getName()));
+
+            if (aio.getEconomy().has(player, cost)) {
+                aio.getEconomy().withdrawPlayer(player, cost);
+            } else {
+                Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(localization.insufficientCmdMoney, "{MONEY}", aio.getEconomy().format(cost)), player);
+                return false;
+            }
+        }
+
+
         return true;
     }
 
-    public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
-        return new ArrayList<>();
+    @Override
+    protected void postCommandProcess(CommandSender sender, String command, String[] args, boolean success) {
+        if (config.commandCosts.costsEnabled && VAULT && isPlayer(sender) && config.commandCosts.hasCommandCost(getName()) && !sender.hasPermission("aio.bypass.costs")) {
+            Player player = (Player) sender;
+            int cost = Math.abs(config.commandCosts.getCommandCost(getName()));
+            aio.getEconomy().depositPlayer(player, cost);
+        }
+
+        super.postCommandProcess(sender, command, args, success);
     }
 
     protected boolean hasCommandPerm(CommandSender sender) {
@@ -95,6 +126,6 @@ public abstract class PluginCommand extends BasePluginCommand {
     private void sendIncorrectUsage(CommandSender sender, List<String> usages) {
         StringBuilder builder = new StringBuilder();
         for (String usage : usages) builder.append(usage).append("\n");
-        Chat.send(PlaceholderUtils.replacePlaceholders(localization.incorrectUsage, new String[]{"{USAGE}", "{ALIAS}"}, new String[]{builder.toString(), Arrays.toString(commandData.getAlias().toArray())}), sender);
+        Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(localization.incorrectUsage, new String[]{"{USAGE}", "{ALIAS}"}, new String[]{builder.toString(), Arrays.toString(commandData.getAlias().toArray())}), sender);
     }
 }

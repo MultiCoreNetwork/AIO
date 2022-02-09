@@ -1,5 +1,6 @@
 package it.multicoredev.aio.api;
 
+import it.multicoredev.aio.api.events.PostCommandEvent;
 import it.multicoredev.aio.api.models.CommandData;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -78,6 +79,7 @@ public abstract class BasePluginCommand extends Command {
     /**
      * Executes the given command, returning its success.
      * If false is returned, then the "usage" plugin.yml entry for this command (if defined) will be sent to the player.
+     * Remember to call postCommandEvent method after the command execution.
      *
      * @param sender The source of the command.
      * @param label  Alias of the command which was used.
@@ -107,6 +109,18 @@ public abstract class BasePluginCommand extends Command {
      */
     protected boolean isPlayer(CommandSender sender) {
         return sender instanceof Player;
+    }
+
+    /**
+     * Fire the {@link PostCommandEvent} after the command has been executed.
+     *
+     * @param sender  The source of the command.
+     * @param command The command that was executed.
+     * @param args    The arguments passed to the command.
+     * @param success Whether the command was successful or not.
+     */
+    protected void postCommandProcess(CommandSender sender, String command, String[] args, boolean success) {
+        Bukkit.getPluginManager().callEvent(new PostCommandEvent(sender, command, args, success));
     }
 
     /**

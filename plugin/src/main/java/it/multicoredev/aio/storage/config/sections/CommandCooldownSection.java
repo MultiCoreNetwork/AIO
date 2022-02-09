@@ -26,13 +26,13 @@ import java.util.Map;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class CommandsCooldownSection extends JsonConfig {
+public class CommandCooldownSection extends JsonConfig {
     @SerializedName("commands_cooldown_enabled")
     public Boolean cooldownEnabled;
     @SerializedName("commands_cooldown")
     public Map<String, Integer> commandsCooldown;
 
-    public CommandsCooldownSection() {
+    public CommandCooldownSection() {
         init();
     }
 

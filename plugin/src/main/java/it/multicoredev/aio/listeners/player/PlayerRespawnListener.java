@@ -48,7 +48,7 @@ public class PlayerRespawnListener extends PluginListenerExecutor<PlayerRespawnE
         Location spawn = spawnModule.spawnLocation;
         if (spawn == null) return true;
 
-        event.setRespawnLocation(spawn); //TODO Check this  ---- alternative ---- player.teleport(spawn);
+        event.setRespawnLocation(spawn); //TODO If this doesn't work use: player.teleport(spawn);
         return true;
     }
 }

@@ -1,7 +1,6 @@
 package it.multicoredev.aio.listeners.player;
 
 import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.utils.PlaceholderUtils;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
 import it.multicoredev.aio.storage.config.modules.ChatModule;
 import it.multicoredev.aio.storage.config.modules.PingModule;
@@ -171,12 +170,12 @@ public class AsyncPlayerChatListener extends PluginListenerExecutor<AsyncPlayerC
 
         if (format == null) format = chatModule.chatFormat;
 
-        format = PlaceholderUtils.replacePlaceholders(
+        format = aio.getPlaceholdersUtils().replacePlaceholders(
                 format,
                 new String[]{"{DISPLAYNAME}", "{NAME}", "{GROUP}"},
                 new Object[]{player.getName(), player.getDisplayName(), group});
 
-        if (player.hasPermission("aio.chat.placeholders")) message = PlaceholderUtils.replacePlaceholders(message);
+        if (player.hasPermission("aio.chat.placeholders")) message = aio.getPlaceholdersUtils().replacePlaceholders(message);
 
         return Chat.getTranslated(format).replace("{MESSAGE}", Chat.getTranslated(message, player, "aio.chat-colors"));
     }

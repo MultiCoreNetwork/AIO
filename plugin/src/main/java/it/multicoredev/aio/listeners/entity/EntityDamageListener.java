@@ -38,9 +38,7 @@ public class EntityDamageListener extends PluginListenerExecutor<EntityDamageEve
         if (!(event.getEntity() instanceof Player)) return;
 
         Player player = (Player) event.getEntity();
-        if (!storage.userExists(player)) return;
         User user = storage.getUser(player);
-
-        if (user.hasGod()) event.setCancelled(true);
+        if (user != null && user.hasGod()) event.setCancelled(true);
     }
 }

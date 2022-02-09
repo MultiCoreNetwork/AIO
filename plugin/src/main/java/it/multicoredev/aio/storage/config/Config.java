@@ -38,8 +38,10 @@ public class Config extends JsonConfig {
 
     @SerializedName("storage")
     public StorageSection storageSection;
-    @SerializedName("commands_cooldown")
-    public CommandsCooldownSection commandsCooldown;
+    @SerializedName("command_costs")
+    public CommandCostsSection commandCosts;
+    @SerializedName("command_cooldown")
+    public CommandCooldownSection commandCooldown;
     @SerializedName("help_book")
     public HelpBookSection helpBookSection;
     @SerializedName("nickname")
@@ -79,6 +81,7 @@ public class Config extends JsonConfig {
         if (eventPriorities == null) eventPriorities = new HashMap<>();
         if (!eventPriorities.containsKey("PlayerPostTeleportEvent")) eventPriorities.put("PlayerPostTeleportEvent", "LOWEST");
         if (!eventPriorities.containsKey("PlayerTeleportCancelledEvent")) eventPriorities.put("PlayerTeleportCancelledEvent", "NORMAL");
+        if (!eventPriorities.containsKey("PostCommandEvent")) eventPriorities.put("PostCommandEvent", "LOWEST");
 
         if (!eventPriorities.containsKey("EntityDamageEvent")) eventPriorities.put("EntityDamageEvent", "LOWEST");
 
@@ -98,7 +101,8 @@ public class Config extends JsonConfig {
         if (!eventPriorities.containsKey("PlayerTeleportEvent")) eventPriorities.put("PlayerTeleportEvent", "LOWEST");
 
         if (storageSection == null) storageSection = new StorageSection();
-        if (commandsCooldown == null) commandsCooldown = new CommandsCooldownSection();
+        if (commandCosts == null) commandCosts = new CommandCostsSection();
+        if (commandCooldown == null) commandCooldown = new CommandCooldownSection();
         if (helpBookSection == null) helpBookSection = new HelpBookSection();
         if (nicknameSection == null) nicknameSection = new NicknameSection();
         if (rtpSection == null) rtpSection = new RTPSection();

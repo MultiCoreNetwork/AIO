@@ -5,11 +5,14 @@ import it.multicoredev.aio.api.models.CommandData;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import static it.multicoredev.aio.AIO.VAULT;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -55,13 +58,11 @@ public class AliasCommand extends PluginCommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (permission != null && !sender.hasPermission(permission)) {
-            insufficientPerms(sender);
-            return false;
-        }
+        if (!preCommandProcess(sender, command, args)) return true;
 
         Bukkit.dispatchCommand(sender, command);
 
+        postCommandProcess(sender, command, args, true);
         return true;
     }
 
@@ -78,5 +79,29 @@ public class AliasCommand extends PluginCommand {
         } else {
             return new ArrayList<>();
         }
+    }
+
+    @Override
+    public boolean preCommandProcess(@NotNull CommandSender sender, @NotNull String command, @NotNull String[] args) {
+        if (permission != null && !sender.hasPermission(permission)) {
+            insufficientPerms(sender);
+            return false;
+        }
+
+        if (config.commandCosts.costsEnabled && VAULT && isPlayer(sender) && config.commandCosts.hasCommandCost(getName()) && !sender.hasPermission("aio.bypass.costs")) {
+            Player player = (Player) sender;
+
+            int cost = Math.abs(config.commandCosts.getCommandCost(getName()));
+
+            if (aio.getEconomy().has(player, cost)) {
+                aio.getEconomy().withdrawPlayer(player, cost);
+            } else {
+                Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(localization.insufficientCmdMoney, "{MONEY}", aio.getEconomy().format(cost)), player);
+                return false;
+            }
+        }
+
+
+        return true;
     }
 }

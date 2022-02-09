@@ -3,7 +3,6 @@ package it.multicoredev.aio.listeners.aio;
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.TeleportManager;
 import it.multicoredev.aio.api.events.PlayerTeleportCancelledEvent;
-import it.multicoredev.aio.utils.PlaceholderUtils;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +38,7 @@ public class PlayerTeleportCancelledListener extends PluginListenerExecutor<Play
         ((TeleportManager) aio.getTeleportManager()).removeTeleport(event.getPlayer());
 
         if (event.shouldNotify() && event.getPlayer().isOnline()) {
-            Chat.send(PlaceholderUtils.replacePlaceholders(localization.teleportCancelled, "{REASON}", event.getReason()), event.getPlayer());
+            Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(localization.teleportCancelled, "{REASON}", event.getReason()), event.getPlayer());
         }
     }
 }

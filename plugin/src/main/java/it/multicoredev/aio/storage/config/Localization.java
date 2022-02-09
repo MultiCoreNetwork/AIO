@@ -40,6 +40,8 @@ public class Localization extends JsonConfig {
     public String hours;
     @SerializedName("incorrect_usage")
     public String incorrectUsage;
+    @SerializedName("insufficient_command_money")
+    public String insufficientCmdMoney;
     @SerializedName("insufficient_permissions")
     public String insufficientPerms;
     @SerializedName("invalid_enchant")
@@ -331,6 +333,7 @@ public class Localization extends JsonConfig {
         if (hour == null) hour = "hour";
         if (hours == null) hours = "hours";
         if (incorrectUsage == null) incorrectUsage = "&cIncorrect usage! Usage:\n&e{USAGE}\n&cAlias: &e{ALIAS}";
+        if (insufficientCmdMoney == null) insufficientCmdMoney = "&cInsufficient money! You need {MONEY} to execute this command.";
         if (insufficientPerms == null) insufficientPerms = "&cInsufficient permissions!";
         if (invalidEnchant == null) invalidEnchant = "&cEnchantment not found.";
         if (invalidNumber == null) invalidNumber = "&cInvalid number!";

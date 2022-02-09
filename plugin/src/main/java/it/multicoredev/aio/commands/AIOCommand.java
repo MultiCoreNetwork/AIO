@@ -4,6 +4,7 @@ import it.multicoredev.aio.AIO;
 import it.multicoredev.mbcore.spigot.Chat;
 import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -38,15 +39,18 @@ public class AIOCommand extends PluginCommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!super.execute(sender, label, args)) return true;
+        if (!preCommandProcess(sender, getName(), args)) return true;
 
         if (args.length < 1) {
             Chat.send("&6&lAIO &f(&eAll In One&f) &bby &g&lMultiCore &h&lNetwork", sender);
+            if (isPlayer(sender)) Chat.sendRaw("[\"\",{\"text\":\"Visit our website \",\"color\":\"aqua\"},{\"text\":\"https://multicore.network\",\"underlined\":true,\"color\":\"blue\",\"clickEvent\":{\"action\":\"open_url\",\"value\":\"https://multicore.network\"}}]", (Player) sender);
+            else Chat.send("&bVisit our website &9&nhttps://multicore.network", sender);
 
             StringBuilder builder = new StringBuilder();
             for (String usage : commandData.getUsages()) builder.append("&b").append(usage).append("\n");
             Chat.send(builder.toString(), sender);
 
+            postCommandProcess(sender, getName(), args, true);
             return true;
         }
 
@@ -54,6 +58,7 @@ public class AIOCommand extends PluginCommand {
         if (subcommand.equalsIgnoreCase("reload")) {
             if (!hasSubPerm(sender, "reload")) {
                 insufficientPerms(sender);
+                postCommandProcess(sender, getName(), args, false);
                 return true;
             }
 
@@ -61,6 +66,7 @@ public class AIOCommand extends PluginCommand {
             aio.onEnable();
         }
 
+        postCommandProcess(sender, getName(), args, true);
         return true;
     }
 

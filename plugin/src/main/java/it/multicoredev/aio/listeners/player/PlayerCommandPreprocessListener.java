@@ -2,10 +2,13 @@ package it.multicoredev.aio.listeners.player;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
+import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 import java.util.Locale;
+
+import static it.multicoredev.aio.AIO.VAULT;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -35,19 +38,31 @@ public class PlayerCommandPreprocessListener extends PluginListenerExecutor<Play
 
     @Override
     public void onEvent(PlayerCommandPreprocessEvent event) {
-        //TODO: Implement
+        Player player = event.getPlayer();
+        String completeCommand = event.getMessage().substring(1).toLowerCase(Locale.ROOT);
+        String command = completeCommand.contains(" ") ? completeCommand.split(" ")[0] : completeCommand;
 
-        if (config.commandsCooldown.cooldownEnabled) {
-            Player player = event.getPlayer();
-            String completeCommand = event.getMessage().substring(1).toLowerCase(Locale.ROOT);
-            String command = completeCommand.contains(" ") ? completeCommand.split(" ")[0] : completeCommand;
+        if (config.commandCooldown.cooldownEnabled) {
+            int commandCooldown = aio.hasCommandCooldown(player, command);
+            if (commandCooldown > 0) {
+                event.setCancelled(true);
+                Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(localization.commandCooldown, "{TIME}", commandCooldown), player);
+            }
 
-            /*if (config.commandsCooldown.hasCommandCooldown(command)) {
-                if (!aio.isCommandRegistered(command)) {
-                    if (aio.hasCommandCooldown(player, command)) event.setCancelled(true);
-                    else aio.addCommandCooldown(player, command);
-                }
-            }*/
+            if (config.commandCooldown.hasCommandCooldown(command) && !aio.getCommandRegistry().getCommandNames().contains(command)) {
+                aio.addCommandCooldown(player, command);
+            }
+        }
+
+        if (config.commandCosts.costsEnabled && VAULT && !aio.getCommandRegistry().getCommandNames().contains(command) && config.commandCosts.hasCommandCost(command) && !player.hasPermission("aio.bypass.costs")) {
+            int cost = Math.abs(config.commandCosts.getCommandCost(command));
+
+            if (aio.getEconomy().has(player, cost)) {
+                aio.getEconomy().withdrawPlayer(player, cost);
+            } else {
+                Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(localization.insufficientCmdMoney, "{MONEY}", aio.getEconomy().format(cost)), player);
+                event.setCancelled(true);
+            }
         }
     }
 }
