@@ -2,7 +2,6 @@ package it.multicoredev.aio.commands.utilities;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.CommandRegistry;
-import it.multicoredev.aio.utils.PlaceholderUtils;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.aio.utils.Utils;
 import it.multicoredev.mbcore.spigot.Chat;
@@ -58,7 +57,7 @@ public class RunLaterCommand extends PluginCommand {
         String command = Chat.builder(args, 1);
         aio.addDeferredCommand(sender, command, delay);
 
-        Chat.send(PlaceholderUtils.replacePlaceholders(localization.runLaterScheduled, "{DELAY}", Utils.formatDelay(delay, localization)), sender);
+        Chat.send(placeholdersUtils.replacePlaceholders(localization.runLaterScheduled, "{DELAY}", Utils.formatDelay(delay, localization)), sender);
         return true;
     }
 

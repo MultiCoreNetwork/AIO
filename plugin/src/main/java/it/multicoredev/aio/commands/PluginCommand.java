@@ -4,6 +4,7 @@ import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.BasePluginCommand;
 import it.multicoredev.aio.api.IStorage;
 import it.multicoredev.aio.api.models.CommandData;
+import it.multicoredev.aio.api.utils.IPlaceholdersUtils;
 import it.multicoredev.aio.storage.config.Config;
 import it.multicoredev.aio.storage.config.Localization;
 import it.multicoredev.mbcore.spigot.Chat;
@@ -43,6 +44,7 @@ public abstract class PluginCommand extends BasePluginCommand {
     protected final Localization localization;
     protected final IStorage storage;
     protected final CommandData commandData;
+    protected final IPlaceholdersUtils placeholdersUtils;
 
     public PluginCommand(AIO aio, String name, CommandData commandData) {
         super(name, commandData);
@@ -51,6 +53,7 @@ public abstract class PluginCommand extends BasePluginCommand {
         this.localization = aio.getLocalization();
         this.storage = aio.getStorage();
         this.commandData = commandData;
+        this.placeholdersUtils = aio.getPlaceholdersUtils();
     }
 
     public PluginCommand(AIO aio, String name) {

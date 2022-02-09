@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -72,6 +73,7 @@ public class User extends JsonConfig {
         if (logins == null) logins = 1;
         if (playTime == null) playTime = 0L;
         if (money == null) money = 0d;
+        if (homes == null) homes = new ArrayList<>();
         if (rtp == null) rtp = 0;
         if (god == null) god = false;
         if (fly == null) fly = false;
@@ -391,6 +393,7 @@ public class User extends JsonConfig {
      * @return home names
      */
     public List<String> getHomeNames() {
+        if (homes == null || homes.isEmpty()) return new ArrayList<>();
         return homes.stream().map(Home::getName).collect(Collectors.toList());
     }
 

@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import it.multicoredev.aio.api.Module;
 import it.multicoredev.aio.api.*;
 import it.multicoredev.aio.api.events.PlayerPostTeleportEvent;
 import it.multicoredev.aio.api.events.PlayerTeleportCancelledEvent;

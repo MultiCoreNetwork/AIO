@@ -1,7 +1,6 @@
 package it.multicoredev.aio.commands.player.kits;
 
 import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.utils.PlaceholderUtils;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.command.CommandSender;
@@ -40,7 +39,7 @@ public class KitsCommand extends PluginCommand {
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!preCommandProcess(sender, getName(), args)) return true;
 
-        Chat.send(PlaceholderUtils.replacePlaceholders(localization.availableWarps, "{KITS}", String.join(", ", aio.getKitStorage().getKitNames(sender))), sender);
+        Chat.send(placeholdersUtils.replacePlaceholders(localization.availableWarps, "{KITS}", String.join(", ", aio.getKitStorage().getKitNames(sender))), sender);
         return true;
     }
 }

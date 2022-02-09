@@ -37,6 +37,6 @@ public class PostCommandListener extends PluginListenerExecutor<PostCommandEvent
         if (!(event.getCommandSender() instanceof Player)) return;
         Player player = (Player) event.getCommandSender();
 
-        if (config.commandsCooldown.cooldownEnabled && event.isSuccess()) aio.addCommandCooldown(player, event.getCommand());
+        if (config.commandCooldown.cooldownEnabled && event.isSuccess()) aio.addCommandCooldown(player, event.getCommand());
     }
 }

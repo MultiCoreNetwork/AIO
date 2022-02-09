@@ -2,7 +2,6 @@ package it.multicoredev.aio.commands.teleport.home;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.User;
-import it.multicoredev.aio.utils.PlaceholderUtils;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.command.CommandSender;
@@ -10,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -53,7 +53,12 @@ public class HomesCommand extends PluginCommand {
         Player player = (Player) sender;
         User user = storage.getUser(player);
 
-        Chat.send(PlaceholderUtils.replacePlaceholders(localization.availableHomes, "{HOMES}", Arrays.toString(user.getHomeNames().toArray())), sender);
+        List<String> homeNames = user.getHomeNames();
+
+        if (homeNames.isEmpty()) Chat.send(localization.noHomes, sender);
+        else
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.availableHomes, "{HOMES}", Arrays.toString(homeNames.toArray())), sender);
+
         return true;
     }
 }

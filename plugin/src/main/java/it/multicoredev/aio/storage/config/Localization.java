@@ -174,12 +174,16 @@ public class Localization extends JsonConfig {
     public String availableHomes;
     @SerializedName("home_already_exists")
     public String homeAlreadyExists;
+    @SerializedName("home_created")
+    public String homeCreated;
     @SerializedName("home_deleted")
     public String homeDeleted;
     @SerializedName("home_limit_exceeded")
     public String homeLimitExceeded;
     @SerializedName("home_not_found")
     public String homeNotFound;
+    @SerializedName("no_homes")
+    public String noHomes;
 
     @SerializedName("heal")
     public String heal;
@@ -411,9 +415,11 @@ public class Localization extends JsonConfig {
 
         if (availableHomes == null) availableHomes = "&hAvailable homes: {HOMES}";
         if (homeAlreadyExists == null) homeAlreadyExists = "&cAn home with this name already exists!";
+        if (homeCreated == null) homeCreated = "&hHome created!";
         if (homeDeleted == null) homeDeleted = "&hHome deleted!";
         if (homeLimitExceeded == null) homeLimitExceeded = "&cYou can't set another home! Limit exceeded!";
         if (homeNotFound == null) homeNotFound = "&cHome not found!";
+        if (noHomes == null) noHomes = "&hNo homes available.";
 
         if (heal == null) heal = "&h{DISPLAYNAME} has been healed.";
         if (healSelf == null) healSelf = "&hYou have been healed.";
@@ -475,7 +481,7 @@ public class Localization extends JsonConfig {
         if (trash == null) trash = "Trash Can";
 
         if (availableWarps == null) availableWarps = "&hWarps available are: {WARPS}";
-        if (invalidWarpMode == null) invalidWarpMode ="&cInvalid warp mode! Only global or local are allowed!";
+        if (invalidWarpMode == null) invalidWarpMode = "&cInvalid warp mode! Only global or local are allowed!";
         if (noWarps == null) noWarps = "&hNo warps available.";
         if (warpAlreadyExist == null) warpAlreadyExist = "&cWarp already exists!";
         if (warpCreated == null) warpCreated = "&hWarp created!";

@@ -66,6 +66,7 @@ public class SetHomeCommand extends PluginCommand {
         }
 
         createHome(player, args[0]);
+        Chat.send(localization.homeCreated, sender);
         return true;
     }
 

@@ -1,7 +1,6 @@
 package it.multicoredev.aio.commands.teleport.warp;
 
 import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.utils.PlaceholderUtils;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.command.CommandSender;
@@ -45,7 +44,7 @@ public class WarpsCommand extends PluginCommand {
 
         if (warpNames.isEmpty()) Chat.send(localization.noWarps, sender);
         else
-            Chat.send(PlaceholderUtils.replacePlaceholders(localization.availableWarps, "{WARPS}", Arrays.toString(aio.getWarpStorage().getWarpNames(sender).toArray())), sender);
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.availableWarps, "{WARPS}", Arrays.toString(aio.getWarpStorage().getWarpNames(sender).toArray())), sender);
 
         return true;
     }

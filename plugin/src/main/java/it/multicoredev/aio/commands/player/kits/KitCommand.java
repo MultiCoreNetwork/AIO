@@ -1,7 +1,6 @@
 package it.multicoredev.aio.commands.player.kits;
 
 import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.utils.PlaceholderUtils;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.aio.models.ItemObject;
 import it.multicoredev.aio.models.Kit;
@@ -124,7 +123,7 @@ public class KitCommand extends PluginCommand {
 
         if (!invalidMaterials.isEmpty()) {
             //TODO Try
-            Chat.severe(PlaceholderUtils.replacePlaceholders(localization.invalidKit, new String[]{"{KIT}", "{INVALID}"}, new String[]{kit.getName(), String.join(", ", invalidMaterials)}));
+            Chat.severe(placeholdersUtils.replacePlaceholders(localization.invalidKit, new String[]{"{KIT}", "{INVALID}"}, new String[]{kit.getName(), String.join(", ", invalidMaterials)}));
             return true;
         }
 
