@@ -8,7 +8,6 @@ import it.multicoredev.aio.storage.config.modules.JoinQuitModule;
 import it.multicoredev.aio.storage.config.modules.SpawnModule;
 import it.multicoredev.aio.utils.Utils;
 import it.multicoredev.mbcore.spigot.Chat;
-import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -22,7 +21,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -46,19 +48,19 @@ import java.util.*;
  */
 public class PlayerJoinListener extends PluginListenerExecutor<PlayerJoinEvent> {
     private final SpawnModule spawnModule;
-    private final JoinQuitModule joinAndQuitModule;
+    private final JoinQuitModule joinQuitModule;
 
     public PlayerJoinListener(Class<PlayerJoinEvent> eventClass, AIO aio) {
         super(eventClass, aio);
 
         this.spawnModule = aio.getModuleManager().getModule(SpawnModule.class);
-        this.joinAndQuitModule = aio.getModuleManager().getModule(JoinQuitModule.class);
+        this.joinQuitModule = aio.getModuleManager().getModule(JoinQuitModule.class);
     }
 
     @Override
     public void onEvent(@NotNull PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        Bukkit.getScheduler().runTaskAsynchronously(aio, () -> aio.addToUsermap(player.getName(), player.getUniqueId()));
+        aio.addToUsermap(player.getName(), player.getUniqueId());
 
         boolean isNew = !storage.userExists(player.getUniqueId());
 
@@ -66,8 +68,9 @@ public class PlayerJoinListener extends PluginListenerExecutor<PlayerJoinEvent> 
 
         if (isNew) {
             user = new User(player);
-            user.setLastLocation(spawnModule.spawnLocation);
+            user.setLastLocation(player.getLocation());
             user.setLogin(new Date().getTime());
+            user.setLogins(1);
 
             if (!config.helpBookSection.firstJoinBooks.isEmpty()) {
                 Inventory inventory = player.getInventory();
@@ -77,13 +80,15 @@ public class PlayerJoinListener extends PluginListenerExecutor<PlayerJoinEvent> 
                 });
             }
 
-            storage.registerUser(user);
+            storage.registerUserAsync(user);
         } else {
             user = storage.getUser(player.getUniqueId());
+            if (user == null) return;
+
             user.setName(player.getName());
             user.setLastLocation(player.getLocation());
-
             user.setLogin(new Date().getTime());
+            user.incrementLogins();
 
             if (user.hasGod()) {
                 if (config.disableGodOnJoin) {
@@ -94,23 +99,23 @@ public class PlayerJoinListener extends PluginListenerExecutor<PlayerJoinEvent> 
                 }
             }
 
-            storage.updateUser(user);
+            if (user.hasFly()) player.setAllowFlight(true);
+
+            storage.updateUserAsync(user);
         }
 
         aio.addUserToCache(user);
 
         if (config.modules.get("spawn")) {
-            if (!spawnModule(event, isNew)) return;
+            if (!spawnModule(player, isNew)) return;
         }
 
         if (config.modules.get("join_quit")) {
-            if (!joinAndQuitModule(event, isNew)) return;
+            if (!joinQuitModule(event, isNew)) return;
         }
     }
 
-    private boolean spawnModule(PlayerJoinEvent event, boolean isNew) {
-        Player player = event.getPlayer();
-
+    private boolean spawnModule(Player player, boolean isNew) {
         if (!isNew && !spawnModule.spawnOnJoin) return true;
 
         Location spawn = spawnModule.spawnLocation;
@@ -121,57 +126,71 @@ public class PlayerJoinListener extends PluginListenerExecutor<PlayerJoinEvent> 
         return true;
     }
 
-    private boolean joinAndQuitModule(PlayerJoinEvent event, boolean isNew) {
-        if (!joinAndQuitModule.overrideJoinMessage) return true;
-        event.setJoinMessage(null);
-
+    private boolean joinQuitModule(PlayerJoinEvent event, boolean isNew) {
         Player player = event.getPlayer();
 
-        if (isNew) {
-            if (joinAndQuitModule.showFirstJoinMessage) sendJoinMessage(player, localization.firstJoinMsg);
-            else sendJoinMessage(player, localization.joinMsg);
+        if (!joinQuitModule.overrideJoinMessage) {
+            event.setJoinMessage(null);
 
-            if (joinAndQuitModule.sendWelcomeMessage) {
-                List<String> welcomeMsg = new ArrayList<>(Arrays.asList(localization.welcomeMsg.split("\\n")));
-                for (String msg : welcomeMsg) {
-                    msg = msg.replace("{DISPLAYNAME}", player.getDisplayName()).replace("{NAME}", player.getName());
-                    if (AIO.PAPI) PlaceholderAPI.setPlaceholders(player, msg);
+            String msg;
+            if (!isNew) {
+                msg = aio.getPlaceholdersUtils().replacePlaceholders(
+                        localization.joinMsg,
+                        new String[]{"{DISPLAYNAME}", "{NAME}"},
+                        new Object[]{player.getDisplayName(), player.getName()});
+
+            } else {
+                if (joinQuitModule.showFirstJoinMessage) {
+                    msg = aio.getPlaceholdersUtils().replacePlaceholders(
+                            localization.firstJoinMsg,
+                            new String[]{"{DISPLAYNAME}", "{NAME}"},
+                            new Object[]{player.getDisplayName(), player.getName()});
+                } else {
+                    msg = aio.getPlaceholdersUtils().replacePlaceholders(
+                            localization.joinMsg,
+                            new String[]{"{DISPLAYNAME}", "{NAME}"},
+                            new Object[]{player.getDisplayName(), player.getName()});
                 }
-
-                Chat.send(welcomeMsg, player);
             }
 
-            if (joinAndQuitModule.sendMotd) sendMotd(player);
+            if (Utils.isVanished(player)) Chat.broadcast(Chat.getTranslated(msg), "pv.see");
+            else Chat.broadcast(Chat.getTranslated(msg));
+        }
 
-            if (joinAndQuitModule.playJingleOnFirstJoin) {
-                Sound sound = Sound.valueOf(joinAndQuitModule.jingleSound);
-                float volume = joinAndQuitModule.jingleVolume;
+        if (isNew && joinQuitModule.sendWelcomeMessage) {
+            Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(
+                    localization.welcomeMsg,
+                    new String[]{"{DISPLAYNAME}", "{NAME}"},
+                    new Object[]{player.getDisplayName(), player.getName()}), player);
+        }
 
-                Bukkit.getScheduler().runTaskAsynchronously(aio, () -> {
-                    Map<String, Float> instructions = parseJingle();
-
-                    for (Player p : Bukkit.getOnlinePlayers()) {
-                        playJingle(p, instructions, sound, volume);
-                    }
-                });
+        if (joinQuitModule.sendMotd && !isNew) {
+            if (joinQuitModule.motdDelay > 0) {
+                Bukkit.getScheduler().runTaskLater(aio, () -> sendMOTD(player), joinQuitModule.motdDelay);
+            } else {
+                sendMOTD(player);
             }
+        }
+
+        if (joinQuitModule.playJingleOnFirstJoin && isNew) {
+            Sound sound = Sound.valueOf(joinQuitModule.jingleSound);
+            float volume = joinQuitModule.jingleVolume;
+
+            Bukkit.getScheduler().runTaskAsynchronously(aio, () -> {
+                Map<String, Float> instructions = parseJingle();
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    playJingle(p, instructions, sound, volume);
+                }
+            });
         }
 
         return true;
     }
 
-    private void sendJoinMessage(Player player, String msg) {
-        msg = msg.replace("{DISPLAYNAME}", player.getDisplayName()).replace("{NAME}", player.getName());
-        if (AIO.PAPI) PlaceholderAPI.setPlaceholders(player, msg);
-
-        if (Utils.isVanished(player)) Chat.broadcast(Chat.getTranslated(msg), "pv.see");
-        else Chat.broadcast(Chat.getTranslated(msg));
-    }
-
     private Map<String, Float> parseJingle() {
         Map<String, Float> instructions = new HashMap<>();
 
-        for (String line : joinAndQuitModule.jingle) {
+        for (String line : joinQuitModule.jingle) {
             float duration;
             try {
                 duration = Float.parseFloat(line.substring(line.indexOf(":") + 1));
@@ -199,41 +218,41 @@ public class PlayerJoinListener extends PluginListenerExecutor<PlayerJoinEvent> 
         }
     }
 
-    private void sendMotd(Player player) {
-        String motd = localization.motd;
+    private void sendMOTD(Player player) {
+        Bukkit.getScheduler().runTaskAsynchronously(aio, () -> {
+            String MOTD = localization.motd;
 
-        motd = motd.replace("{DISPLAYNAME}", player.getDisplayName())
-                .replace("{NAME}", player.getName());
+            MOTD = aio.getPlaceholdersUtils().replacePlaceholders(
+                    MOTD,
+                    new String[]{"{DISPLAYNAME}", "{NAME}"},
+                    new Object[]{player.getDisplayName(), player.getName()});
 
-        if (Utils.isValidURL(motd)) {
-            try {
-                HttpURLConnection connection = (HttpURLConnection) new URL(motd).openConnection();
-                connection.setRequestMethod("GET");
-                connection.setRequestProperty("User-Agent", "Mozilla/5.0");
+            if (Utils.isValidURL(MOTD)) {
+                try {
+                    HttpURLConnection connection = (HttpURLConnection) new URL(MOTD).openConnection();
+                    connection.setRequestMethod("GET");
+                    connection.setRequestProperty("User-Agent", "Mozilla/5.0");
 
-                StringBuilder builder = new StringBuilder();
+                    StringBuilder builder = new StringBuilder();
 
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        builder.append(line).append("\n");
+                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            builder.append(line).append("\n");
+                        }
                     }
+
+                    MOTD = builder.toString();
+                    MOTD = aio.getPlaceholdersUtils().replacePlaceholders(
+                            MOTD,
+                            new String[]{"{DISPLAYNAME}", "{NAME}"},
+                            new Object[]{player.getDisplayName(), player.getName()});
+                } catch (IOException e) {
+                    Chat.warning("&eFailed to retrieve remote MOTD: " + e.getMessage());
                 }
-
-                motd = builder.toString();
-            } catch (IOException ignored) {
-                return;
             }
-        }
 
-        motd = motd.replace("{DISPLAYNAME}", player.getDisplayName())
-                .replace("{NAME}", player.getName());
-        PlaceholderAPI.setPlaceholders(player, motd);
-
-        List<String> motdList = Arrays.asList(motd.split("\n"));
-
-        if (joinAndQuitModule.motdDelay > 0)
-            Bukkit.getScheduler().runTaskLaterAsynchronously(aio, () -> Chat.send(motdList, player), joinAndQuitModule.motdDelay * 20);
-        else Chat.send(motdList, player);
+            Chat.send(MOTD, player);
+        });
     }
 }

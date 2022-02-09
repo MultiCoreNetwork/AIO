@@ -11,6 +11,7 @@ import it.multicoredev.aio.api.events.PlayerTeleportCancelledEvent;
 import it.multicoredev.aio.api.listeners.IListenerRegistry;
 import it.multicoredev.aio.api.models.CommandData;
 import it.multicoredev.aio.api.tp.ITeleportManager;
+import it.multicoredev.aio.api.utils.IPlaceholdersUtils;
 import it.multicoredev.aio.commands.AIOCommand;
 import it.multicoredev.aio.commands.AliasCommand;
 import it.multicoredev.aio.commands.economy.EconomyCommand;
@@ -49,6 +50,8 @@ import it.multicoredev.aio.tasks.ClearCacheTask;
 import it.multicoredev.aio.tasks.SavePlayerDataTask;
 import it.multicoredev.aio.utils.ReflectionUtils;
 import it.multicoredev.aio.utils.perms.PermissionHandler;
+import it.multicoredev.aio.utils.placeholders.PAPIPlaceholdersUtils;
+import it.multicoredev.aio.utils.placeholders.StdPlaceholdersUtils;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -104,7 +107,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     private final File configFile = new File(root, "config.json");
     private final File localizationFile = new File(root, "localization.json");
     private final File commandsFile = new File(root, "commands.json");
-    private final File userMapFile = new File(root, "usermap.json");
+    private final File usermapFile = new File(root, "usermap.json");
     private final File kitsFile = new File(root, "kits.json");
     private final File warpsFile = new File(root, "warps.json");
 
@@ -127,6 +130,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     //private Map<UUID, Map<String, Date>> commandsCooldown;
     private AIOEconomy economy;
     private PermissionHandler permissionHandler;
+    private IPlaceholdersUtils placeholdersUtils;
 
     public static boolean debug = true;
 
@@ -134,10 +138,8 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     //TODO Enchant disenchant commands change output msg enchant name
     //TODO Fly speed (Save also walk speed and set on Join)
     //TODO Add to commands like heal or feed... the ability to user selectors
-    //TODO Add error to preconditions
     //TODO Reset module name when loading
     //TODO Change command syntax to /command [on|off|toggle] [player]
-    //TODO To fix usermap
 
     @Override
     public void onEnable() {
@@ -192,6 +194,9 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         }
 
         permissionHandler = new PermissionHandler(this);
+
+        if (PAPI) placeholdersUtils = new PAPIPlaceholdersUtils();
+        else placeholdersUtils = new StdPlaceholdersUtils();
 
         registerListeners();
         registerCommands();
@@ -258,6 +263,11 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         return economy;
     }
 
+    @Override
+    public IPlaceholdersUtils getPlaceholdersUtils() {
+        return placeholdersUtils;
+    }
+
     public PermissionHandler getPermissionHandler() {
         return permissionHandler;
     }
@@ -285,6 +295,20 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             writer.write(gson.toJson(obj));
             writer.flush();
         }
+    }
+
+    public static void serializeAsync(File file, Object obj) {
+        new Thread(() -> {
+            try {
+                try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
+                    writer.write(gson.toJson(obj));
+                    writer.flush();
+                }
+            } catch (Exception e) {
+                Chat.warning("&c" + e.getMessage());
+                if (debug) e.printStackTrace();
+            }
+        }).start();
     }
 
 //    public void addCommandCooldown(Player player, String command) {
@@ -352,6 +376,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
     public void addToUsermap(String name, UUID uuid) {
         usermap.put(name, uuid);
+        serializeAsync(usermapFile, usermap);
     }
 
     public void saveWarps() throws Exception {
@@ -579,11 +604,11 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             }
         }
 
-        if (!userMapFile.exists() || !userMapFile.isFile()) {
+        if (!usermapFile.exists() || !usermapFile.isFile()) {
             usermap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
             try {
-                serialize(userMapFile, usermap);
+                serialize(usermapFile, usermap);
             } catch (Exception e) {
                 Chat.severe("&cCannot save usermap.json");
                 Chat.severe("&4" + e.getMessage());
@@ -591,19 +616,19 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             }
         } else {
             try {
-                usermap = deserialize(userMapFile, HashMap.class);
+                usermap = deserialize(usermapFile, HashMap.class);
                 if (usermap == null) throw new NullPointerException("Usermap is null");
             } catch (Exception e) {
                 Chat.severe("&4" + e.getMessage());
                 if (debug) e.printStackTrace();
 
-                if (!backupFile(userMapFile)) return false;
+                if (!backupFile(usermapFile)) return false;
                 Chat.warning("&4Usermap file is corrupted, creating new one");
 
                 usermap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
                 try {
-                    serialize(userMapFile, usermap);
+                    serialize(usermapFile, usermap);
                 } catch (Exception e1) {
                     Chat.severe("&cCannot save usermap.json");
                     if (debug) e1.printStackTrace();

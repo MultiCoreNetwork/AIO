@@ -58,7 +58,7 @@ public class LightningCommand extends PluginCommand {
             target = player.getLocation();
         } else {
             Player player = (Player) sender;
-            Block block = player.getTargetBlockExact(32, FluidCollisionMode.ALWAYS);
+            Block block = player.getTargetBlockExact(64, FluidCollisionMode.ALWAYS);
             if (block != null) target = block.getLocation();
         }
 

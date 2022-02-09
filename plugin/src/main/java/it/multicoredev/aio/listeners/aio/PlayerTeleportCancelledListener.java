@@ -3,7 +3,7 @@ package it.multicoredev.aio.listeners.aio;
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.TeleportManager;
 import it.multicoredev.aio.api.events.PlayerTeleportCancelledEvent;
-import it.multicoredev.aio.api.utils.PlaceholderUtils;
+import it.multicoredev.aio.utils.PlaceholderUtils;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.jetbrains.annotations.NotNull;

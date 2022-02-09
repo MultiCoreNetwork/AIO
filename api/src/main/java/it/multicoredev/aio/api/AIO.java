@@ -2,6 +2,7 @@ package it.multicoredev.aio.api;
 
 import it.multicoredev.aio.api.listeners.IListenerRegistry;
 import it.multicoredev.aio.api.tp.ITeleportManager;
+import it.multicoredev.aio.api.utils.IPlaceholdersUtils;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
@@ -78,4 +79,11 @@ public abstract class AIO extends JavaPlugin {
      * @return the instance of the {@link IEconomy} or null if module is disabled or Vault is missing.
      */
     @Nullable public abstract IEconomy getEconomy();
+
+    /**
+     * Get an instance of the {@link IPlaceholdersUtils} interface.
+     *
+     * @return the instance of the {@link IPlaceholdersUtils}.
+     */
+    public abstract IPlaceholdersUtils getPlaceholdersUtils();
 }

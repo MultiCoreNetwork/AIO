@@ -6,7 +6,6 @@ import it.multicoredev.aio.listeners.PluginListenerExecutor;
 import it.multicoredev.aio.storage.config.modules.JoinQuitModule;
 import it.multicoredev.aio.utils.Utils;
 import it.multicoredev.mbcore.spigot.Chat;
-import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
@@ -45,37 +44,33 @@ public class PlayerQuitListener extends PluginListenerExecutor<PlayerQuitEvent> 
     public void onEvent(@NotNull PlayerQuitEvent event) {
         Player player = event.getPlayer();
 
-        if (storage.userExists(player)) {
-            User user = storage.getUser(player);
+        User user = storage.getUser(player);
+        if (user != null) {
             user.setLogoutLocation(player.getLocation());
-            user.setLogin(null);
-
             user.addPlayTime(new Date().getTime() - user.getLogin());
-
+            user.setLogin(null);
             storage.updateUserAsync(user);
         }
 
         if (config.modules.get("join_quit")) {
-            if (!joinAndQuitModule(event)) return;
+            if (!joinQuitModule(event)) return;
         }
     }
 
-    private boolean joinAndQuitModule(PlayerQuitEvent event) {
-        if (!joinAndQuitModule.overrideQuitMessage) return true;
-        event.setQuitMessage(null);
+    private boolean joinQuitModule(PlayerQuitEvent event) {
+        if (joinAndQuitModule.overrideQuitMessage) {
+            Player player = event.getPlayer();
+            event.setQuitMessage(null);
 
-        Player player = event.getPlayer();
+            String msg = aio.getPlaceholdersUtils().replacePlaceholders(
+                    localization.quitMsg,
+                    new String[]{"{DISPLAYNAME}", "{NAME}"},
+                    new Object[]{player.getDisplayName(), player.getName()});
 
-        sendQuitMessage(player, localization.quitMsg);
+            if (Utils.isVanished(player)) Chat.broadcast(Chat.getTranslated(msg), "pv.see");
+            else Chat.broadcast(Chat.getTranslated(msg));
+        }
 
         return true;
-    }
-
-    private void sendQuitMessage(Player player, String msg) {
-        msg = msg.replace("{DISPLAYNAME}", player.getDisplayName()).replace("{NAME}", player.getName());
-        if (AIO.PAPI) PlaceholderAPI.setPlaceholders(player, msg);
-
-        if (Utils.isVanished(player)) Chat.broadcast(Chat.getTranslated(msg), "pv.see");
-        else Chat.broadcast(Chat.getTranslated(msg));
     }
 }

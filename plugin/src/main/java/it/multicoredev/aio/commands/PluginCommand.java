@@ -4,7 +4,7 @@ import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.BasePluginCommand;
 import it.multicoredev.aio.api.IStorage;
 import it.multicoredev.aio.api.models.CommandData;
-import it.multicoredev.aio.api.utils.PlaceholderUtils;
+import it.multicoredev.aio.utils.PlaceholderUtils;
 import it.multicoredev.aio.storage.config.Config;
 import it.multicoredev.aio.storage.config.Localization;
 import it.multicoredev.mbcore.spigot.Chat;

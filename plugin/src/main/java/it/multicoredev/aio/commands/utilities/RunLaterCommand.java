@@ -2,7 +2,7 @@ package it.multicoredev.aio.commands.utilities;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.CommandRegistry;
-import it.multicoredev.aio.api.utils.PlaceholderUtils;
+import it.multicoredev.aio.utils.PlaceholderUtils;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.aio.utils.Utils;
 import it.multicoredev.mbcore.spigot.Chat;

@@ -156,6 +156,16 @@ public class User extends JsonConfig {
     }
 
     /**
+     * Increment the number of times the player has logged in.
+     *
+     * @return this object.
+     */
+    public User incrementLogins() {
+        this.logins++;
+        return this;
+    }
+
+    /**
      * Get the last time the player has been saved.
      *
      * @return the last time the player has been saved.

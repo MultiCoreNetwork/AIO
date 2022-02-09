@@ -1,7 +1,7 @@
 package it.multicoredev.aio.listeners.player;
 
 import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.api.utils.PlaceholderUtils;
+import it.multicoredev.aio.utils.PlaceholderUtils;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
 import it.multicoredev.aio.storage.config.modules.ChatModule;
 import it.multicoredev.aio.storage.config.modules.PingModule;
