@@ -273,6 +273,11 @@ public class Localization extends JsonConfig {
     @SerializedName("sudo_success")
     public String sudoSuccess;
 
+    @SerializedName("suicide_broadcast")
+    public String suicideBroadcast;
+    @SerializedName("suicide_success")
+    public String suicideSuccess;
+
     @SerializedName("fly_speed_set")
     public String flySpeedSet;
     @SerializedName("fly_speed_set_self")
@@ -475,6 +480,9 @@ public class Localization extends JsonConfig {
         if (sudoFailed == null) sudoFailed = "&cSudo failed!";
         if (sudoPrevent == null) sudoPrevent = "&cYou can't use sudo as this player.";
         if (sudoSuccess == null) sudoSuccess = "&hSudo success!";
+
+        if (suicideBroadcast == null) suicideBroadcast = "&h{DISPLAYNAME} committed suicide.";
+        if (suicideSuccess == null) suicideSuccess = "&hYou suicided!";
 
         if (flySpeedSet == null) flySpeedSet = "&h{DISPLAYNAME}'s flying speed set to {SPEED}.";
         if (flySpeedSetSelf == null) flySpeedSetSelf = "&hFlying speed set to {SPEED}.";

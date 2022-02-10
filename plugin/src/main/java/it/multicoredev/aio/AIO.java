@@ -816,6 +816,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         if (commands.isEnabled("spawn") && moduleManager.isModuleEnabled(SpawnModule.class))
             commandRegistry.registerCommand(new SpawnCommand(this), this);
         if (commands.isEnabled("speed")) commandRegistry.registerCommand(new SpeedCommand(this), this);
+        if (commands.isEnabled("suicide")) commandRegistry.registerCommand(new SuicideCommand(this), this);
         if (commands.isEnabled("sudo")) commandRegistry.registerCommand(new SudoCommand(this), this);
         if (commands.isEnabled("sun")) commandRegistry.registerCommand(new SunCommand(this), this);
         if (commands.isEnabled("thunder")) commandRegistry.registerCommand(new ThunderCommand(this), this);

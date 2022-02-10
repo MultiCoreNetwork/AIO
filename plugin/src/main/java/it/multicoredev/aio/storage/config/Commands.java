@@ -247,6 +247,11 @@ public class Commands extends JsonConfig {
                 "Run a command or send a message as another player",
                 "/sudo <player|console> <command|message>"
         ));
+        if (!commands.containsKey("suicide")) commands.put("suicide", new CommandData(
+                true,
+                "It makes you die",
+                "/suicide"
+        ));
         if (!commands.containsKey("sun")) commands.put("sun", new CommandData(
                 true,
                 "Set the time to day",

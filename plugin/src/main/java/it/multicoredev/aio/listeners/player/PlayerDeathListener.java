@@ -2,8 +2,10 @@ package it.multicoredev.aio.listeners.player;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.User;
+import it.multicoredev.aio.api.utils.IPlaceholdersUtils;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,6 +40,15 @@ public class PlayerDeathListener extends PluginListenerExecutor<PlayerDeathEvent
         Player player = event.getEntity();
 
         if (config.disablePlayerDeathMessages) event.setDeathMessage(null);
+
+        if (config.suicideBroadcast) {
+            EntityDamageEvent entityDamageEvent = event.getEntity().getLastDamageCause();
+
+            if (entityDamageEvent != null && entityDamageEvent.getCause() == EntityDamageEvent.DamageCause.SUICIDE) {
+                IPlaceholdersUtils placeholdersUtils = aio.getPlaceholdersUtils();
+                event.setDeathMessage(placeholdersUtils.replacePlaceholders(localization.suicideBroadcast, new String[]{"{NAME}", "{DISPLAYNAME}"}, new String[]{player.getName(), player.getDisplayName()}));
+            }
+        }
 
         User user = storage.getUser(player);
         if (user != null) {

@@ -61,6 +61,8 @@ public class Config extends JsonConfig {
     public Boolean disablePlayerDeathMessages;
     @SerializedName("disable_god_on_join")
     public Boolean disableGodOnJoin;
+    @SerializedName("suicide_broadcast")
+    public Boolean suicideBroadcast;
     @SerializedName("clear_players_cache")
     public Long clearPlayersCache;
     @SerializedName("save_players_data")
@@ -113,6 +115,7 @@ public class Config extends JsonConfig {
         if (warpTeleportDelay == null) warpTeleportDelay = -1L;
         if (disablePlayerDeathMessages == null) disablePlayerDeathMessages = false;
         if (disableGodOnJoin == null) disableGodOnJoin = false;
+        if (suicideBroadcast == null) suicideBroadcast = true;
         if (clearPlayersCache == null) clearPlayersCache = 12000L;
         if (savePlayersData == null) savePlayersData = 6000L;
 
