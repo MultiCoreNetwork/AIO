@@ -169,6 +169,8 @@ public class Localization extends JsonConfig {
     public String hatSuccess;
     @SerializedName("prevent_hat")
     public String preventHat;
+    @SerializedName("target_has_inventory_full")
+    public String targetHasInventoryFull;
 
     @SerializedName("available_homes")
     public String availableHomes;
@@ -416,6 +418,7 @@ public class Localization extends JsonConfig {
 
         if (hatSuccess == null) hatSuccess = "&hYou wore your hat!";
         if (preventHat == null) preventHat = "&hYou can't wear as hat this item!";
+        if (targetHasInventoryFull == null) targetHasInventoryFull = "&cTarget has inventory full!";
 
         if (availableHomes == null) availableHomes = "&hAvailable homes: {HOMES}";
         if (homeAlreadyExists == null) homeAlreadyExists = "&cAn home with this name already exists!";

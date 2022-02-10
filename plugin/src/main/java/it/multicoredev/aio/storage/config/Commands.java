@@ -132,6 +132,11 @@ public class Commands extends JsonConfig {
                 "Toggle god mode for a player",
                 "/god [player]"
         ));
+        if (!commands.containsKey("hat")) commands.put("hat", new CommandData(
+                true,
+                "Put an item as hat",
+                "/hat [player]"
+        ));
         if (!commands.containsKey("heal")) commands.put("heal", new CommandData(
                 true,
                 "Heal a player",
