@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import io.papermc.paper.event.player.PlayerCommandPostprocessEvent;
 import it.multicoredev.aio.api.Module;
 import it.multicoredev.aio.api.*;
 import it.multicoredev.aio.api.events.PlayerPostTeleportEvent;
@@ -766,7 +767,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     private void registerListeners() {
         listenerRegistry.registerListener(new PlayerPostTeleportListener(PlayerPostTeleportEvent.class, this), config.getEventPriority("PlayerPostTeleportEvent"), this);
         listenerRegistry.registerListener(new PlayerTeleportCancelledListener(PlayerTeleportCancelledEvent.class, this), config.getEventPriority("PlayerTeleportCancelledEvent"), this);
-        listenerRegistry.registerListener(new PostCommandListener(PostCommandEvent.class, this), config.getEventPriority("PostCommandEvent"), this);
+        listenerRegistry.registerListener(new PostCommandListener(PlayerCommandPostprocessEvent.class, this), config.getEventPriority("PostCommandEvent"), this);
 
         listenerRegistry.registerListener(new EntityDamageListener(EntityDamageEvent.class, this), config.getEventPriority("EntityDamageEvent"), this);
 
