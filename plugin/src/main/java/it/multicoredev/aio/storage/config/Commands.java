@@ -240,7 +240,7 @@ public class Commands extends JsonConfig {
         if (!commands.containsKey("sudo")) commands.put("sudo", new CommandData(
                 true,
                 "Run a command or send a message as another player",
-                "/sudo <player> <command|message>"
+                "/sudo <player|console> <command|message>"
         ));
         if (!commands.containsKey("sun")) commands.put("sun", new CommandData(
                 true,

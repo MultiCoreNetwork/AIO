@@ -102,7 +102,8 @@ public class SudoCommand extends PluginCommand {
         } else if (args.length == 2) {
             String arg = args[1];
             if (arg.startsWith("/")) {
-                return TabCompleterUtil.getCompletions(arg.substring(1), ((CommandRegistry) aio.getCommandRegistry()).getAllCommandNames());
+                List<String> completions = TabCompleterUtil.getCompletions(arg.substring(1), ((CommandRegistry) aio.getCommandRegistry()).getAllCommandNames());
+                return getFormattedCompletions(completions);
             }
         } else if (args.length > 2 && args[1].startsWith("/")) {
             org.bukkit.command.PluginCommand cmd = aio.getCommand(args[1].substring(1));
@@ -111,9 +112,19 @@ public class SudoCommand extends PluginCommand {
 
             List<String> completions = cmd.getTabCompleter().onTabComplete(sender, cmd, alias, args);
             if (completions == null) return new ArrayList<>();
-            return completions;
+            return getFormattedCompletions(completions);
         }
 
         return new ArrayList<>();
+    }
+
+    private List<String> getFormattedCompletions(List<String> completions) {
+        List<String> formattedCompletions = new ArrayList<>();
+
+        for (String completion : completions) {
+            formattedCompletions.add("/" + completion);
+        }
+
+        return formattedCompletions;
     }
 }
