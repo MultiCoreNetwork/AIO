@@ -6,8 +6,9 @@ import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.List;
+
+import static it.multicoredev.aio.utils.Utils.getStringFromList;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -46,7 +47,7 @@ public class KitsCommand extends PluginCommand {
 
         if (kitNames.isEmpty()) Chat.send(localization.noKits, sender);
         else
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.availableKits, "{KITS}", Arrays.toString(kitNames.toArray())), sender);
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.availableKits, "{KITS}", getStringFromList(kitNames)), sender);
 
         return true;
     }

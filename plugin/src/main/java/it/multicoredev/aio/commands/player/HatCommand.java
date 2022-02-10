@@ -15,6 +15,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import static it.multicoredev.aio.utils.Utils.hasSpaceInInventory;
+
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
  * This file is part of AIO.
@@ -77,7 +79,7 @@ public class HatCommand extends PluginCommand {
 
             PlayerInventory targetInventory = target.getInventory();
 
-            if (targetInventory.firstEmpty() == -1) {
+            if (hasSpaceInInventory(target, item)) {
                 Chat.send(localization.targetHasInventoryFull, sender);
                 return true;
             }

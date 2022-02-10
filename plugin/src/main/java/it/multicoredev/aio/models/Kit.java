@@ -31,4 +31,8 @@ public class Kit {
     public List<ItemObject> getItems() {
         return items;
     }
+
+    public void addItem(ItemObject itemObject) {
+        items.add(itemObject);
+    }
 }

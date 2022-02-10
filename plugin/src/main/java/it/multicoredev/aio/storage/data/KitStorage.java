@@ -50,4 +50,8 @@ public class KitStorage extends JsonConfig {
 
         return kitList;
     }
+
+    public void addKit(Kit kit) {
+        kits.add(kit);
+    }
 }

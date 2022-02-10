@@ -15,8 +15,9 @@ import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+
+import static it.multicoredev.aio.utils.Utils.hasSpaceInInventory;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -127,16 +128,15 @@ public class KitCommand extends PluginCommand {
             return true;
         }
 
-        int amount = itemStacks.size();
         PlayerInventory playerInventory = target.getInventory();
 
-        if (Arrays.stream(playerInventory.getContents()).filter(itemStack -> itemStack.getType().equals(Material.AIR)).count() < amount) {
+        if (hasSpaceInInventory(target, itemStacks)) {
             Chat.send(localization.kitNoSpace, sender);
             return true;
         }
 
         for (ItemStack itemStack : itemStacks) {
-            playerInventory.addItem(itemStack);
+            if (itemStack != null) playerInventory.addItem(itemStack);
         }
 
         Chat.send(localization.kitSuccess, sender);
