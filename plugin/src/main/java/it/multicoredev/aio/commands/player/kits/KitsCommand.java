@@ -6,6 +6,9 @@ import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
  * This file is part of AIO.
@@ -39,7 +42,12 @@ public class KitsCommand extends PluginCommand {
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!preCommandProcess(sender, getName(), args)) return true;
 
-        Chat.send(placeholdersUtils.replacePlaceholders(localization.availableWarps, "{KITS}", String.join(", ", aio.getKitStorage().getKitNames(sender))), sender);
+        List<String> kitNames = aio.getKitStorage().getKitNames(sender);
+
+        if (kitNames.isEmpty()) Chat.send(localization.noKits, sender);
+        else
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.availableKits, "{KITS}", Arrays.toString(kitNames.toArray())), sender);
+
         return true;
     }
 }

@@ -199,6 +199,8 @@ public class Localization extends JsonConfig {
     @SerializedName("helpbook_given_self")
     public String helpbookGivenSelf;
 
+    @SerializedName("available_kits")
+    public String availableKits;
     @SerializedName("kit_empty")
     public String kitEmpty;
     @SerializedName("kit_not_found")
@@ -211,6 +213,8 @@ public class Localization extends JsonConfig {
     public String kitSuccess;
     @SerializedName("invalid_kit")
     public String invalidKit;
+    @SerializedName("no_kits")
+    public String noKits;
 
     @SerializedName("invalid_nickname")
     public String invalidNickname;
@@ -429,7 +433,9 @@ public class Localization extends JsonConfig {
         if (helpbookGiven == null) helpbookGiven = "&hYou gave &e{book} &hto {DISPLAYNAME}.";
         if (helpbookGivenSelf == null) helpbookGivenSelf = "&hYou received &e{book}&h.";
 
+        if (availableKits == null) availableKits = "&hAvailable kits: {KITS}";
         if (invalidKit == null) invalidKit = "&eSome items described in the kit {KIT} are invalid: {INVALID}";
+        if (noKits == null) noKits = "&hNo kits available.";
         if (kitEmpty == null) kitEmpty = "&cThis kit is empty.";
         if (kitNotFound == null) kitNotFound = "&cKit not found.";
         if (kitNoPerms == null) kitNoPerms = "&cYou don't have permissions for use this kit.";
