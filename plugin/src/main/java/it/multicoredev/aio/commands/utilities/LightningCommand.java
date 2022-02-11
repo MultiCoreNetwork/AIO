@@ -3,6 +3,7 @@ package it.multicoredev.aio.commands.utilities;
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.mbcore.spigot.Chat;
+import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
@@ -10,6 +11,9 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -58,7 +62,7 @@ public class LightningCommand extends PluginCommand {
             target = player.getLocation();
         } else {
             Player player = (Player) sender;
-            Block block = player.getTargetBlockExact(64, FluidCollisionMode.ALWAYS);
+            Block block = player.getTargetBlockExact(player.getServer().getViewDistance() * 16, FluidCollisionMode.ALWAYS);
             if (block != null) target = block.getLocation();
         }
 
@@ -69,5 +73,12 @@ public class LightningCommand extends PluginCommand {
 
         target.getWorld().strikeLightning(target);
         return true;
+    }
+
+    @Override
+    public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
+        if (!hasCommandPerm(sender)) return new ArrayList<>();
+        if (args.length == 1) return TabCompleterUtil.getPlayers(args[0], sender.hasPermission("pv.see"));
+        return new ArrayList<>();
     }
 }

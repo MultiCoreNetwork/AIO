@@ -4,12 +4,11 @@ import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.papermc.paper.event.player.PlayerCommandPostprocessEvent;
+import io.papermc.paper.event.server.CommandPostprocessEvent;
 import it.multicoredev.aio.api.Module;
 import it.multicoredev.aio.api.*;
 import it.multicoredev.aio.api.events.PlayerPostTeleportEvent;
 import it.multicoredev.aio.api.events.PlayerTeleportCancelledEvent;
-import it.multicoredev.aio.api.events.PostCommandEvent;
 import it.multicoredev.aio.api.listeners.IListenerRegistry;
 import it.multicoredev.aio.api.models.CommandData;
 import it.multicoredev.aio.api.tp.ITeleportManager;
@@ -388,7 +387,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         deferredCommands.put(id, Bukkit.getScheduler().runTaskLater(this, () -> {
             Bukkit.dispatchCommand(sender, command);
             removeCompletedCommand(id);
-        }, delay));
+        }, delay * 20));
     }
 
     private boolean initConfigs() {
@@ -767,7 +766,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     private void registerListeners() {
         listenerRegistry.registerListener(new PlayerPostTeleportListener(PlayerPostTeleportEvent.class, this), config.getEventPriority("PlayerPostTeleportEvent"), this);
         listenerRegistry.registerListener(new PlayerTeleportCancelledListener(PlayerTeleportCancelledEvent.class, this), config.getEventPriority("PlayerTeleportCancelledEvent"), this);
-        listenerRegistry.registerListener(new PostCommandListener(PlayerCommandPostprocessEvent.class, this), config.getEventPriority("PostCommandEvent"), this);
+        listenerRegistry.registerListener(new PostCommandListener(CommandPostprocessEvent.class, this), config.getEventPriority("PostCommandEvent"), this);
 
         listenerRegistry.registerListener(new EntityDamageListener(EntityDamageEvent.class, this), config.getEventPriority("EntityDamageEvent"), this);
 
@@ -791,6 +790,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         if (commands.isEnabled("disenchant")) commandRegistry.registerCommand(new DisenchantCommand(this), this);
         if (commands.isEnabled("economy") && VAULT) commandRegistry.registerCommand(new EconomyCommand(this), this);
         if (commands.isEnabled("enchant")) commandRegistry.registerCommand(new EnchantCommand(this), this);
+        if (commands.isEnabled("entitylist")) commandRegistry.registerCommand(new EntitylistCommand(this), this);
         if (commands.isEnabled("feed")) commandRegistry.registerCommand(new FeedCommand(this), this);
         if (commands.isEnabled("fly")) commandRegistry.registerCommand(new FlyCommand(this), this);
         if (commands.isEnabled("gamemode")) commandRegistry.registerCommand(new GamemodeCommand(this), this);

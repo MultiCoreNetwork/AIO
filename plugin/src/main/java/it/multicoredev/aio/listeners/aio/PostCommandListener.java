@@ -1,9 +1,9 @@
 package it.multicoredev.aio.listeners.aio;
 
-import io.papermc.paper.event.player.PlayerCommandPostprocessEvent;
+import io.papermc.paper.event.server.CommandPostprocessEvent;
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
-import it.multicoredev.mbcore.spigot.Chat;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -26,15 +26,15 @@ import org.jetbrains.annotations.NotNull;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class PostCommandListener extends PluginListenerExecutor<PlayerCommandPostprocessEvent> {
+public class PostCommandListener extends PluginListenerExecutor<CommandPostprocessEvent> {
 
-    public PostCommandListener(Class<PlayerCommandPostprocessEvent> eventClass, AIO aio) {
+    public PostCommandListener(Class<CommandPostprocessEvent> eventClass, AIO aio) {
         super(eventClass, aio);
     }
 
     @Override
-    public void onEvent(@NotNull PlayerCommandPostprocessEvent event) {
-        Chat.info("&2Post command event!\n&e" + event.getCommand() + "\n&6" + event.getPlayer() + "\n&b" + event.wasSuccess());
-        if (config.commandCooldown.cooldownEnabled && event.wasSuccess()) aio.addCommandCooldown(event.getPlayer(), event.getCommand());
+    public void onEvent(@NotNull CommandPostprocessEvent event) {
+        if (!(event.getCommandSender() instanceof Player)) return;
+        if (config.commandCooldown.cooldownEnabled && event.wasSuccess()) aio.addCommandCooldown((Player) event.getCommandSender(), event.getCommand());
     }
 }

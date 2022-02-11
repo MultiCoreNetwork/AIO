@@ -2,6 +2,7 @@ package it.multicoredev.aio.utils;
 
 import it.multicoredev.aio.storage.config.Localization;
 import it.multicoredev.mbcore.spigot.Chat;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -101,7 +102,7 @@ public class Utils {
         switch (timeUnit) {
             case "s":
             case "S":
-                return number * 20;
+                return number;
             case "m":
                 return TimeUnit.SECONDS.convert(number, TimeUnit.MINUTES);
             case "h":
@@ -164,6 +165,7 @@ public class Utils {
             double zDistance = random.nextDouble() * (maxDistance - minDistance) + minDistance;
 
             Location newLocation = center.clone().add(xDistance, 0, zDistance);
+
             if (!setY(newLocation)) continue;
 
             if (isSafeLocation(newLocation)) return newLocation;
@@ -175,6 +177,9 @@ public class Utils {
     private static boolean setY(Location location) {
         World world = location.getWorld();
         if (world == null) return false;
+
+        Chunk chunk = location.getChunk();
+        world.loadChunk(chunk.getX(), chunk.getZ());
 
         World.Environment environment = world.getEnvironment();
         if (environment == World.Environment.NORMAL || environment == World.Environment.THE_END || environment == World.Environment.CUSTOM) {

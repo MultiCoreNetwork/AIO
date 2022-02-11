@@ -72,7 +72,7 @@ public class ThunderCommand extends PluginCommand {
         int duration = (int) (new Random().nextFloat() * (0.5) + 0.5) * 24000;
         world.setWeatherDuration(duration);
         world.setThundering(true);
-        world.setWeatherDuration(duration);
+        world.setThunderDuration(duration);
         Chat.send(localization.weatherSetThunder.replace("{WORLD}", world.getName()), sender);
         return true;
     }
