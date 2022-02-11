@@ -425,7 +425,7 @@ public class Localization extends JsonConfig {
         if (preventHat == null) preventHat = "&hYou can't wear as hat this item!";
         if (targetHasInventoryFull == null) targetHasInventoryFull = "&cTarget has inventory full!";
 
-        if (availableHomes == null) availableHomes = "&hAvailable homes: {HOMES}";
+        if (availableHomes == null) availableHomes = "&hAvailable homes: &e{HOMES}";
         if (homeAlreadyExists == null) homeAlreadyExists = "&cAn home with this name already exists!";
         if (homeCreated == null) homeCreated = "&hHome created!";
         if (homeDeleted == null) homeDeleted = "&hHome deleted!";
@@ -441,7 +441,7 @@ public class Localization extends JsonConfig {
         if (helpbookGiven == null) helpbookGiven = "&hYou gave &e{book} &hto {DISPLAYNAME}.";
         if (helpbookGivenSelf == null) helpbookGivenSelf = "&hYou received &e{book}&h.";
 
-        if (availableKits == null) availableKits = "&hAvailable kits: {KITS}";
+        if (availableKits == null) availableKits = "&hAvailable kits: &e{KITS}";
         if (invalidKit == null) invalidKit = "&eSome items described in the kit {KIT} are invalid: {INVALID}";
         if (noKits == null) noKits = "&hNo kits available.";
         if (kitEmpty == null) kitEmpty = "&cThis kit is empty.";
@@ -497,7 +497,7 @@ public class Localization extends JsonConfig {
 
         if (trash == null) trash = "Trash Can";
 
-        if (availableWarps == null) availableWarps = "&hWarps available are: {WARPS}";
+        if (availableWarps == null) availableWarps = "&hWarps available are: &e{WARPS}";
         if (invalidWarpMode == null) invalidWarpMode = "&cInvalid warp mode! Only global or local are allowed!";
         if (noWarps == null) noWarps = "&hNo warps available.";
         if (warpAlreadyExist == null) warpAlreadyExist = "&cWarp already exists!";
