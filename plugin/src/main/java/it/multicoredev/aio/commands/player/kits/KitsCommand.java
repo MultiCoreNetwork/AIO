@@ -3,12 +3,15 @@ package it.multicoredev.aio.commands.player.kits;
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.mbcore.spigot.Chat;
+import it.multicoredev.mbcore.spigot.util.chat.RawMessage;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-
-import static it.multicoredev.aio.utils.Utils.getStringFromList;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -33,8 +36,6 @@ import static it.multicoredev.aio.utils.Utils.getStringFromList;
 public class KitsCommand extends PluginCommand {
     private static final String CMD = "kits";
 
-    //TODO Divide in pages if needed
-
     public KitsCommand(AIO aio) {
         super(aio, CMD);
     }
@@ -43,11 +44,91 @@ public class KitsCommand extends PluginCommand {
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!preCommandProcess(sender, getName(), args)) return true;
 
-        List<String> kitNames = aio.getKitStorage().getKitNames(sender);
+        List<String> kits = aio.getKitStorage().getKitNames(sender);
+        if (kits.isEmpty()) Chat.send(localization.noKits, sender);
 
-        if (kitNames.isEmpty()) Chat.send(localization.noKits, sender);
-        else
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.availableKits, "{KITS}", getStringFromList(kitNames)), sender);
+        int page = 0;
+
+        if (args.length > 0) {
+            try {
+                page = Math.max(0, Integer.parseInt(args[0]) - 1);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        float maxPages = (float) kits.size() / (float) 18;
+
+        if (page > maxPages) {
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.pageNotFound, "{PAGES}", maxPages), sender);
+            return true;
+        }
+
+        Chat.send(placeholdersUtils.replacePlaceholders(localization.availableKits), sender);
+
+        if (kits.size() < 19) {
+            for (String kit : kits) {
+                Chat.send(placeholdersUtils.replacePlaceholders(localization.kitListFormat, "{KIT}", kit), sender);
+            }
+        } else {
+            int minIndex = page * 18;
+            int remaining = kits.size() - minIndex;
+            int maxIndex = remaining <= 19 ? minIndex + remaining : minIndex + 18;
+
+            for (int i = minIndex; i < maxIndex; i++) {
+                Chat.send(placeholdersUtils.replacePlaceholders(localization.kitListFormat, "{KIT}", kits.get(i)), sender);
+            }
+
+            if (isPlayer(sender)) {
+                String nav = placeholdersUtils.replacePlaceholders(
+                        localization.pageNavigation, new String[]{
+                                "{PREV_PAGE}",
+                                "{CURRENT_PAGE}",
+                                "{MAX_PAGES}",
+                                "{NEXT_PAGE}"
+                        },
+                        new Object[]{
+                                page == 0 ? "" : "{PREV_PAGE}",
+                                page + 1,
+                                (int) maxPages,
+                                page == (int) maxPages ? "" : "{NEXT_PAGE}"
+                        });
+
+                BaseComponent[] navComponents = TextComponent.fromLegacyText(nav);
+                RawMessage msg = new RawMessage();
+
+                for (BaseComponent bc : navComponents) {
+                    if (bc.toPlainText().equals("{PREV_PAGE}")) {
+                        TextComponent tc = (TextComponent) bc;
+                        tc.setText("<--");
+                        tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "kits " + (page - 1)));
+                        msg.append(tc);
+                    } else if (bc.toPlainText().equals("{NEXT_PAGE}")) {
+                        TextComponent tc = (TextComponent) bc;
+                        tc.setText("-->");
+                        tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "kits " + (page + 1)));
+                        msg.append(tc);
+                    } else {
+                        msg.append((TextComponent) bc);
+                    }
+                }
+
+                Chat.sendRaw(msg, (Player) sender);
+            } else {
+                Chat.send(placeholdersUtils.replacePlaceholders(
+                        localization.pageNavigation, new String[]{
+                                "{PREV_PAGE}",
+                                "{CURRENT_PAGE}",
+                                "{MAX_PAGES}",
+                                "{NEXT_PAGE}"
+                        },
+                        new Object[]{
+                                page == 0 ? "" : "<--",
+                                page + 1,
+                                (int) maxPages,
+                                page == (int) maxPages ? "" : "-->"
+                        }), sender);
+            }
+        }
 
         return true;
     }

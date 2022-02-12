@@ -37,6 +37,7 @@ import it.multicoredev.aio.listeners.aio.PlayerTeleportCancelledListener;
 import it.multicoredev.aio.listeners.aio.PostCommandListener;
 import it.multicoredev.aio.listeners.entity.EntityDamageListener;
 import it.multicoredev.aio.listeners.player.*;
+import it.multicoredev.aio.models.HelpBook;
 import it.multicoredev.aio.storage.config.Commands;
 import it.multicoredev.aio.storage.config.Config;
 import it.multicoredev.aio.storage.config.Localization;
@@ -104,6 +105,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
     private final File root = getDataFolder();
     private final File modulesDir = new File(root, "modules");
+    private final File helpbooksDir = new File(root, "helpbooks");
     private final File configFile = new File(root, "config.json");
     private final File localizationFile = new File(root, "localization.json");
     private final File commandsFile = new File(root, "commands.json");
@@ -114,6 +116,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     private Config config;
     private Localization localization;
     private ModuleManager moduleManager;
+    private List<HelpBook> helpbooks;
     private Commands commands;
     private IStorage storage;
     private Map<String, UUID> usermap;
@@ -276,6 +279,10 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
     public Config getConfiguration() {
         return config;
+    }
+
+    public List<HelpBook> getHelpbooks() {
+        return Collections.unmodifiableList(helpbooks);
     }
 
     public Localization getLocalization() {
@@ -602,6 +609,38 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                 }
 
                 if (config.modules.get(module.getName())) moduleManager.registerModule(module);
+            }
+        }
+
+        if (!helpbooksDir.exists() || !helpbooksDir.isDirectory()) {
+            if (!helpbooksDir.mkdir()) {
+                Chat.severe("&4Cannot create helpbooks folder");
+                return false;
+            }
+        }
+
+        File[] helpbooks = helpbooksDir.listFiles();
+        if (helpbooks != null) {
+            for (File helpbookFile : helpbooks) {
+                if (!helpbookFile.isFile() || !helpbookFile.getName().toLowerCase(Locale.ROOT).endsWith(".json")) continue;
+
+                try {
+                    HelpBook helpbook = deserialize(helpbookFile, HelpBook.class);
+                    if (helpbook == null) throw new NullPointerException("Helpbook is null");
+
+                    if (helpbook.completeMissing()) {
+                        try {
+                            serialize(helpbookFile, helpbook);
+                        } catch (Exception e) {
+                            Chat.warning("&4" + e.getMessage());
+                            if (debug) e.printStackTrace();
+                        }
+                    }
+
+                    this.helpbooks.add(helpbook);
+                } catch (Exception e) {
+                    Chat.warning("&eHelpbook " + helpbookFile.getName() + " is corrupted or has an invalid format.");
+                }
             }
         }
 

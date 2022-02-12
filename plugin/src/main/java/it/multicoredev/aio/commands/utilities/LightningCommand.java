@@ -51,27 +51,28 @@ public class LightningCommand extends PluginCommand {
             return true;
         }
 
-        Location target = null;
+        List<Location> targets = new ArrayList<>();
         if (args.length > 0) {
-            Player player = Bukkit.getPlayer(args[0]);
-            if (player == null || !player.isOnline()) {
+            List<Player> players = parsePlayers(sender, args[0]);
+            if (players.isEmpty()) {
                 Chat.send(localization.playerNotFound, sender);
                 return true;
             }
 
-            target = player.getLocation();
+            players.forEach(p -> targets.add(p.getLocation()));
         } else {
             Player player = (Player) sender;
             Block block = player.getTargetBlockExact(player.getServer().getViewDistance() * 16, FluidCollisionMode.ALWAYS);
-            if (block != null) target = block.getLocation();
+            if (block != null) targets.add(block.getLocation());
         }
 
-        if (target == null || target.getWorld() == null) {
+        targets.removeIf(l -> l.getWorld() == null);
+        if (targets.isEmpty()) {
             Chat.send(localization.lightningSummonFailed, sender);
             return true;
         }
 
-        target.getWorld().strikeLightning(target);
+        targets.forEach(t -> t.getWorld().strikeLightning(t));
         return true;
     }
 
