@@ -8,8 +8,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-import static it.multicoredev.aio.utils.Utils.getStringFromList;
-
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
  * This file is part of AIO.
@@ -44,8 +42,8 @@ public class WarpsCommand extends PluginCommand {
         List<String> warpNames = aio.getWarpStorage().getWarpNames(sender);
 
         if (warpNames.isEmpty()) Chat.send(localization.noWarps, sender);
-        else
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.availableWarps, "{WARPS}", getStringFromList(warpNames)), sender);
+        //else
+        //Chat.send(placeholdersUtils.replacePlaceholders(localization.availableWarps, "{WARPS}", getStringFromList(warpNames)), sender);
 
         return true;
     }

@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public abstract class AIO extends JavaPlugin {
-    private static AIO aio;
+    protected static AIO aio;
 
     /**
      * Get an instance of the AIO API.

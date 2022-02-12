@@ -8,8 +8,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-import static it.multicoredev.aio.utils.Utils.getStringFromList;
-
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
  * This file is part of AIO.
@@ -46,8 +44,8 @@ public class KitsCommand extends PluginCommand {
         List<String> kitNames = aio.getKitStorage().getKitNames(sender);
 
         if (kitNames.isEmpty()) Chat.send(localization.noKits, sender);
-        else
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.availableKits, "{KITS}", getStringFromList(kitNames)), sender);
+        //else
+            //Chat.send(placeholdersUtils.replacePlaceholders(localization.availableKits, "{KITS}", getStringFromList(kitNames)), sender);
 
         return true;
     }

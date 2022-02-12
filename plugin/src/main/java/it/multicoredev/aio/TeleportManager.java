@@ -64,7 +64,10 @@ public class TeleportManager implements ITeleportManager {
         Location to = Utils.getRandomLocation(center, minDistance, maxDistance);
         if (to == null) return;
 
-        teleport(player, to, timer);
+        Bukkit.getScheduler().callSyncMethod(AIO.getInstance(), () -> {
+            teleport(player, to, timer);
+            return true;
+        });
     }
 
     @Override

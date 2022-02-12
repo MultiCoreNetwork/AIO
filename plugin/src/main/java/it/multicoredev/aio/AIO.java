@@ -143,6 +143,8 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
     @Override
     public void onEnable() {
+        aio = this;
+
         moduleManager = new ModuleManager(this);
 
         if (!initConfigs()) {

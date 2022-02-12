@@ -178,14 +178,14 @@ public class Utils {
 
         World.Environment environment = world.getEnvironment();
         if (environment == World.Environment.NORMAL || environment == World.Environment.THE_END || environment == World.Environment.CUSTOM) {
-            location.setY(world.getHighestBlockYAt(location));
+            location.setY(world.getHighestBlockYAt(location) + 1);
+            return true;
         } else if (environment == World.Environment.NETHER) {
             List<Integer> validY = new ArrayList<>();
             for (int i = 0; i < 128; i++) validY.add(i);
             Collections.shuffle(validY);
 
             for (int y : validY) {
-
                 Location loc0 = location.clone();
                 loc0.setY(y);
                 Location loc1 = loc0.clone().add(0, 1, 0);
@@ -207,8 +207,9 @@ public class Utils {
         Material mat0 = location.clone().add(0, -1, 0).getBlock().getType();
         Material mat1 = location.getBlock().getType();
         Material mat2 = location.clone().add(0, 1, 0).getBlock().getType();
+        Material mat3 = location.clone().add(0, -2, 0).getBlock().getType();
 
-        if (!mat0.isSolid() || mat0.hasGravity()) return false;
+        if (!mat0.isSolid() || (mat0.hasGravity() && mat3.isAir())) return false;
         if (!mat1.isAir() || !mat2.isAir()) return false;
 
         return !mat0.equals(Material.MAGMA_BLOCK) && !mat0.equals(Material.CACTUS);

@@ -67,6 +67,12 @@ public class RTPCommand extends PluginCommand {
             return true;
         }
 
+        if (config.rtpSection.isWorldBlacklisted(target.getWorld())) {
+            //TODO
+            //Chat.send(localization.rtpWorldBlacklisted, sender);
+            return true;
+        }
+
         if (config.rtpSection.maxRtp > 0) {
             if ((sender instanceof Player) && !hasSubPerm(sender, "bypass-limits")) {
                 User user = storage.getUser(((Player) sender).getUniqueId());
@@ -82,14 +88,16 @@ public class RTPCommand extends PluginCommand {
             }
         }
 
-        aio.getTeleportManager().randomTeleport(
+        Bukkit.getScheduler().runTaskAsynchronously(aio, () -> aio.getTeleportManager().randomTeleport(
                 target,
                 config.rtpSection.centerX,
                 config.rtpSection.centerZ,
                 config.rtpSection.spreadDistance,
                 config.rtpSection.maxRange,
                 config.rtpSection.rtpTeleportDelay
-        );
+        ));
+
+        //TODO Send teleporting message...
 
         return true;
     }

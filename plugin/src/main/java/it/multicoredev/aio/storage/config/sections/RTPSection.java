@@ -2,6 +2,10 @@ package it.multicoredev.aio.storage.config.sections;
 
 import com.google.gson.annotations.SerializedName;
 import it.multicoredev.mclib.json.JsonConfig;
+import org.bukkit.World;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -36,6 +40,8 @@ public class RTPSection extends JsonConfig {
     public Integer rtpTeleportDelay;
     @SerializedName("max_rtp")
     public Integer maxRtp;
+    @SerializedName("blacklisted_worlds")
+    public List<String> blacklistedWorlds;
 
     public RTPSection() {
         init();
@@ -49,5 +55,16 @@ public class RTPSection extends JsonConfig {
         if (maxRange == null) maxRange = 10000;
         if (rtpTeleportDelay == null) rtpTeleportDelay = -1;
         if (maxRtp == null) maxRtp = -1;
+        if (blacklistedWorlds == null) blacklistedWorlds = new ArrayList<>();
+    }
+
+    public boolean isWorldBlacklisted(World world) {
+        if (world == null) return true;
+
+        for (String w : blacklistedWorlds) {
+            if (w.equalsIgnoreCase(world.getName())) return true;
+        }
+
+        return false;
     }
 }
