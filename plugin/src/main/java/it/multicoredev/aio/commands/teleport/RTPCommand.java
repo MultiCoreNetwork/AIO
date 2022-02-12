@@ -68,8 +68,7 @@ public class RTPCommand extends PluginCommand {
         }
 
         if (config.rtpSection.isWorldBlacklisted(target.getWorld())) {
-            //TODO
-            //Chat.send(localization.rtpWorldBlacklisted, sender);
+            Chat.send(localization.rtpBlacklistedWorld, sender);
             return true;
         }
 
@@ -97,7 +96,12 @@ public class RTPCommand extends PluginCommand {
                 config.rtpSection.rtpTeleportDelay
         ));
 
-        //TODO Send teleporting message...
+        if (target.equals(sender)) Chat.send(placeholdersUtils.replacePlaceholders(localization.rtpTeleportSelf), target);
+        else Chat.send(placeholdersUtils.replacePlaceholders(
+                localization.rtpTeleport,
+                new String[]{"{NAME}", "{DISPLAYNAME}"},
+                new Object[]{target.getName(), target.getDisplayName()}
+        ), target);
 
         return true;
     }

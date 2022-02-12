@@ -249,6 +249,8 @@ public class Localization extends JsonConfig {
 
     @SerializedName("max_rtp_exceeded")
     public String maxRtpExceeded;
+    @SerializedName("rtp_blacklisted_world")
+    public String rtpBlacklistedWorld;
     @SerializedName("rtp_teleport")
     public String rtpTeleport;
     @SerializedName("rtp_teleport_self")
@@ -467,8 +469,9 @@ public class Localization extends JsonConfig {
         if (itemsNotRepairedSelf == null) itemsNotRepairedSelf = "&cNone of your items has been repaired.";
 
         if (maxRtpExceeded == null) maxRtpExceeded = "&cYou exceeded the max amount of RTPs.";
-        if (rtpTeleport == null) rtpTeleport = "&h{DISPLAYNAME} has been teleported to a random location.";
-        if (rtpTeleportSelf == null) rtpTeleportSelf = "&hYou have been teleported to a random location.";
+        if (rtpBlacklistedWorld == null) rtpBlacklistedWorld = "&cYou can't use RTP in this world.";
+        if (rtpTeleport == null) rtpTeleport = "&h{DISPLAYNAME} is being teleported to a random location.";
+        if (rtpTeleportSelf == null) rtpTeleportSelf = "&hYou are being teleported to a random location.";
 
         if (runLaterScheduled == null) runLaterScheduled = "&hCommand was scheduled to be run in {DELAY}.";
 
