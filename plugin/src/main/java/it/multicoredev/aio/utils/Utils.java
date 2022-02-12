@@ -2,10 +2,14 @@ package it.multicoredev.aio.utils;
 
 import it.multicoredev.aio.storage.config.Localization;
 import it.multicoredev.mbcore.spigot.Chat;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 
 import java.util.*;
@@ -213,5 +217,34 @@ public class Utils {
         if (!mat1.isAir() || !mat2.isAir()) return false;
 
         return !mat0.equals(Material.MAGMA_BLOCK) && !mat0.equals(Material.CACTUS);
+    }
+
+    public static String getStringFromList(List<String> list) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (int i = 0; i < list.size(); i++) {
+            stringBuilder.append(list.get(i));
+            if (i != list.size() - 1) stringBuilder.append(", ");
+        }
+
+        return stringBuilder.toString();
+    }
+
+    public static boolean hasSpaceInInventory(Player player, ItemStack item) {
+        Inventory inventory = Bukkit.createInventory(player, InventoryType.PLAYER);
+        inventory.setContents(player.getInventory().getContents());
+
+        return !inventory.addItem(item).isEmpty();
+    }
+
+    public static boolean hasSpaceInInventory(Player player, List<ItemStack> items) {
+        Inventory inventory = Bukkit.createInventory(player, InventoryType.PLAYER);
+        inventory.setContents(player.getInventory().getContents());
+
+        for (ItemStack item : items) {
+            if (inventory.addItem(item).isEmpty()) return false;
+        }
+
+        return true;
     }
 }

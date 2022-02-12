@@ -17,6 +17,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import static it.multicoredev.aio.utils.Utils.hasSpaceInInventory;
+
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
  * This file is part of AIO.
@@ -115,7 +117,6 @@ public class KitCommand extends PluginCommand {
             ItemStack itemStack = new ItemStack(material, itemObject.getAmount());
             String nbt = itemObject.getNbtString();
 
-            //TODO Try
             if (!nbt.isEmpty()) itemStack = Bukkit.getUnsafe().modifyItemStack(itemStack, itemObject.getNbtString());
             itemStacks.add(itemStack);
         }
@@ -128,10 +129,10 @@ public class KitCommand extends PluginCommand {
 
         PlayerInventory playerInventory = target.getInventory();
 
-        /*if (hasSpaceInInventory(target, itemStacks)) {
+        if (hasSpaceInInventory(target, itemStacks)) {
             Chat.send(localization.kitNoSpace, sender);
             return true;
-        }*/
+        }
 
         for (ItemStack itemStack : itemStacks) {
             if (itemStack != null) playerInventory.addItem(itemStack);
