@@ -99,12 +99,12 @@ public class KitsCommand extends PluginCommand {
                 for (BaseComponent bc : navComponents) {
                     if (bc.toPlainText().equals("{PREV_PAGE}")) {
                         TextComponent tc = (TextComponent) bc;
-                        tc.setText("<--");
+                        tc.setText("<-- ");
                         tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "kits " + (page - 1)));
                         msg.append(tc);
                     } else if (bc.toPlainText().equals("{NEXT_PAGE}")) {
                         TextComponent tc = (TextComponent) bc;
-                        tc.setText("-->");
+                        tc.setText(" -->");
                         tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "kits " + (page + 1)));
                         msg.append(tc);
                     } else {
@@ -122,10 +122,10 @@ public class KitsCommand extends PluginCommand {
                                 "{NEXT_PAGE}"
                         },
                         new Object[]{
-                                page == 0 ? "" : "<--",
+                                page == 0 ? "" : "<-- ",
                                 page + 1,
                                 (int) maxPages,
-                                page == (int) maxPages ? "" : "-->"
+                                page == (int) maxPages ? "" : " -->"
                         }), sender);
             }
         }

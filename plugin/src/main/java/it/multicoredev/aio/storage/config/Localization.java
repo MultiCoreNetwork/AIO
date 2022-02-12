@@ -63,6 +63,10 @@ public class Localization extends JsonConfig {
     public String noItemInHand;
     @SerializedName("not_a_player")
     public String notPlayer;
+    @SerializedName("page_navigation")
+    public String pageNavigation;
+    @SerializedName("page_not_found")
+    public String pageNotFound;
     @SerializedName("player_not_found")
     public String playerNotFound;
     public String second;
@@ -207,6 +211,8 @@ public class Localization extends JsonConfig {
     public String kitEmpty;
     @SerializedName("kit_not_found")
     public String kitNotFound;
+    @SerializedName("kit_list_format")
+    public String kitListFormat;
     @SerializedName("kit_no_perms")
     public String kitNoPerms;
     @SerializedName("kit_no_space")
@@ -342,7 +348,8 @@ public class Localization extends JsonConfig {
     protected void init() {
         if (localization == null) localization = "us";
         if (commandCooldown == null) commandCooldown = "&cYou have to wait {TIME} to use this command again.";
-        if (commandException == null) commandException = "&cThis command throw an exception! Check the console for more info.";
+        if (commandException == null)
+            commandException = "&cThis command throw an exception! Check the console for more info.";
         if (currencySingular == null) currencySingular = "$";
         if (currencyPlural == null) currencyPlural = "$";
         if (day == null) day = "day";
@@ -350,7 +357,8 @@ public class Localization extends JsonConfig {
         if (hour == null) hour = "hour";
         if (hours == null) hours = "hours";
         if (incorrectUsage == null) incorrectUsage = "&cIncorrect usage! Usage:\n&e{USAGE}\n&cAlias: &e{ALIAS}";
-        if (insufficientCmdMoney == null) insufficientCmdMoney = "&cInsufficient money! You need {MONEY} to execute this command.";
+        if (insufficientCmdMoney == null)
+            insufficientCmdMoney = "&cInsufficient money! You need {MONEY} to execute this command.";
         if (insufficientPerms == null) insufficientPerms = "&cInsufficient permissions!";
         if (invalidEnchant == null) invalidEnchant = "&cEnchantment not found.";
         if (invalidNumber == null) invalidNumber = "&cInvalid number!";
@@ -364,6 +372,8 @@ public class Localization extends JsonConfig {
         if (notImplemented == null) notImplemented = "&4This command is not implemented yet!";
         if (noItemInHand == null) noItemInHand = "&cYou must hold an item in your main hand.";
         if (notPlayer == null) notPlayer = "&cYou must be a player to execute this command!";
+        if (pageNavigation == null) pageNavigation = "&h&l{PREV_PAGE}&e{CURRENT_PAGE}/{MAX_PAGES}&h&l{NEXT_PAGE}";
+        if (pageNotFound == null) pageNotFound = "&cPage not found! There are {PAGES} pages.";
         if (playerNotFound == null) playerNotFound = "&cPlayer not found.";
         if (second == null) second = "second";
         if (seconds == null) seconds = "seconds";
@@ -443,10 +453,11 @@ public class Localization extends JsonConfig {
         if (helpbookGiven == null) helpbookGiven = "&hYou gave &e{book} &hto {DISPLAYNAME}.";
         if (helpbookGivenSelf == null) helpbookGivenSelf = "&hYou received &e{book}&h.";
 
-        if (availableKits == null) availableKits = "&hAvailable kits: &e{KITS}";
+        if (availableKits == null) availableKits = "&hAvailable kits:";
         if (invalidKit == null) invalidKit = "&eSome items described in the kit {KIT} are invalid: {INVALID}";
         if (noKits == null) noKits = "&hNo kits available.";
         if (kitEmpty == null) kitEmpty = "&cThis kit is empty.";
+        if (kitListFormat == null) kitListFormat = "&e- {KIT}";
         if (kitNotFound == null) kitNotFound = "&cKit not found.";
         if (kitNoPerms == null) kitNoPerms = "&cYou don't have permissions for use this kit.";
         if (kitNoSpace == null) kitNoSpace = "&cThere is not enough inventory space.";
