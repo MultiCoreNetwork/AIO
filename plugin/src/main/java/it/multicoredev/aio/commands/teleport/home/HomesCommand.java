@@ -10,6 +10,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import static it.multicoredev.aio.utils.Utils.getStringFromList;
+
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -56,8 +58,8 @@ public class HomesCommand extends PluginCommand {
         List<String> homeNames = user.getHomeNames();
 
         if (homeNames.isEmpty()) Chat.send(localization.noHomes, sender);
-        //else
-        //    Chat.send(placeholdersUtils.replacePlaceholders(localization.availableHomes, "{HOMES}", getStringFromList(homeNames)), sender);
+        else
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.availableHomes, "{HOMES}", getStringFromList(homeNames)), sender);
 
         return true;
     }
