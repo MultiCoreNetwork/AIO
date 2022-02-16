@@ -6,11 +6,13 @@ import it.multicoredev.mbcore.spigot.Chat;
 import it.multicoredev.mbcore.spigot.util.chat.RawMessage;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -93,8 +95,41 @@ public class KitsCommand extends PluginCommand {
                                 page == (int) maxPages ? "" : "{NEXT_PAGE}"
                         });
 
-                BaseComponent[] navComponents = TextComponent.fromLegacyText(nav);
+                List<String> components = new ArrayList<>();
+                int indexPrevPage = nav.indexOf("{PREV_PAGE}");
+                int indexNextPage = nav.indexOf("{NEXT_PAGE}");
+
+                if (indexPrevPage == -1 && indexNextPage == -1) {
+                    components.add(nav);
+                } else {
+                    if (indexPrevPage != -1) {
+                        components.add(nav.substring(0, indexPrevPage));
+                        components.add("{PREV_PAGE}");
+
+                        if (indexNextPage != -1) {
+                            components.add(nav.substring(indexPrevPage + 11, indexNextPage));
+                            components.add("{NEXT_PAGE}");
+                            components.add(nav.substring(indexNextPage + 11));
+                        } else {
+                            components.add(nav.substring(indexPrevPage + 11));
+                        }
+                    } else {
+                        components.add(nav.substring(0, indexNextPage));
+                        components.add("{NEXT_PAGE}");
+                        components.add(nav.substring(indexNextPage + 11));
+                    }
+                }
+
+                ComponentBuilder componentBuilder = new ComponentBuilder();
+
+                for (String str : components) {
+                    componentBuilder.append(Chat.getTranslated(str));
+                }
+
+                BaseComponent[] navComponents = componentBuilder.create();
                 RawMessage msg = new RawMessage();
+
+                //TODO Color to arrows
 
                 for (BaseComponent bc : navComponents) {
                     if (bc.toPlainText().equals("{PREV_PAGE}")) {
@@ -113,6 +148,7 @@ public class KitsCommand extends PluginCommand {
                 }
 
                 Chat.sendRaw(msg, (Player) sender);
+
             } else {
                 Chat.send(placeholdersUtils.replacePlaceholders(
                         localization.pageNavigation, new String[]{
