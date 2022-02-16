@@ -91,7 +91,7 @@ public class KitsCommand extends PluginCommand {
                         new Object[]{
                                 page == 0 ? "" : "{PREV_PAGE}",
                                 page + 1,
-                                (int) maxPages,
+                                (int) maxPages + 1,
                                 page == (int) maxPages ? "" : "{NEXT_PAGE}"
                         });
 
@@ -135,12 +135,12 @@ public class KitsCommand extends PluginCommand {
                     if (bc.toPlainText().equals("{PREV_PAGE}")) {
                         TextComponent tc = (TextComponent) bc;
                         tc.setText("<-- ");
-                        tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "kits " + (page - 1)));
+                        tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "kits " + page));
                         msg.append(tc);
                     } else if (bc.toPlainText().equals("{NEXT_PAGE}")) {
                         TextComponent tc = (TextComponent) bc;
                         tc.setText(" -->");
-                        tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "kits " + (page + 1)));
+                        tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "kits " + page));
                         msg.append(tc);
                     } else {
                         msg.append((TextComponent) bc);
@@ -160,7 +160,7 @@ public class KitsCommand extends PluginCommand {
                         new Object[]{
                                 page == 0 ? "" : "<-- ",
                                 page + 1,
-                                (int) maxPages,
+                                (int) maxPages + 1,
                                 page == (int) maxPages ? "" : " -->"
                         }), sender);
             }
