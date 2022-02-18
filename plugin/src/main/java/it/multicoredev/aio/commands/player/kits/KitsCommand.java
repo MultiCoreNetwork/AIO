@@ -123,7 +123,7 @@ public class KitsCommand extends PluginCommand {
                 ComponentBuilder componentBuilder = new ComponentBuilder();
 
                 for (String str : components) {
-                    componentBuilder.append(Chat.getTranslated(str));
+                    componentBuilder.append(TextComponent.fromLegacyText(Chat.getTranslated(str)));
                 }
 
                 BaseComponent[] navComponents = componentBuilder.create();
@@ -135,12 +135,12 @@ public class KitsCommand extends PluginCommand {
                     if (bc.toPlainText().equals("{PREV_PAGE}")) {
                         TextComponent tc = (TextComponent) bc;
                         tc.setText("<-- ");
-                        tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "kits " + page));
+                        tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/kits " + (page - 1)));
                         msg.append(tc);
                     } else if (bc.toPlainText().equals("{NEXT_PAGE}")) {
                         TextComponent tc = (TextComponent) bc;
                         tc.setText(" -->");
-                        tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "kits " + page));
+                        tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/kits " + (page == 0 ? page + 2 : page + 1)));
                         msg.append(tc);
                     } else {
                         msg.append((TextComponent) bc);
