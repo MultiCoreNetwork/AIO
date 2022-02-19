@@ -47,7 +47,10 @@ public class KitsCommand extends PluginCommand {
         if (!preCommandProcess(sender, getName(), args)) return true;
 
         List<String> kits = aio.getKitStorage().getKitNames(sender);
-        if (kits.isEmpty()) Chat.send(localization.noKits, sender);
+        if (kits.isEmpty()) {
+            Chat.send(localization.noKits, sender);
+            return true;
+        }
 
         int page = 0;
 
@@ -128,8 +131,6 @@ public class KitsCommand extends PluginCommand {
 
                 BaseComponent[] navComponents = componentBuilder.create();
                 RawMessage msg = new RawMessage();
-
-                //TODO Color to arrows
 
                 for (BaseComponent bc : navComponents) {
                     if (bc.toPlainText().equals("{PREV_PAGE}")) {

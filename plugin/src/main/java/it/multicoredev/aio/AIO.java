@@ -678,7 +678,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         }
 
         if (!warpsFile.exists() || !warpsFile.isFile()) {
-            warpStorage = new WarpStorage(this);
+            warpStorage = new WarpStorage();
 
             try {
                 serialize(warpsFile, warpStorage);
@@ -698,7 +698,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                 if (!backupFile(warpsFile)) return false;
                 Chat.warning("&4WarpStorage file is corrupted, creating new one");
 
-                warpStorage = new WarpStorage(this);
+                warpStorage = new WarpStorage();
 
                 try {
                     serialize(warpsFile, warpStorage);

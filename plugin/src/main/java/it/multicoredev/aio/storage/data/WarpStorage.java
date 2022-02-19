@@ -9,7 +9,6 @@ import it.multicoredev.mclib.json.JsonConfig;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,12 +34,9 @@ import java.util.List;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class WarpStorage extends JsonConfig implements IWarpStorage {
-    private final transient AIO aio;
     private List<Warp> warps;
 
-    public WarpStorage(@NotNull AIO aio) {
-        this.aio = aio;
-
+    public WarpStorage() {
         init();
     }
 
@@ -51,6 +47,8 @@ public class WarpStorage extends JsonConfig implements IWarpStorage {
 
     @Override
     public void saveWarps() {
+        AIO aio = (AIO) AIO.getInstance();
+
         try {
             aio.saveWarps();
         } catch (Exception e) {

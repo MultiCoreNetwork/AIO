@@ -4,13 +4,17 @@ import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.User;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.mbcore.spigot.Chat;
+import it.multicoredev.mbcore.spigot.util.chat.RawMessage;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import static it.multicoredev.aio.utils.Utils.getStringFromList;
 
 
 /**
@@ -45,7 +49,6 @@ public class HomesCommand extends PluginCommand {
         if (!preCommandProcess(sender, getName(), args)) return true;
         //TODO Add homes [player]
         //TODO Use format to display home list to allow custom formatting and coords
-        //TODO Divide in pages
 
         if (!isPlayer(sender)) {
             Chat.send(localization.notPlayer, sender);
@@ -55,11 +58,124 @@ public class HomesCommand extends PluginCommand {
         Player player = (Player) sender;
         User user = storage.getUser(player);
 
-        List<String> homeNames = user.getHomeNames();
+        List<String> homes = user.getHomeNames();
 
-        if (homeNames.isEmpty()) Chat.send(localization.noHomes, sender);
-        else
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.availableHomes, "{HOMES}", getStringFromList(homeNames)), sender);
+        if (homes.isEmpty()) {
+            Chat.send(localization.noHomes, sender);
+            return true;
+        }
+
+        int page = 0;
+
+        if (args.length > 0) {
+            try {
+                page = Math.max(0, Integer.parseInt(args[0]) - 1);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        float maxPages = (float) homes.size() / (float) 18;
+
+        if (page > maxPages) {
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.pageNotFound, "{PAGES}", maxPages), sender);
+            return true;
+        }
+
+        Chat.send(placeholdersUtils.replacePlaceholders(localization.availableHomes), sender);
+
+        if (homes.size() < 19) {
+            for (String home : homes) {
+                RawMessage msg = new RawMessage();
+                TextComponent tc = (TextComponent) new ComponentBuilder().append(TextComponent.fromLegacyText(Chat.getTranslated(placeholdersUtils.replacePlaceholders(localization.homeListFormat, "{HOME}", home)))).create()[0];
+                tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/home " + home));
+                msg.append(tc);
+
+                Chat.sendRaw(msg, (Player) sender);
+            }
+        } else {
+            int minIndex = page * 18;
+            int remaining = homes.size() - minIndex;
+            int maxIndex = remaining <= 19 ? minIndex + remaining : minIndex + 18;
+
+            for (int i = minIndex; i < maxIndex; i++) {
+                String home = homes.get(i);
+
+                RawMessage msg = new RawMessage();
+                TextComponent tc = (TextComponent) new ComponentBuilder().append(TextComponent.fromLegacyText(Chat.getTranslated(placeholdersUtils.replacePlaceholders(localization.homeListFormat, "{HOME}", home)))).create()[0];
+                tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/home " + home));
+                msg.append(tc);
+
+                Chat.sendRaw(msg, (Player) sender);
+            }
+
+            if (isPlayer(sender)) {
+                String nav = placeholdersUtils.replacePlaceholders(
+                        localization.pageNavigation, new String[]{
+                                "{PREV_PAGE}",
+                                "{CURRENT_PAGE}",
+                                "{MAX_PAGES}",
+                                "{NEXT_PAGE}"
+                        },
+                        new Object[]{
+                                page == 0 ? "" : "{PREV_PAGE}",
+                                page + 1,
+                                (int) maxPages + 1,
+                                page == (int) maxPages ? "" : "{NEXT_PAGE}"
+                        });
+
+                List<String> components = new ArrayList<>();
+                int indexPrevPage = nav.indexOf("{PREV_PAGE}");
+                int indexNextPage = nav.indexOf("{NEXT_PAGE}");
+
+                if (indexPrevPage == -1 && indexNextPage == -1) {
+                    components.add(nav);
+                } else {
+                    if (indexPrevPage != -1) {
+                        components.add(nav.substring(0, indexPrevPage));
+                        components.add("{PREV_PAGE}");
+
+                        if (indexNextPage != -1) {
+                            components.add(nav.substring(indexPrevPage + 11, indexNextPage));
+                            components.add("{NEXT_PAGE}");
+                            components.add(nav.substring(indexNextPage + 11));
+                        } else {
+                            components.add(nav.substring(indexPrevPage + 11));
+                        }
+                    } else {
+                        components.add(nav.substring(0, indexNextPage));
+                        components.add("{NEXT_PAGE}");
+                        components.add(nav.substring(indexNextPage + 11));
+                    }
+                }
+
+                ComponentBuilder componentBuilder = new ComponentBuilder();
+
+                for (String str : components) {
+                    componentBuilder.append(TextComponent.fromLegacyText(Chat.getTranslated(str)));
+                }
+
+                BaseComponent[] navComponents = componentBuilder.create();
+                RawMessage msg = new RawMessage();
+
+                for (BaseComponent bc : navComponents) {
+                    if (bc.toPlainText().equals("{PREV_PAGE}")) {
+                        TextComponent tc = (TextComponent) bc;
+                        tc.setText("<-- ");
+                        tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/homes " + (page - 1)));
+                        msg.append(tc);
+                    } else if (bc.toPlainText().equals("{NEXT_PAGE}")) {
+                        TextComponent tc = (TextComponent) bc;
+                        tc.setText(" -->");
+                        tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/homes " + (page == 0 ? page + 2 : page + 1)));
+                        msg.append(tc);
+                    } else {
+                        msg.append((TextComponent) bc);
+                    }
+                }
+
+                Chat.sendRaw(msg, (Player) sender);
+            }
+        }
 
         return true;
     }
