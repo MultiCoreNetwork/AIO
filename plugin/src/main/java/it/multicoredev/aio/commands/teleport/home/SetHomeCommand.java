@@ -66,7 +66,6 @@ public class SetHomeCommand extends PluginCommand {
         }
 
         createHome(player, args[0]);
-        Chat.send(localization.homeCreated, sender);
         return true;
     }
 
@@ -87,6 +86,7 @@ public class SetHomeCommand extends PluginCommand {
         user.addHome(home);
 
         storage.updateUser(user);
+        Chat.send(localization.homeCreated, player);
     }
 
     private int getHomesAmount(Player player) {

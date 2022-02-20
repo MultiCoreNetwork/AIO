@@ -186,6 +186,8 @@ public class Localization extends JsonConfig {
     public String homeDeleted;
     @SerializedName("home_limit_exceeded")
     public String homeLimitExceeded;
+    @SerializedName("home_list_format")
+    public String homeListFormat;
     @SerializedName("home_not_found")
     public String homeNotFound;
     @SerializedName("no_homes")
@@ -317,6 +319,8 @@ public class Localization extends JsonConfig {
     public String warpCreated;
     @SerializedName("warp_deleted")
     public String warpDeleted;
+    @SerializedName("warp_list_format")
+    public String warpListFormat;
     @SerializedName("warp_not_found")
     public String warpNotFound;
     @SerializedName("warp_not_global")
@@ -387,11 +391,14 @@ public class Localization extends JsonConfig {
 
         if (chatCleaned == null) chatCleaned = "&hChat cleaned by the staff.";
 
-        if (itemDisenchanted == null) itemDisenchanted = "&hYou removed &e{ENCHANTMENT} &hform &e{DISPLAYNAME}&h's &e{ITEM} &h.";
+        if (itemDisenchanted == null)
+            itemDisenchanted = "&hYou removed &e{ENCHANTMENT} &hform &e{DISPLAYNAME}&h's &e{ITEM} &h.";
         if (itemDisenchantedSelf == null) itemDisenchantedSelf = "&hYou removed &e{ENCHANTMENT} &hfrom &e{ITEM} &h.";
 
-        if (itemEnchanted == null) itemEnchanted = "&hYou enchanted &e{DISPLAYNAME}&h's &e{ITEM} &hwith &e{ENCHANTMENT} {LEVEL}&h.";
-        if (itemEnchantedSelf == null) itemEnchantedSelf = "&hYour &e{ITEM} &hhas been enchanted with &e{ENCHANTMENT} {LEVEL}&h.";
+        if (itemEnchanted == null)
+            itemEnchanted = "&hYou enchanted &e{DISPLAYNAME}&h's &e{ITEM} &hwith &e{ENCHANTMENT} {LEVEL}&h.";
+        if (itemEnchantedSelf == null)
+            itemEnchantedSelf = "&hYour &e{ITEM} &hhas been enchanted with &e{ENCHANTMENT} {LEVEL}&h.";
 
         if (insufficientMoney == null) insufficientMoney = "Insufficient money";
         if (maxMoneyReached == null) maxMoneyReached = "Max money reached";
@@ -402,10 +409,13 @@ public class Localization extends JsonConfig {
         if (moneySet == null) moneySet = "Money set";
         if (moneyNotSet == null) moneyNotSet = "Money not set";
 
-        if (moneyDepositedSender == null) moneyDepositedSender = "&e{MONEY}&h deposited to &e{DISPLAYNAME}&h's balance.";
+        if (moneyDepositedSender == null)
+            moneyDepositedSender = "&e{MONEY}&h deposited to &e{DISPLAYNAME}&h's balance.";
         if (moneyDepositedReceiver == null) moneyDepositedReceiver = "&e{MONEY}&h has been deposited to your balance.";
-        if (moneyWithdrawnSender == null) moneyWithdrawnSender = "&e{MONEY}&h withdrawn from &e{DISPLAYNAME}&h's balance.";
-        if (moneyWithdrawnReceiver == null) moneyWithdrawnReceiver = "&e{MONEY}&h has been withdrawn from your balance.";
+        if (moneyWithdrawnSender == null)
+            moneyWithdrawnSender = "&e{MONEY}&h withdrawn from &e{DISPLAYNAME}&h's balance.";
+        if (moneyWithdrawnReceiver == null)
+            moneyWithdrawnReceiver = "&e{MONEY}&h has been withdrawn from your balance.";
         if (moneySetSender == null) moneySetSender = "&e{DISPLAYNAME}&h's balance set to &e{MONEY}&h.";
         if (moneySetReceiver == null) moneySetReceiver = "&hYour balance has been set to &e{MONEY}&h.";
         if (moneyResetSender == null) moneyResetSender = "&e{DISPLAYNAME}&h's balance reset to &e{MONEY}&h.";
@@ -435,11 +445,12 @@ public class Localization extends JsonConfig {
         if (preventHat == null) preventHat = "&hYou can't wear as hat this item!";
         if (targetHasInventoryFull == null) targetHasInventoryFull = "&cTarget has inventory full!";
 
-        if (availableHomes == null) availableHomes = "&hAvailable homes: &e{HOMES}";
+        if (availableHomes == null) availableHomes = "&hAvailable homes:";
         if (homeAlreadyExists == null) homeAlreadyExists = "&cAn home with this name already exists!";
         if (homeCreated == null) homeCreated = "&hHome created!";
         if (homeDeleted == null) homeDeleted = "&hHome deleted!";
         if (homeLimitExceeded == null) homeLimitExceeded = "&cYou can't set another home! Limit exceeded!";
+        if (homeListFormat == null) homeListFormat = "&e- {HOME}";
         if (homeNotFound == null) homeNotFound = "&cHome not found!";
         if (noHomes == null) noHomes = "&hNo homes available.";
 
@@ -508,12 +519,13 @@ public class Localization extends JsonConfig {
 
         if (trash == null) trash = "Trash Can";
 
-        if (availableWarps == null) availableWarps = "&hWarps available are: &e{WARPS}";
+        if (availableWarps == null) availableWarps = "&hWarps available are:";
         if (invalidWarpMode == null) invalidWarpMode = "&cInvalid warp mode! Only global or local are allowed!";
         if (noWarps == null) noWarps = "&hNo warps available.";
         if (warpAlreadyExist == null) warpAlreadyExist = "&cWarp already exists!";
         if (warpCreated == null) warpCreated = "&hWarp created!";
         if (warpDeleted == null) warpDeleted = "&hWarp deleted!";
+        if (warpListFormat == null) warpListFormat = "&e- {WARP}";
         if (warpNotFound == null) warpNotFound = "&cWarp not found!";
         if (warpNotGlobal == null) warpNotGlobal = "&cYou can teleport to this warp only from world: {WORLD}!";
 

@@ -3,12 +3,17 @@ package it.multicoredev.aio.commands.teleport.warp;
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.mbcore.spigot.Chat;
+import it.multicoredev.mbcore.spigot.util.chat.RawMessage;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import static it.multicoredev.aio.utils.Utils.getStringFromList;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -41,11 +46,123 @@ public class WarpsCommand extends PluginCommand {
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!preCommandProcess(sender, getName(), args)) return true;
 
-        List<String> warpNames = aio.getWarpStorage().getWarpNames(sender);
+        List<String> warps = aio.getWarpStorage().getWarpNames(sender);
 
-        if (warpNames.isEmpty()) Chat.send(localization.noWarps, sender);
-        else
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.availableWarps, "{WARPS}", getStringFromList(warpNames)), sender);
+        if (warps.isEmpty()) {
+            Chat.send(localization.noWarps, sender);
+            return true;
+        }
+
+        int page = 0;
+
+        if (args.length > 0) {
+            try {
+                page = Math.max(0, Integer.parseInt(args[0]) - 1);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        float maxPages = (float) warps.size() / (float) 18;
+
+        if (page > maxPages) {
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.pageNotFound, "{PAGES}", maxPages), sender);
+            return true;
+        }
+
+        Chat.send(placeholdersUtils.replacePlaceholders(localization.availableWarps), sender);
+
+        if (warps.size() < 19) {
+            for (String warp : warps) {
+                RawMessage msg = new RawMessage();
+                TextComponent tc = (TextComponent) new ComponentBuilder().append(TextComponent.fromLegacyText(Chat.getTranslated(placeholdersUtils.replacePlaceholders(localization.warpListFormat, "{WARP}", warp)))).create()[0];
+                tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/warp " + warp));
+                msg.append(tc);
+
+                Chat.sendRaw(msg, (Player) sender);            }
+        } else {
+            int minIndex = page * 18;
+            int remaining = warps.size() - minIndex;
+            int maxIndex = remaining <= 19 ? minIndex + remaining : minIndex + 18;
+
+            for (int i = minIndex; i < maxIndex; i++) {
+                String warp = warps.get(i);
+
+                RawMessage msg = new RawMessage();
+                TextComponent tc = (TextComponent) new ComponentBuilder().append(TextComponent.fromLegacyText(Chat.getTranslated(placeholdersUtils.replacePlaceholders(localization.warpListFormat, "{WARP}", warp)))).create()[0];
+                tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/warp " + warp));
+                msg.append(tc);
+
+                Chat.sendRaw(msg, (Player) sender);
+            }
+
+            if (isPlayer(sender)) {
+                String nav = placeholdersUtils.replacePlaceholders(
+                        localization.pageNavigation, new String[]{
+                                "{PREV_PAGE}",
+                                "{CURRENT_PAGE}",
+                                "{MAX_PAGES}",
+                                "{NEXT_PAGE}"
+                        },
+                        new Object[]{
+                                page == 0 ? "" : "{PREV_PAGE}",
+                                page + 1,
+                                (int) maxPages + 1,
+                                page == (int) maxPages ? "" : "{NEXT_PAGE}"
+                        });
+
+                List<String> components = new ArrayList<>();
+                int indexPrevPage = nav.indexOf("{PREV_PAGE}");
+                int indexNextPage = nav.indexOf("{NEXT_PAGE}");
+
+                if (indexPrevPage == -1 && indexNextPage == -1) {
+                    components.add(nav);
+                } else {
+                    if (indexPrevPage != -1) {
+                        components.add(nav.substring(0, indexPrevPage));
+                        components.add("{PREV_PAGE}");
+
+                        if (indexNextPage != -1) {
+                            components.add(nav.substring(indexPrevPage + 11, indexNextPage));
+                            components.add("{NEXT_PAGE}");
+                            components.add(nav.substring(indexNextPage + 11));
+                        } else {
+                            components.add(nav.substring(indexPrevPage + 11));
+                        }
+                    } else {
+                        components.add(nav.substring(0, indexNextPage));
+                        components.add("{NEXT_PAGE}");
+                        components.add(nav.substring(indexNextPage + 11));
+                    }
+                }
+
+                ComponentBuilder componentBuilder = new ComponentBuilder();
+
+                for (String str : components) {
+                    componentBuilder.append(TextComponent.fromLegacyText(Chat.getTranslated(str)));
+                }
+
+                BaseComponent[] navComponents = componentBuilder.create();
+                RawMessage msg = new RawMessage();
+
+                for (BaseComponent bc : navComponents) {
+                    if (bc.toPlainText().equals("{PREV_PAGE}")) {
+                        TextComponent tc = (TextComponent) bc;
+                        tc.setText("<-- ");
+                        tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/warps " + (page - 1)));
+                        msg.append(tc);
+                    } else if (bc.toPlainText().equals("{NEXT_PAGE}")) {
+                        TextComponent tc = (TextComponent) bc;
+                        tc.setText(" -->");
+                        tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/warps " + (page == 0 ? page + 2 : page + 1)));
+                        msg.append(tc);
+                    } else {
+                        msg.append((TextComponent) bc);
+                    }
+                }
+
+                Chat.sendRaw(msg, (Player) sender);
+            }
+        }
 
         return true;
     }
