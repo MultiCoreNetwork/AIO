@@ -1,10 +1,10 @@
 package it.multicoredev.aio.listeners.aio;
 
-import io.papermc.paper.event.server.CommandPostprocessEvent;
+/*import io.papermc.paper.event.server.CommandPostprocessEvent;
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.NotNull;*/
 
 /**
  * Copyright © 2022 by Lorenzo Magni
@@ -26,9 +26,9 @@ import org.jetbrains.annotations.NotNull;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class PostCommandListener extends PluginListenerExecutor<CommandPostprocessEvent> {
+public class PostCommandListener /*extends PluginListenerExecutor<CommandPostprocessEvent>*/ {
 
-    public PostCommandListener(Class<CommandPostprocessEvent> eventClass, AIO aio) {
+    /*public PostCommandListener(Class<CommandPostprocessEvent> eventClass, AIO aio) {
         super(eventClass, aio);
     }
 
@@ -36,5 +36,5 @@ public class PostCommandListener extends PluginListenerExecutor<CommandPostproce
     public void onEvent(@NotNull CommandPostprocessEvent event) {
         if (!(event.getCommandSender() instanceof Player)) return;
         if (config.commandCooldown.cooldownEnabled && event.wasSuccess()) aio.addCommandCooldown((Player) event.getCommandSender(), event.getCommand());
-    }
+    }*/
 }
