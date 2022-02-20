@@ -45,6 +45,10 @@
             <name>Lorenzo Magni</name>
             <url>https://github.com/LoreSchaeffer</url>
         </developer>
+        <developer>
+            <id>fren_gor</id>
+            <url>https://github.com/frengor</url>
+        </developer>
     </developers>
 
     <repositories>
