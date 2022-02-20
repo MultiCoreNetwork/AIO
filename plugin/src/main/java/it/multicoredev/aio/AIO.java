@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import it.multicoredev.aio.api.Module;
 import it.multicoredev.aio.api.*;
+import it.multicoredev.aio.api.events.AfkEvent;
 import it.multicoredev.aio.api.events.PlayerPostTeleportEvent;
 import it.multicoredev.aio.api.events.PlayerTeleportCancelledEvent;
 import it.multicoredev.aio.api.listeners.IListenerRegistry;
@@ -31,6 +32,7 @@ import it.multicoredev.aio.commands.teleport.warp.WarpCommand;
 import it.multicoredev.aio.commands.teleport.warp.WarpsCommand;
 import it.multicoredev.aio.commands.utilities.*;
 import it.multicoredev.aio.commands.utilities.time_and_weather.*;
+import it.multicoredev.aio.listeners.aio.AfkListener;
 import it.multicoredev.aio.listeners.aio.PlayerPostTeleportListener;
 import it.multicoredev.aio.listeners.aio.PlayerTeleportCancelledListener;
 import it.multicoredev.aio.listeners.entity.EntityDamageListener;
@@ -47,6 +49,7 @@ import it.multicoredev.aio.storage.config.sections.StorageSection;
 import it.multicoredev.aio.storage.data.FileStorage;
 import it.multicoredev.aio.storage.data.KitStorage;
 import it.multicoredev.aio.storage.data.WarpStorage;
+import it.multicoredev.aio.tasks.AfkTask;
 import it.multicoredev.aio.tasks.ClearCacheTask;
 import it.multicoredev.aio.tasks.SavePlayerDataTask;
 import it.multicoredev.aio.utils.ReflectionUtils;
@@ -817,6 +820,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         listenerRegistry.registerListener(new PlayerPostTeleportListener(PlayerPostTeleportEvent.class, this), config.getEventPriority("PlayerPostTeleportEvent"), this);
         listenerRegistry.registerListener(new PlayerTeleportCancelledListener(PlayerTeleportCancelledEvent.class, this), config.getEventPriority("PlayerTeleportCancelledEvent"), this);
         //listenerRegistry.registerListener(new PostCommandListener(CommandPostprocessEvent.class, this), config.getEventPriority("PostCommandEvent"), this);
+        listenerRegistry.registerListener(new AfkListener(AfkEvent.class, this), config.getEventPriority("AfkEvent"), this);
 
         listenerRegistry.registerListener(new EntityDamageListener(EntityDamageEvent.class, this), config.getEventPriority("EntityDamageEvent"), this);
 
@@ -832,6 +836,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     private void registerCommands() {
         commandRegistry.registerCommand(new AIOCommand(this), this);
 
+        if (commands.isEnabled("afk")) commandRegistry.registerCommand(new AfkCommand(this), this);
         if (commands.isEnabled("back")) commandRegistry.registerCommand(new BackCommand(this), this);
         if (commands.isEnabled("cleanchat")) commandRegistry.registerCommand(new CleanChatCommand(this), this);
         if (commands.isEnabled("day")) commandRegistry.registerCommand(new DayCommand(this), this);
@@ -904,6 +909,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     }
 
     private void startTasks() {
+        tasks.put("afk", getServer().getScheduler().runTaskTimer(this, new AfkTask(this), 20, 20));
         tasks.put("clear_player_cache", getServer().getScheduler().runTaskTimerAsynchronously(this, new ClearCacheTask(this), config.clearPlayersCache, config.clearPlayersCache));
         tasks.put("save_payer_data", getServer().getScheduler().runTaskTimerAsynchronously(this, new SavePlayerDataTask(this), config.savePlayersData, config.savePlayersData));
     }

@@ -1,8 +1,10 @@
 package it.multicoredev.aio.api;
 
 import com.google.gson.annotations.SerializedName;
+import it.multicoredev.aio.api.events.AfkEvent;
 import it.multicoredev.aio.api.models.Home;
 import it.multicoredev.mclib.json.JsonConfig;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -52,6 +54,9 @@ public class User extends JsonConfig {
     private Integer rtp;
     private Boolean god;
     private Boolean fly;
+    private transient boolean afk;
+    private transient long afkCooldownTimestamp = -1; // Initialised with an invalid cooldown
+    private transient Location afkLastLocation;
 
     private volatile Long lastSave = null;
 
@@ -473,6 +478,84 @@ public class User extends JsonConfig {
      */
     public User setFly(Boolean fly) {
         this.fly = fly;
+        return this;
+    }
+
+    /**
+     * Check if the player is AFK.
+     *
+     * @return true if the player is AFk, false otherwise.
+     */
+    public boolean isAfk() {
+        return afk;
+    }
+
+    /**
+     * Set if the player is AFK.
+     * This method also sets afkLastLocation to null and resets the afkCooldownTimestamp (putting it to -1) if player is leaving AFK mode.
+     *
+     * @param afk true if the player is AFK, false otherwise.
+     * @return this object.
+     */
+    public User setAfk(boolean afk) {
+        if (this.afk && !afk) {
+            // If player is leaving AFK mode, then resets afkLastLocation and afkCooldownTimestamp
+            this.afkLastLocation = null;
+            this.afkCooldownTimestamp = -1;
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) { // Just to be sure
+                Bukkit.getPluginManager().callEvent(new AfkEvent(player, false));
+            }
+            this.afk = afk;
+        } else if (!this.afk && afk) {
+            // Player is going AFK
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) { // Just to be sure
+                this.afkLastLocation = player.getLocation();
+                this.afkCooldownTimestamp = System.currentTimeMillis();
+                Bukkit.getPluginManager().callEvent(new AfkEvent(player, true));
+            }
+            this.afk = afk;
+        }
+        return this;
+    }
+
+    /**
+     * Get the AFK cooldown timestamp.
+     *
+     * @return the AFK cooldown timestamp, or -1 if invalid.
+     */
+    public long getAfkCooldownTimestamp() {
+        return afkCooldownTimestamp;
+    }
+
+    /**
+     * Set the AFK cooldown timestamp.
+     *
+     * @param afkCooldownTimestamp the AFK cooldown timestamp.
+     * @return this object.
+     */
+    public User setAfkCooldownTimestamp(long afkCooldownTimestamp) {
+        this.afkCooldownTimestamp = afkCooldownTimestamp;
+        return this;
+    }
+
+    /**
+     * Get the last location of the player while they're AFK.
+     * @return the last location of the player while they're AFK, or null if the player was not AFK
+     */
+    @Nullable
+    public Location getAfkLastLocation() {
+        return afkLastLocation;
+    }
+
+    /**
+     * Set the last location of the player while they're AFK.
+     * @param afkLastLocation the last location of the player while they're AFK, or null if invalid.
+     * @return this object.
+     */
+    public User setAfkLastLocation(@NotNull Location afkLastLocation) {
+        this.afkLastLocation = afkLastLocation;
         return this;
     }
 }

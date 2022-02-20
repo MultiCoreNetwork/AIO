@@ -57,6 +57,11 @@ public class Commands extends JsonConfig {
                 "Main command of the plugin",
                 "/aio"
         ));
+        if (!commands.containsKey("afk")) commands.put("afk", new CommandData(
+                true,
+                "Toggle AFK status",
+                new UsagesBuilder().add("default", "/afk [on|off|toggle]", "/afk <player> [on|off|toggle]").build()
+        ));
         if (!commands.containsKey("back")) commands.put("back", new CommandData(
                 true,
                 "Teleport back to previous location",

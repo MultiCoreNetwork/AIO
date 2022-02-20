@@ -1,6 +1,7 @@
 package it.multicoredev.aio.listeners.player;
 
 import it.multicoredev.aio.AIO;
+import it.multicoredev.aio.api.User;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.entity.Player;
@@ -39,6 +40,13 @@ public class PlayerCommandPreprocessListener extends PluginListenerExecutor<Play
     @Override
     public void onEvent(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
+
+        User user = aio.getStorage().getUser(player);
+        if (user != null) {
+            user.setAfkCooldownTimestamp(System.currentTimeMillis());
+            user.setAfk(false);
+        }
+
         String completeCommand = event.getMessage().substring(1).toLowerCase(Locale.ROOT);
         String command = completeCommand.contains(" ") ? completeCommand.split(" ")[0] : completeCommand;
 

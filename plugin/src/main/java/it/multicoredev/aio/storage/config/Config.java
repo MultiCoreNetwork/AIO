@@ -48,6 +48,8 @@ public class Config extends JsonConfig {
     public NicknameSection nicknameSection;
     @SerializedName("rtp")
     public RTPSection rtpSection;
+    @SerializedName("afk")
+    public AfkSection afkSection;
 
     @SerializedName("back_teleport_delay")
     public Long backTeleportDelay;
@@ -84,6 +86,7 @@ public class Config extends JsonConfig {
         if (!eventPriorities.containsKey("PlayerPostTeleportEvent")) eventPriorities.put("PlayerPostTeleportEvent", "LOWEST");
         if (!eventPriorities.containsKey("PlayerTeleportCancelledEvent")) eventPriorities.put("PlayerTeleportCancelledEvent", "NORMAL");
         if (!eventPriorities.containsKey("PostCommandEvent")) eventPriorities.put("PostCommandEvent", "LOWEST");
+        if (!eventPriorities.containsKey("AfkEvent")) eventPriorities.put("AfkEvent", "LOWEST");
 
         if (!eventPriorities.containsKey("EntityDamageEvent")) eventPriorities.put("EntityDamageEvent", "LOWEST");
 
@@ -108,6 +111,7 @@ public class Config extends JsonConfig {
         if (helpBookSection == null) helpBookSection = new HelpBookSection();
         if (nicknameSection == null) nicknameSection = new NicknameSection();
         if (rtpSection == null) rtpSection = new RTPSection();
+        if (afkSection == null) afkSection = new AfkSection();
 
         if (backTeleportDelay == null) backTeleportDelay = -1L;
         if (defaultHomeLimit == null) defaultHomeLimit = 3;
