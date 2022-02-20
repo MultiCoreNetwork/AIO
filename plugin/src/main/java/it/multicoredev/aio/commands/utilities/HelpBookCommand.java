@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
  */
 public class HelpBookCommand extends PluginCommand {
     private static final String CMD = "helpbook";
-    private final Map<UUID, Map<String, Date>> cooldowns = new HashMap<>();
 
     public HelpBookCommand(AIO aio) {
         super(aio, CMD);
@@ -46,89 +45,62 @@ public class HelpBookCommand extends PluginCommand {
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!preCommandProcess(sender, getName(), args)) return true;
 
-        String id;
-        Player target;
-
         if (!isPlayer(sender) && args.length < 1) {
             Chat.send(localization.notPlayer, sender);
             return true;
         }
 
+        String id;
+        List<Player> targets;
+
         if (args.length > 1) {
             id = args[0];
-            target = Bukkit.getPlayer(args[1]);
+            targets = parsePlayers(sender, args[1]);
 
-            if (!hasSubPerm(sender, "other") && target != sender) {
+            if (!hasSubPerm(sender, "other")) {
                 insufficientPerms(sender);
                 return true;
             }
         } else if (args.length == 1) {
             id = args[0];
-
-            if (!config.helpBookSection.containsBook(id)) {
-                target = Bukkit.getPlayer(id);
-                id = config.helpBookSection.defBook;
-            } else {
-                target = (Player) sender;
-            }
+            targets = Collections.singletonList((Player) sender);
         } else {
-            incorrectUsage(sender);
+            id = config.helpBookSection.defBook;
+            targets = Collections.singletonList((Player) sender);
+        }
+
+        HelpBook hb = aio.getHelpbook(id);
+
+        if (hb == null) {
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.helpbookNotFound), sender);
             return true;
         }
 
-        if (!config.helpBookSection.containsBook(id)) {
-            Chat.send(localization.helpbookNotFound, sender);
+        if (targets.isEmpty()) {
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.playerNotFound), sender);
             return true;
         }
-
-        if (target == null) {
-            Chat.send(localization.playerNotFound, sender);
-            return true;
-        }
-
-        HelpBook hb = config.helpBookSection.getBook(id);
 
         if (hb.permission != null && !hasSubPerm(sender, hb.permission.toLowerCase(Locale.ROOT))) {
             insufficientPerms(sender);
             return true;
         }
 
-        if (!hasSubPerm(sender, "no-cooldown") && isPlayer(sender)) {
-            UUID uuid = ((Player) sender).getUniqueId();
-            if (cooldowns.containsKey(uuid)) {
-                Map<String, Date> books = cooldowns.get(uuid);
-                if (books.containsKey(hb.id)) {
-                    Date last = books.get(hb.id);
-                    Date now = new Date();
-
-                    long difference = (now.getTime() - last.getTime()) / 1000;
-                    if (difference < config.helpBookSection.getBookCooldown) {
-                        Chat.send(localization.helpbookCooldown.replace("{TIME}", String.valueOf(difference)), sender);
-                        return true;
-                    }
-                }
-
-                books.put(hb.id, new Date());
+        targets.forEach(target -> {
+            Inventory inventory = target.getInventory();
+            if (!inventory.addItem(hb.getBook()).isEmpty()) {
+                if (target != sender) Chat.send(localization.inventoryFull
+                        .replace("{NAME}", target.getName())
+                        .replace("{DISPLAYNAME}", target.getDisplayName()), sender);
+                else Chat.send(localization.inventoryFullSelf, sender);
             } else {
-                Map<String, Date> books = new HashMap<>();
-                books.put(hb.id, new Date());
-                cooldowns.put(uuid, books);
+                if (target != sender) Chat.send(localization.helpbookGiven
+                        .replace("{BOOK}", hb.name)
+                        .replace("{NAME}", target.getName())
+                        .replace("{DISPLAYNAME}", target.getDisplayName()), sender);
+                else Chat.send(localization.inventoryFullSelf.replace("{BOOK}", hb.name), sender);
             }
-        }
-
-        Inventory inventory = target.getInventory();
-        if (!inventory.addItem(hb.getBook()).isEmpty()) {
-            if (target != sender) Chat.send(localization.inventoryFull
-                    .replace("{NAME}", target.getName())
-                    .replace("{DISPLAYNAME}", target.getDisplayName()), sender);
-            else Chat.send(localization.inventoryFullSelf, sender);
-        } else {
-            if (target != sender) Chat.send(localization.helpbookGiven
-                    .replace("{BOOK}", hb.name)
-                    .replace("{NAME}", target.getName())
-                    .replace("{DISPLAYNAME}", target.getDisplayName()), sender);
-            else Chat.send(localization.inventoryFullSelf.replace("{BOOK}", hb.name), sender);
-        }
+        });
 
         return true;
     }
@@ -138,7 +110,7 @@ public class HelpBookCommand extends PluginCommand {
         if (!hasCommandPerm(sender)) return new ArrayList<>();
 
         if (args.length == 1) {
-            return TabCompleterUtil.getCompletions(args[0], config.helpBookSection.books
+            return TabCompleterUtil.getCompletions(args[0], aio.getHelpbooks()
                     .stream()
                     .filter(book -> book.permission == null || hasSubPerm(sender, book.permission))
                     .map(book -> book.id)

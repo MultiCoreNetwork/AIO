@@ -198,8 +198,6 @@ public class Localization extends JsonConfig {
 
     @SerializedName("helpbook_not_found")
     public String helpbookNotFound;
-    @SerializedName("helpbook_cooldown")
-    public String helpbookCooldown;
     @SerializedName("helpbook_given")
     public String helpbookGiven;
     @SerializedName("helpbook_given_self")
@@ -449,7 +447,6 @@ public class Localization extends JsonConfig {
         if (healSelf == null) healSelf = "&hYou have been healed.";
 
         if (helpbookNotFound == null) helpbookNotFound = "&cBook not found.";
-        if (helpbookCooldown == null) helpbookCooldown = "&cYou have to wait {TIME} seconds to get this book.";
         if (helpbookGiven == null) helpbookGiven = "&hYou gave &e{book} &hto {DISPLAYNAME}.";
         if (helpbookGivenSelf == null) helpbookGivenSelf = "&hYou received &e{book}&h.";
 
@@ -491,7 +488,7 @@ public class Localization extends JsonConfig {
         if (spawnTeleport == null) spawnTeleport = "&h{DISPLAYNAME} has been teleported to the spawn.";
         if (spawnTeleportSelf == null) spawnTeleportSelf = "&hYou have been teleported to the spawn.";
 
-        if (sudoFailed == null) sudoFailed = "&cSudo failed!";
+        if (sudoFailed == null) sudoFailed = "&cSudo failed for player {DISPLAYNAME}!";
         if (sudoPrevent == null) sudoPrevent = "&cYou can't use sudo as this player.";
         if (sudoSuccess == null) sudoSuccess = "&hSudo success!";
 

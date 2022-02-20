@@ -1,7 +1,6 @@
 package it.multicoredev.aio.storage.config.sections;
 
 import com.google.gson.annotations.SerializedName;
-import it.multicoredev.aio.models.HelpBook;
 import it.multicoredev.mclib.json.JsonConfig;
 
 import java.util.ArrayList;
@@ -28,12 +27,8 @@ import java.util.List;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class HelpBookSection extends JsonConfig {
-    @SerializedName("help_books")
-    public List<HelpBook> books;
     @SerializedName("default_book")
     public String defBook;
-    @SerializedName("get_book_cooldown")
-    public Integer getBookCooldown;
     @SerializedName("first_join_books")
     public List<String> firstJoinBooks;
 
@@ -43,25 +38,7 @@ public class HelpBookSection extends JsonConfig {
 
     @Override
     protected void init() {
-        if (books == null) books = new ArrayList<>();
         if (defBook == null) defBook = "rules";
-        if (getBookCooldown == null) getBookCooldown = -1;
         if (firstJoinBooks == null) firstJoinBooks = new ArrayList<>();
-    }
-
-    public boolean containsBook(String id) {
-        for (HelpBook book : books) {
-            if (id.equalsIgnoreCase(book.id)) return true;
-        }
-
-        return false;
-    }
-
-    public HelpBook getBook(String id) {
-        for (HelpBook book : books) {
-            if (id.equalsIgnoreCase(book.id)) return book;
-        }
-
-        return null;
     }
 }

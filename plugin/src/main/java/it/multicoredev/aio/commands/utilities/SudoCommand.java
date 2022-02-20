@@ -50,39 +50,44 @@ public class SudoCommand extends PluginCommand {
             return true;
         }
 
-        CommandSender target;
-        if (args[0].equalsIgnoreCase("console")) {
-            if (!hasSubPerm(sender, "console")) {
-                insufficientPerms(sender);
-                postCommandProcess(sender, getName(), args, false);
-                return true;
-            }
+        List<CommandSender> targets = new ArrayList<>(parsePlayers(sender, args[0]));
+        if (targets.isEmpty()) {
+            if (args[0].equalsIgnoreCase("console")) {
+                if (!hasSubPerm(sender, "console")) {
+                    insufficientPerms(sender);
+                    postCommandProcess(sender, getName(), args, false);
+                    return true;
+                }
 
-            target = Bukkit.getConsoleSender();
-        } else {
-            target = Bukkit.getPlayer(args[0]);
-
-            if (target == null || !((Player) target).isOnline()) {
+                targets.add(Bukkit.getConsoleSender());
+            } else {
                 Chat.send(localization.playerNotFound, sender);
-                postCommandProcess(sender, getName(), args, false);
-                return true;
-            }
-
-            if (hasSubPerm(target, "prevent")) {
-                Chat.send(localization.sudoPrevent, sender);
                 postCommandProcess(sender, getName(), args, false);
                 return true;
             }
         }
 
+        targets.removeIf(target -> isPlayer(target) && hasSubPerm(target, "prevent"));
+
         String input = Chat.builder(args, 1);
         if (input.startsWith("/")) {
-            Bukkit.dispatchCommand(target, input.substring(1));
+            targets.forEach(target -> Bukkit.dispatchCommand(target, input.substring(1)));
         } else {
-            if (isPlayer(target)) {
-                ((Player) target).chat(input);
-            } else {
-                Chat.send(localization.sudoFailed, sender);
+            boolean success = false;
+            for (CommandSender target : targets) {
+                if (isPlayer(target)) {
+                    ((Player) target).chat(input);
+                    success = true;
+                } else {
+                    Chat.send(placeholdersUtils.replacePlaceholders(
+                            localization.sudoFailed,
+                            new String[]{"{NAME}", "{DISPLAYNAME}"},
+                            new Object[]{target.getName(), isPlayer(target) ? target.getName() : ((Player) target).getDisplayName()}
+                    ), target);
+                }
+            }
+
+            if (!success) {
                 postCommandProcess(sender, getName(), args, false);
                 return true;
             }

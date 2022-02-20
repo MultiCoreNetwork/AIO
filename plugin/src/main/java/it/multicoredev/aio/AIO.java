@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.papermc.paper.event.server.CommandPostprocessEvent;
 import it.multicoredev.aio.api.Module;
 import it.multicoredev.aio.api.*;
 import it.multicoredev.aio.api.events.PlayerPostTeleportEvent;
@@ -34,7 +33,6 @@ import it.multicoredev.aio.commands.utilities.*;
 import it.multicoredev.aio.commands.utilities.time_and_weather.*;
 import it.multicoredev.aio.listeners.aio.PlayerPostTeleportListener;
 import it.multicoredev.aio.listeners.aio.PlayerTeleportCancelledListener;
-import it.multicoredev.aio.listeners.aio.PostCommandListener;
 import it.multicoredev.aio.listeners.entity.EntityDamageListener;
 import it.multicoredev.aio.listeners.player.*;
 import it.multicoredev.aio.models.HelpBook;
@@ -143,6 +141,8 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     //TODO Add to commands like heal or feed... the ability to user selectors
     //TODO Reset module name when loading
     //TODO Change command syntax to /command [on|off|toggle] [player]
+    //TODO Add postCommandProcess before returns
+    //TODO ALL Chat.send must have placeholderutils.replace....
 
     @Override
     public void onEnable() {
@@ -283,6 +283,15 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
     public List<HelpBook> getHelpbooks() {
         return Collections.unmodifiableList(helpbooks);
+    }
+
+    @Nullable
+    public HelpBook getHelpbook(String id) {
+        for (HelpBook hb : helpbooks) {
+            if (Objects.equals(hb.id, id)) return hb;
+        }
+
+        return null;
     }
 
     public Localization getLocalization() {
@@ -807,7 +816,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     private void registerListeners() {
         listenerRegistry.registerListener(new PlayerPostTeleportListener(PlayerPostTeleportEvent.class, this), config.getEventPriority("PlayerPostTeleportEvent"), this);
         listenerRegistry.registerListener(new PlayerTeleportCancelledListener(PlayerTeleportCancelledEvent.class, this), config.getEventPriority("PlayerTeleportCancelledEvent"), this);
-        listenerRegistry.registerListener(new PostCommandListener(CommandPostprocessEvent.class, this), config.getEventPriority("PostCommandEvent"), this);
+        //listenerRegistry.registerListener(new PostCommandListener(CommandPostprocessEvent.class, this), config.getEventPriority("PostCommandEvent"), this);
 
         listenerRegistry.registerListener(new EntityDamageListener(EntityDamageEvent.class, this), config.getEventPriority("EntityDamageEvent"), this);
 
