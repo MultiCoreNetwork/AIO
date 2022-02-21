@@ -492,7 +492,7 @@ public class User extends JsonConfig {
 
     /**
      * Set if the player is AFK.
-     * This method also sets afkLastLocation to null and resets the afkCooldownTimestamp (putting it to -1) if player is leaving AFK mode.
+     * This method also updates afkLastLocation and afkCooldownTimestamp.
      *
      * @param afk true if the player is AFK, false otherwise.
      * @return this object.

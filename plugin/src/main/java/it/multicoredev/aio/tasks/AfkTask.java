@@ -46,24 +46,29 @@ public class AfkTask implements Runnable {
             User user = storage.getUser(p);
             if (user == null) continue;
 
-            long oldTime = user.getAfkCooldownTimestamp();
-            if (oldTime + cooldown > time) continue;
-
             @Nullable Location oldLoc = user.getAfkLastLocation();
+
+            Location loc = p.getLocation();
             if (user.isAfk()) {
-                Location loc = p.getLocation();
                 if (!loc.equals(oldLoc)) {
                     user.setAfk(false);
-                } else {
-                    user.setAfkLastLocation(loc);
+                    continue;
                 }
-            } else {
-                // TODO
-                Location loc = p.getLocation();
-                if (!loc.equals(oldLoc)) {
+                long oldTime = user.getAfkCooldownTimestamp();
+                if (oldTime + cooldown < time) {
                     user.setAfk(false);
-                } else {
+                    continue;
+                }
+                user.setAfkLastLocation(loc);
+            } else {
+                long oldTime = user.getAfkCooldownTimestamp();
+                if (oldTime < 0 || !loc.equals(oldLoc)) {
+                    user.setAfkCooldownTimestamp(time);
                     user.setAfkLastLocation(loc);
+                    continue;
+                }
+                if (oldTime + cooldown > time) {
+                    user.setAfk(true);
                 }
             }
         }
