@@ -1,8 +1,9 @@
 package it.multicoredev.aio.listeners.aio;
 
 import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.api.events.AfkEvent;
+import it.multicoredev.aio.api.events.AfkToggleEvent;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -25,14 +26,19 @@ import org.jetbrains.annotations.NotNull;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class AfkListener extends PluginListenerExecutor<AfkEvent> {
+public class AfkListener extends PluginListenerExecutor<AfkToggleEvent> {
 
-    public AfkListener(Class<AfkEvent> eventClass, AIO aio) {
+    public AfkListener(Class<AfkToggleEvent> eventClass, AIO aio) {
         super(eventClass, aio);
     }
 
     @Override
-    public void onEvent(@NotNull AfkEvent event) {
+    public void onEvent(@NotNull AfkToggleEvent event) {
+        Player player = event.getPlayer();
+        if (event.isAfk()) {
+            
+        } else {
 
+        }
     }
 }

@@ -39,6 +39,9 @@ public class EntityDamageListener extends PluginListenerExecutor<EntityDamageEve
 
         Player player = (Player) event.getEntity();
         User user = storage.getUser(player);
-        if (user != null && user.hasGod()) event.setCancelled(true);
+        if (user == null) return;
+
+        boolean shouldDoAfkInvulnerability = config.afkSection.afkInvulnerability && user.isAfk();
+        if (user.hasGod() || shouldDoAfkInvulnerability) event.setCancelled(true);
     }
 }

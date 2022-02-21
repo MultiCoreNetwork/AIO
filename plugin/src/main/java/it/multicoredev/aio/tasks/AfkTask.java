@@ -3,6 +3,7 @@ package it.multicoredev.aio.tasks;
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.IStorage;
 import it.multicoredev.aio.api.User;
+import it.multicoredev.aio.storage.config.Config;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -29,18 +30,17 @@ import org.jetbrains.annotations.Nullable;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class AfkTask implements Runnable {
-    private final AIO aio;
-    private final long cooldown;
+    private final Config config;
+    private final IStorage storage;
 
     public AfkTask(AIO aio) {
-        this.aio = aio;
-        cooldown = aio.getConfiguration().afkSection.afkSecondsCooldown * 1000L;
+        this.config = aio.getConfiguration();
+        this.storage = aio.getStorage();
     }
 
     @Override
     public void run() {
         long time = System.currentTimeMillis();
-        IStorage storage = aio.getStorage();
 
         for (Player p : Bukkit.getOnlinePlayers()) {
             User user = storage.getUser(p);
@@ -50,24 +50,24 @@ public class AfkTask implements Runnable {
 
             Location loc = p.getLocation();
             if (user.isAfk()) {
-                if (!loc.equals(oldLoc)) {
+                if (config.afkSection.afkRemoveOnMovement && !loc.equals(oldLoc)) {
                     user.setAfk(false);
                     continue;
                 }
                 long oldTime = user.getAfkCooldownTimestamp();
-                if (oldTime + cooldown < time) {
+                if (oldTime + config.afkSection.afkMillisecondsCooldown < time) {
                     user.setAfk(false);
                     continue;
                 }
                 user.setAfkLastLocation(loc);
             } else {
                 long oldTime = user.getAfkCooldownTimestamp();
-                if (oldTime < 0 || !loc.equals(oldLoc)) {
+                if (oldTime < 0 || (config.afkSection.afkRemoveOnMovement && !loc.equals(oldLoc))) {
                     user.setAfkCooldownTimestamp(time);
                     user.setAfkLastLocation(loc);
                     continue;
                 }
-                if (oldTime + cooldown > time) {
+                if (oldTime + config.afkSection.afkMillisecondsCooldown > time) {
                     user.setAfk(true);
                 }
             }

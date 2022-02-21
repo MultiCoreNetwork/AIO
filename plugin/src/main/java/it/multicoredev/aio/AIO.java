@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import it.multicoredev.aio.api.Module;
 import it.multicoredev.aio.api.*;
-import it.multicoredev.aio.api.events.AfkEvent;
+import it.multicoredev.aio.api.events.AfkToggleEvent;
 import it.multicoredev.aio.api.events.PlayerPostTeleportEvent;
 import it.multicoredev.aio.api.events.PlayerTeleportCancelledEvent;
 import it.multicoredev.aio.api.listeners.IListenerRegistry;
@@ -820,7 +820,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         listenerRegistry.registerListener(new PlayerPostTeleportListener(PlayerPostTeleportEvent.class, this), config.getEventPriority("PlayerPostTeleportEvent"), this);
         listenerRegistry.registerListener(new PlayerTeleportCancelledListener(PlayerTeleportCancelledEvent.class, this), config.getEventPriority("PlayerTeleportCancelledEvent"), this);
         //listenerRegistry.registerListener(new PostCommandListener(CommandPostprocessEvent.class, this), config.getEventPriority("PostCommandEvent"), this);
-        listenerRegistry.registerListener(new AfkListener(AfkEvent.class, this), config.getEventPriority("AfkEvent"), this);
+        listenerRegistry.registerListener(new AfkListener(AfkToggleEvent.class, this), config.getEventPriority("AfkToggleEvent"), this);
 
         listenerRegistry.registerListener(new EntityDamageListener(EntityDamageEvent.class, this), config.getEventPriority("EntityDamageEvent"), this);
 

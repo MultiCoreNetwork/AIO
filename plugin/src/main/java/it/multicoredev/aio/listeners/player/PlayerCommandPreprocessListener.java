@@ -41,10 +41,13 @@ public class PlayerCommandPreprocessListener extends PluginListenerExecutor<Play
     public void onEvent(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
 
-        User user = aio.getStorage().getUser(player);
+        // AFK
+        User user = storage.getUser(player);
         if (user != null) {
-            user.setAfkCooldownTimestamp(System.currentTimeMillis());
-            user.setAfk(false);
+            if (config.afkSection.afkRemoveOnCommand) {
+                user.setAfkCooldownTimestamp(System.currentTimeMillis());
+                user.setAfk(false);
+            }
         }
 
         String completeCommand = event.getMessage().substring(1).toLowerCase(Locale.ROOT);

@@ -1,7 +1,7 @@
 package it.multicoredev.aio.api;
 
 import com.google.gson.annotations.SerializedName;
-import it.multicoredev.aio.api.events.AfkEvent;
+import it.multicoredev.aio.api.events.AfkToggleEvent;
 import it.multicoredev.aio.api.models.Home;
 import it.multicoredev.mclib.json.JsonConfig;
 import org.bukkit.Bukkit;
@@ -504,7 +504,7 @@ public class User extends JsonConfig {
             this.afkCooldownTimestamp = -1;
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) { // Just to be sure
-                Bukkit.getPluginManager().callEvent(new AfkEvent(player, false));
+                Bukkit.getPluginManager().callEvent(new AfkToggleEvent(player, false));
             }
             this.afk = afk;
         } else if (!this.afk && afk) {
@@ -513,7 +513,7 @@ public class User extends JsonConfig {
             if (player != null) { // Just to be sure
                 this.afkLastLocation = player.getLocation();
                 this.afkCooldownTimestamp = System.currentTimeMillis();
-                Bukkit.getPluginManager().callEvent(new AfkEvent(player, true));
+                Bukkit.getPluginManager().callEvent(new AfkToggleEvent(player, true));
             }
             this.afk = afk;
         }

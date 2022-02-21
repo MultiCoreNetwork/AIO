@@ -35,6 +35,7 @@ public class AfkSection extends JsonConfig {
 
     @SerializedName("afk_cooldown")
     public Integer afkSecondsCooldown;
+    public transient long afkMillisecondsCooldown;
 
     @SerializedName("afk_remove_on_message")
     public Boolean afkRemoveOnMessage;
@@ -71,9 +72,13 @@ public class AfkSection extends JsonConfig {
             afkSecondsCooldown = 1;
         }
 
+        afkMillisecondsCooldown = afkSecondsCooldown * 1000L;
+
         if (afkRemoveOnMessage == null) afkRemoveOnMessage = true;
         if (afkRemoveOnMovement == null) afkRemoveOnMovement = true;
         if (afkRemoveOnCommand == null) afkRemoveOnCommand = true;
+
+        if (afkInvulnerability == null) afkInvulnerability = true;
 
         if (broadcastType == null) {
             broadcastType = BROADCAST_WITH_PERM; // Both doNotBroadcast and broadcastEverybody are already false

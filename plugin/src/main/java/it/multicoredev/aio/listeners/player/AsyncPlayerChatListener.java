@@ -1,6 +1,7 @@
 package it.multicoredev.aio.listeners.player;
 
 import it.multicoredev.aio.AIO;
+import it.multicoredev.aio.api.User;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
 import it.multicoredev.aio.storage.config.modules.ChatModule;
 import it.multicoredev.aio.storage.config.modules.PingModule;
@@ -13,7 +14,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 
 import static it.multicoredev.aio.AIO.LUCKPERMS;
 import static it.multicoredev.aio.AIO.VAULT;
@@ -50,6 +55,19 @@ public class AsyncPlayerChatListener extends PluginListenerExecutor<AsyncPlayerC
 
     @Override
     public void onEvent(@NotNull AsyncPlayerChatEvent event) {
+
+        Bukkit.getScheduler().callSyncMethod(aio, () -> {
+            // AFK
+            User user = storage.getUser(event.getPlayer());
+            if (user != null) {
+                if (config.afkSection.afkRemoveOnMessage) {
+                    user.setAfkCooldownTimestamp(System.currentTimeMillis());
+                    user.setAfk(false);
+                }
+            }
+            return null;
+        });
+
         if (config.modules.get("chat")) chatModule(event);
 
         if (config.modules.get("ping")) {
@@ -175,7 +193,8 @@ public class AsyncPlayerChatListener extends PluginListenerExecutor<AsyncPlayerC
                 new String[]{"{DISPLAYNAME}", "{NAME}", "{GROUP}"},
                 new Object[]{player.getName(), player.getDisplayName(), group});
 
-        if (player.hasPermission("aio.chat.placeholders")) message = aio.getPlaceholdersUtils().replacePlaceholders(message);
+        if (player.hasPermission("aio.chat.placeholders"))
+            message = aio.getPlaceholdersUtils().replacePlaceholders(message);
 
         return Chat.getTranslated(format).replace("{MESSAGE}", Chat.getTranslated(message, player, "aio.chat-colors"));
     }
