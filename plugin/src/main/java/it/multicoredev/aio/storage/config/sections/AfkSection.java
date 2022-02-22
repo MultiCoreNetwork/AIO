@@ -47,6 +47,9 @@ public class AfkSection extends JsonConfig {
     @SerializedName("afk_invulnerability")
     public Boolean afkInvulnerability;
 
+    @SerializedName("show_in_display_name")
+    public Boolean modifyDisplayName;
+
     @SerializedName("broadcast")
     public String broadcastType;
     public transient boolean doNotBroadcast;
@@ -79,6 +82,8 @@ public class AfkSection extends JsonConfig {
         if (afkRemoveOnCommand == null) afkRemoveOnCommand = true;
 
         if (afkInvulnerability == null) afkInvulnerability = true;
+
+        if (modifyDisplayName == null) modifyDisplayName = false;
 
         if (broadcastType == null) {
             broadcastType = BROADCAST_WITH_PERM; // Both doNotBroadcast and broadcastEverybody are already false
