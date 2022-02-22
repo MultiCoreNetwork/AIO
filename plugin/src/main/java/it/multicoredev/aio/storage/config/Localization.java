@@ -342,6 +342,9 @@ public class Localization extends JsonConfig {
     @SerializedName("welcome_message")
     public String welcomeMsg;
 
+    @SerializedName("afk_placeholder_replacement")
+    public String afkPlaceholderReplacement;
+
     public Localization() {
         init();
     }
@@ -537,6 +540,8 @@ public class Localization extends JsonConfig {
         if (quitMsg == null) quitMsg = "&4{DISPLAYNAME}&4 left the game!";
         if (firstJoinMsg == null) firstJoinMsg = "&9{DISPLAYNAME}&9 joined the game for the first time!";
         if (welcomeMsg == null) welcomeMsg = "&bWelcome to the server!";
+
+        if (afkPlaceholderReplacement == null) afkPlaceholderReplacement = "&7[AFK]&f";
     }
 
     public String getCurrency(double amount) {

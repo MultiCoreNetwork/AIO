@@ -54,6 +54,7 @@ import it.multicoredev.aio.tasks.ClearCacheTask;
 import it.multicoredev.aio.tasks.SavePlayerDataTask;
 import it.multicoredev.aio.utils.ReflectionUtils;
 import it.multicoredev.aio.utils.perms.PermissionHandler;
+import it.multicoredev.aio.utils.placeholders.PAPIPlaceholderHook;
 import it.multicoredev.aio.utils.placeholders.PAPIPlaceholdersUtils;
 import it.multicoredev.aio.utils.placeholders.StdPlaceholdersUtils;
 import it.multicoredev.mbcore.spigot.Chat;
@@ -203,7 +204,10 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
         permissionHandler = new PermissionHandler(this);
 
-        if (PAPI) placeholdersUtils = new PAPIPlaceholdersUtils();
+        if (PAPI) {
+            placeholdersUtils = new PAPIPlaceholdersUtils();
+            new PAPIPlaceholderHook(this).register();
+        }
         else placeholdersUtils = new StdPlaceholdersUtils();
 
         registerListeners();
