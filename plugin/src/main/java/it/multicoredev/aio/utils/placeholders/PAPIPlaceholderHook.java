@@ -46,7 +46,7 @@ public class PAPIPlaceholderHook extends PlaceholderExpansion {
 
     @Override
     public String getAuthor() {
-        return version;
+        return authors;
     }
 
     @Override
