@@ -342,8 +342,18 @@ public class Localization extends JsonConfig {
     @SerializedName("welcome_message")
     public String welcomeMsg;
 
+    @SerializedName("afk_enter_broadcast_self")
+    public String afkEnterBroadcastSelf;
+    @SerializedName("afk_enter_broadcast_others")
+    public String afkEnterBroadcastOthers;
+    @SerializedName("afk_leave_broadcast_self")
+    public String afkLeaveBroadcastSelf;
+    @SerializedName("afk_leave_broadcast_others")
+    public String afkLeaveBroadcastOthers;
     @SerializedName("afk_placeholder_replacement")
     public String afkPlaceholderReplacement;
+    @SerializedName("afk_name_prefix")
+    public String afkDisplayNamePrefix;
 
     public Localization() {
         init();
@@ -541,7 +551,12 @@ public class Localization extends JsonConfig {
         if (firstJoinMsg == null) firstJoinMsg = "&9{DISPLAYNAME}&9 joined the game for the first time!";
         if (welcomeMsg == null) welcomeMsg = "&bWelcome to the server!";
 
-        if (afkPlaceholderReplacement == null) afkPlaceholderReplacement = "&7[AFK]&f";
+        if (afkEnterBroadcastSelf == null) afkEnterBroadcastSelf = "&hYou are now AFK.";
+        if (afkEnterBroadcastOthers == null) afkEnterBroadcastOthers = "&h{PLAYER} is now AFK.";
+        if (afkLeaveBroadcastSelf == null) afkLeaveBroadcastSelf = "&hYou are no longer AFK.";
+        if (afkLeaveBroadcastOthers == null) afkLeaveBroadcastOthers = "&h{PLAYER} is no longer AFK.";
+        if (afkPlaceholderReplacement == null) afkPlaceholderReplacement = "&7[AFK]&r";
+        if (afkDisplayNamePrefix == null) afkDisplayNamePrefix = "&7[AFK] &r";
     }
 
     public String getCurrency(double amount) {

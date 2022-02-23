@@ -58,10 +58,14 @@ public class AfkSection extends JsonConfig {
     @SerializedName("broadcast_permission")
     public String broadcastPermission;
 
-    @SerializedName("afk_enter_commands")
-    public List<String> afkEnterCommands;
-    @SerializedName("afk_leave_commands")
-    public List<String> afkLeaveCommands;
+    @SerializedName("afk_enter_commands_console")
+    public List<String> afkEnterCommandsConsole;
+    @SerializedName("afk_enter_commands_player")
+    public List<String> afkEnterCommandsPlayer;
+    @SerializedName("afk_leave_commands_console")
+    public List<String> afkLeaveCommandsConsole;
+    @SerializedName("afk_leave_commands_player")
+    public List<String> afkLeaveCommandsPlayer;
 
     public AfkSection() {
         init();
@@ -108,7 +112,9 @@ public class AfkSection extends JsonConfig {
         if (broadcastPermission == null || broadcastPermission.trim().isEmpty())
             broadcastPermission = "aio.afk.broadcast";
 
-        if (afkEnterCommands == null) afkEnterCommands = List.of();
-        if (afkLeaveCommands == null) afkLeaveCommands = List.of();
+        if (afkEnterCommandsConsole == null) afkEnterCommandsConsole = List.of();
+        if (afkEnterCommandsPlayer == null) afkEnterCommandsPlayer = List.of();
+        if (afkLeaveCommandsConsole == null) afkLeaveCommandsConsole = List.of();
+        if (afkLeaveCommandsPlayer == null) afkLeaveCommandsPlayer = List.of();
     }
 }
