@@ -19,7 +19,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <apiVersion>1.16</apiVersion>
-        <build-number>107</build-number>
+        <build-number>108</build-number>
     </properties>
 
     <organization>

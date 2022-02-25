@@ -304,6 +304,12 @@ public class Localization extends JsonConfig {
     public String tpall;
     @SerializedName("tpall_self")
     public String tpallSelf;
+    @SerializedName("tpa_request_canceled")
+    public String tpaRequestCanceled;
+    @SerializedName("tpa_request_sent")
+    public String tpaRequestSent;
+    @SerializedName("tpa_request_target")
+    public String tpaRequestTarget;
 
     public String trash;
 
@@ -519,6 +525,9 @@ public class Localization extends JsonConfig {
 
         if (tpall == null) tpall = "&hYou have been teleported!";
         if (tpallSelf == null) tpallSelf = "&hYou teleported everyone to you.";
+        if (tpaRequestCanceled == null) tpaRequestCanceled = "&6{REQUESTER}'s teleport request has been cancelled.";
+        if (tpaRequestSent == null) tpaRequestSent = "&hYou sent a teleport request to {TARGET}";
+        if (tpaRequestTarget == null) tpaRequestTarget = "&hYou received a teleport request to you from {REQUESTER}";
 
         if (trash == null) trash = "Trash Can";
 

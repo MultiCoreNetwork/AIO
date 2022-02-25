@@ -2,6 +2,7 @@ package it.multicoredev.aio.commands.teleport.tp;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.tp.TeleportRequestType;
+import it.multicoredev.aio.api.utils.IPlaceholdersUtils;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.mbcore.spigot.Chat;
 import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
@@ -56,7 +57,9 @@ public class TpaCommand extends PluginCommand {
         //TODO Implement Economy Chance
         aio.getTeleportManager().requestTeleport(TeleportRequestType.TPA, requester, target);
 
-        //Chat.send(localization.tpaRequestSent, sender);
+        IPlaceholdersUtils placeholdersUtils = aio.getPlaceholdersUtils();
+        Chat.send(placeholdersUtils.replacePlaceholders(localization.tpaRequestSent, "{TARGET}", target.getName()), sender);
+        Chat.send(placeholdersUtils.replacePlaceholders(localization.tpaRequestTarget, "{REQUESTER}", requester.getName()), target);
         return true;
     }
 
