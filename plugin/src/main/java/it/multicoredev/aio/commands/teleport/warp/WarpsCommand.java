@@ -43,14 +43,12 @@ public class WarpsCommand extends PluginCommand {
     }
 
     @Override
-    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preCommandProcess(sender, getName(), args)) return true;
-
+    public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         List<String> warps = aio.getWarpStorage().getWarpNames(sender);
 
         if (warps.isEmpty()) {
             Chat.send(localization.noWarps, sender);
-            return true;
+            return false;
         }
 
         int page = 0;
@@ -66,7 +64,7 @@ public class WarpsCommand extends PluginCommand {
 
         if (page > maxPages) {
             Chat.send(placeholdersUtils.replacePlaceholders(localization.pageNotFound, "{PAGES}", maxPages), sender);
-            return true;
+            return false;
         }
 
         Chat.send(placeholdersUtils.replacePlaceholders(localization.availableWarps), sender);

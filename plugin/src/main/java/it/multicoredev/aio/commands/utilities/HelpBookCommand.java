@@ -5,6 +5,7 @@ import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.aio.models.HelpBook;
 import it.multicoredev.mbcore.spigot.Chat;
 import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -51,11 +52,11 @@ public class HelpBookCommand extends PluginCommand {
         }
 
         String id;
-        List<Player> targets;
+        Player target;
 
         if (args.length > 1) {
             id = args[0];
-            targets = parsePlayers(sender, args[1]);
+            target = Bukkit.getPlayer(args[1]);
 
             if (!hasSubPerm(sender, "other")) {
                 insufficientPerms(sender);
@@ -63,21 +64,21 @@ public class HelpBookCommand extends PluginCommand {
             }
         } else if (args.length == 1) {
             id = args[0];
-            targets = Collections.singletonList((Player) sender);
+            target = (Player) sender;
         } else {
             id = config.helpBookSection.defBook;
-            targets = Collections.singletonList((Player) sender);
+            target = (Player) sender;
         }
 
         HelpBook hb = aio.getHelpbook(id);
 
-        if (hb == null) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.helpbookNotFound), sender);
+        if (target == null) {
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.playerNotFound), sender);
             return false;
         }
 
-        if (targets.isEmpty()) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.playerNotFound), sender);
+        if (hb == null) {
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.helpbookNotFound), sender);
             return false;
         }
 
@@ -86,24 +87,22 @@ public class HelpBookCommand extends PluginCommand {
             return false;
         }
 
-        targets.forEach(target -> {
-            Inventory inventory = target.getInventory();
-            if (!inventory.addItem(hb.getBook()).isEmpty()) {
-                if (target != sender) Chat.send(placeholdersUtils.replacePlaceholders(
-                        localization.inventoryFull,
-                        new String[]{"{NAME}", "{DISPLAYNAME}"},
-                        new Object[]{target.getName(), target.getDisplayName()}
-                ), sender);
-                else Chat.send(placeholdersUtils.replacePlaceholders(localization.inventoryFullSelf), sender);
-            } else {
-                if (target != sender) Chat.send(placeholdersUtils.replacePlaceholders(
-                        localization.helpbookGiven,
-                        new String[]{"{BOOK}", "{NAME}", "{DISPLAYNAME}"},
-                        new Object[]{hb.name, target.getName(), target.getDisplayName()}
-                ), sender);
-                else Chat.send(localization.inventoryFullSelf.replace("{BOOK}", hb.name), sender);
-            }
-        });
+        Inventory inventory = target.getInventory();
+        if (!inventory.addItem(hb.getBook()).isEmpty()) {
+            if (target != sender) Chat.send(placeholdersUtils.replacePlaceholders(
+                    localization.inventoryFull,
+                    new String[]{"{NAME}", "{DISPLAYNAME}"},
+                    new Object[]{target.getName(), target.getDisplayName()}
+            ), sender);
+            else Chat.send(placeholdersUtils.replacePlaceholders(localization.inventoryFullSelf), sender);
+        } else {
+            if (target != sender) Chat.send(placeholdersUtils.replacePlaceholders(
+                    localization.helpbookGiven,
+                    new String[]{"{BOOK}", "{NAME}", "{DISPLAYNAME}"},
+                    new Object[]{hb.name, target.getName(), target.getDisplayName()}
+            ), sender);
+            else Chat.send(localization.inventoryFullSelf.replace("{BOOK}", hb.name), sender);
+        }
 
         return true;
     }

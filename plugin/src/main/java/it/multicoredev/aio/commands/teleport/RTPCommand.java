@@ -37,9 +37,7 @@ public class RTPCommand extends PluginCommand {
     }
 
     @Override
-    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preCommandProcess(sender, getName(), args)) return true;
-
+    public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         Player target;
 
         if (isPlayer(sender)) {
@@ -48,41 +46,41 @@ public class RTPCommand extends PluginCommand {
             } else {
                 if (!hasSubPerm(sender, "other")) {
                     insufficientPerms(sender);
-                    return true;
+                    return false;
                 }
 
                 target = Bukkit.getPlayer(args[0]);
             }
         } else {
             if (args.length < 1) {
-                Chat.send(localization.notPlayer, sender);
-                return true;
+                Chat.send(placeholdersUtils.replacePlaceholders(localization.notPlayer), sender);
+                return false;
             }
 
             target = Bukkit.getPlayer(args[0]);
         }
 
         if (target == null) {
-            Chat.send(localization.playerNotFound, sender);
-            return true;
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.playerNotFound), sender);
+            return false;
         }
 
         if (config.rtpSection.isWorldBlacklisted(target.getWorld())) {
-            Chat.send(localization.rtpBlacklistedWorld, sender);
-            return true;
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.rtpBlacklistedWorld), sender);
+            return false;
         }
 
         if (config.rtpSection.maxRtp > 0) {
             if ((sender instanceof Player) && !hasSubPerm(sender, "bypass-limits")) {
                 User user = storage.getUser(((Player) sender).getUniqueId());
                 if (user == null) {
-                    Chat.send(localization.playerNotFound, sender);
-                    return true;
+                    Chat.send(placeholdersUtils.replacePlaceholders(localization.playerNotFound), sender);
+                    return false;
                 }
 
                 if (user.getRTP() > config.rtpSection.maxRtp) {
-                    Chat.send(localization.maxRtpExceeded, sender);
-                    return true;
+                    Chat.send(placeholdersUtils.replacePlaceholders(localization.maxRtpExceeded), sender);
+                    return false;
                 }
             }
         }

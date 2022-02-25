@@ -47,48 +47,43 @@ public class SudoCommand extends PluginCommand {
             return false;
         }
 
-        List<CommandSender> targets = new ArrayList<>(parsePlayers(sender, args[0]));
-        if (targets.isEmpty()) {
+        CommandSender target = Bukkit.getPlayer(args[0]);
+        if (target == null) {
             if (args[0].equalsIgnoreCase("console")) {
                 if (!hasSubPerm(sender, "console")) {
                     insufficientPerms(sender);
                     return false;
                 }
 
-                targets.add(Bukkit.getConsoleSender());
+                target = Bukkit.getConsoleSender();
             } else {
                 Chat.send(placeholdersUtils.replacePlaceholders(localization.playerNotFound), sender);
                 return false;
             }
         }
 
-        targets.removeIf(target -> isPlayer(target) && hasSubPerm(target, "prevent"));
+        if (hasSubPerm(target, "prevent")) {
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.sudoPrevent), sender);
+            return false;
+        }
 
         String input = Chat.builder(args, 1);
         if (input.startsWith("/")) {
-            targets.forEach(target -> Bukkit.dispatchCommand(target, input.substring(1)));
+            Bukkit.dispatchCommand(target, input.substring(1));
         } else {
-            boolean success = false;
-            for (CommandSender target : targets) {
-                if (isPlayer(target)) {
-                    ((Player) target).chat(input);
-                    success = true;
-                } else {
-                    Chat.send(placeholdersUtils.replacePlaceholders(
-                            localization.sudoFailed,
-                            new String[]{"{NAME}", "{DISPLAYNAME}"},
-                            new Object[]{target.getName(), isPlayer(target) ? target.getName() : ((Player) target).getDisplayName()}
-                    ), target);
-                }
-            }
-
-            if (!success) {
+            if (isPlayer(target)) {
+                ((Player) target).chat(input);
+            } else {
+                Chat.send(placeholdersUtils.replacePlaceholders(
+                        localization.sudoFailed,
+                        new String[]{"{NAME}", "{DISPLAYNAME}"},
+                        new Object[]{target.getName(), isPlayer(target) ? target.getName() : ((Player) target).getDisplayName()}
+                ), target);
                 return false;
             }
         }
 
         Chat.send(placeholdersUtils.replacePlaceholders(localization.sudoSuccess), sender);
-        
         return true;
     }
 

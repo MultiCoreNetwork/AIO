@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -45,12 +46,10 @@ public class WarpCommand extends PluginCommand {
     }
 
     @Override
-    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preCommandProcess(sender, getName(), args)) return true;
-
+    public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (args.length == 0) {
             incorrectUsage(sender);
-            return true;
+            return false;
         }
 
         Player target;
@@ -61,36 +60,36 @@ public class WarpCommand extends PluginCommand {
             } else {
                 if (!hasSubPerm(sender, "other")) {
                     insufficientPerms(sender);
-                    return true;
+                    return false;
                 }
 
                 target = Bukkit.getPlayer(args[0]);
             }
         } else {
             if (args.length < 2) {
-                Chat.send(localization.notPlayer, sender);
-                return true;
+                Chat.send(placeholdersUtils.replacePlaceholders(localization.notPlayer), sender);
+                return false;
             }
 
             target = Bukkit.getPlayer(args[1]);
         }
 
         if (target == null) {
-            Chat.send(localization.playerNotFound, sender);
-            return true;
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.playerNotFound), sender);
+            return false;
         }
 
         String warpName = args[0];
         WarpStorage warpStorage = aio.getWarpStorage();
 
         if (!warpStorage.existsWarp(warpName)) {
-            Chat.send(localization.warpNotFound, sender);
-            return true;
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.warpNotFound), sender);
+            return false;
         }
 
         if (!sender.hasPermission("aio.warp." + warpName)) {
             insufficientPerms(sender);
-            return true;
+            return false;
         }
 
         Warp warp = warpStorage.getWarp(warpName);
@@ -101,13 +100,13 @@ public class WarpCommand extends PluginCommand {
                 World world = location.getWorld();
 
                 if (world == null) {
-                    Chat.send(localization.warpNotFound, sender);
-                    return true;
+                    Chat.send(placeholdersUtils.replacePlaceholders(localization.warpNotFound), sender);
+                    return false;
                 }
 
-                if (!target.getLocation().getWorld().equals(world)) {
-                    Chat.send(localization.warpNotGlobal.replace("{WORLD}", world.getName()), sender);
-                    return true;
+                if (!Objects.equals(target.getLocation().getWorld(), world)) {
+                    Chat.send(placeholdersUtils.replacePlaceholders(localization.warpNotGlobal, "{WORLD}", world.getName()), sender);
+                    return false;
                 }
             }
         }

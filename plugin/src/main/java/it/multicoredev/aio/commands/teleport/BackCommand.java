@@ -41,9 +41,7 @@ public class BackCommand extends PluginCommand {
     }
 
     @Override
-    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preCommandProcess(sender, getName(), args)) return true;
-
+    public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         Player target;
 
         if (isPlayer(sender)) {
@@ -52,33 +50,32 @@ public class BackCommand extends PluginCommand {
             } else {
                 if (!hasSubPerm(sender, "other")) {
                     insufficientPerms(sender);
-                    return true;
+                    return false;
                 }
 
                 target = Bukkit.getPlayer(args[0]);
             }
         } else {
             if (args.length < 1) {
-                Chat.send(localization.notPlayer, sender);
-                return true;
+                Chat.send(placeholdersUtils.replacePlaceholders(localization.notPlayer), sender);
+                return false;
             }
 
             target = Bukkit.getPlayer(args[0]);
         }
 
         if (target == null) {
-            Chat.send(localization.playerNotFound, sender);
-            return true;
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.playerNotFound), sender);
+            return false;
         }
 
         User user = storage.getUser(target.getUniqueId());
         if (user == null || user.getLastLocation() == null) {
-            Chat.send(localization.locationNotAvailable, sender);
-            return true;
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.locationNotAvailable), sender);
+            return false;
         }
 
         aio.getTeleportManager().teleport(target, user.getLastLocation());
-
         return true;
     }
 
