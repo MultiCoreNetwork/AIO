@@ -424,7 +424,7 @@ public class Localization extends JsonConfig {
         if (moneyResetSender == null) moneyResetSender = "&e{DISPLAYNAME}&h's balance reset to &e{MONEY}&h.";
         if (moneyResetReceiver == null) moneyResetReceiver = "&hYour balance has been reset to &e{MONEY}&h.";
 
-        if (entityList == null) entityList = "&hThere are {ENTITIES} in world {WORLD}.";
+        if (entityList == null) entityList = "&hThere are {AMOUNT} in world {WORLD}.";
         if (entityListFormat == null) entityListFormat = "#2196f3{ENTITY} &e{AMOUNT}";
 
         if (feed == null) feed = "&h{DISPLAYNAME} has been fed.";

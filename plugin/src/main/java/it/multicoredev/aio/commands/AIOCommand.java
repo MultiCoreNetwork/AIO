@@ -3,6 +3,10 @@ package it.multicoredev.aio.commands;
 import it.multicoredev.aio.AIO;
 import it.multicoredev.mbcore.spigot.Chat;
 import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
+import it.multicoredev.mbcore.spigot.util.chat.RawMessage;
+import it.multicoredev.mbcore.spigot.util.chat.TextComponentBuilder;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ClickEvent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -38,35 +42,34 @@ public class AIOCommand extends PluginCommand {
     }
 
     @Override
-    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preCommandProcess(sender, getName(), args)) return true;
-
+    public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (args.length < 1) {
             Chat.send("&6&lAIO &f(&eAll In One&f) &bby &g&lMultiCore &h&lNetwork", sender);
-            if (isPlayer(sender)) Chat.sendRaw("[\"\",{\"text\":\"Visit our website \",\"color\":\"aqua\"},{\"text\":\"https://multicore.network\",\"underlined\":true,\"color\":\"blue\",\"clickEvent\":{\"action\":\"open_url\",\"value\":\"https://multicore.network\"}}]", (Player) sender);
-            else Chat.send("&bVisit our website &9&nhttps://multicore.network", sender);
+            if (isPlayer(sender)) {
+                RawMessage msg = new RawMessage();
+                msg.append(new TextComponentBuilder("Visit our website ").setColor(ChatColor.AQUA).get());
+                msg.append(new TextComponentBuilder("https://multicore.network").setColor(ChatColor.BLUE).setUnderlined(true).setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://multicore.network")).get());
+                Chat.sendRaw(msg, (Player) sender);
+            } else {
+                Chat.send("&bVisit our website &9&nhttps://multicore.network", sender);
+            }
 
             StringBuilder builder = new StringBuilder();
             for (String usage : commandData.getUsages()) builder.append("&b").append(usage).append("\n");
             Chat.send(builder.toString(), sender);
-
-            postCommandProcess(sender, getName(), args, true);
-            return true;
+            return false;
         }
 
         String subcommand = args[0];
         if (subcommand.equalsIgnoreCase("reload")) {
             if (!hasSubPerm(sender, "reload")) {
                 insufficientPerms(sender);
-                postCommandProcess(sender, getName(), args, false);
-                return true;
+                return false;
             }
 
             aio.onDisable();
             aio.onEnable();
         }
-
-        postCommandProcess(sender, getName(), args, true);
         return true;
     }
 
@@ -74,9 +77,7 @@ public class AIOCommand extends PluginCommand {
     public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
         if (args.length == 1) {
             List<String> completions = new ArrayList<>();
-
             if (hasSubPerm(sender, "reload")) completions.add("reload");
-
             return TabCompleterUtil.getCompletions(args[0], completions);
         }
 

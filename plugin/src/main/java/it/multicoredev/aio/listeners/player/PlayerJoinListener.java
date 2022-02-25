@@ -75,7 +75,8 @@ public class PlayerJoinListener extends PluginListenerExecutor<PlayerJoinEvent> 
             if (!config.helpBookSection.firstJoinBooks.isEmpty()) {
                 Inventory inventory = player.getInventory();
                 config.helpBookSection.firstJoinBooks.forEach(book -> {
-                    HelpBook hb = config.helpBookSection.getBook(book);
+                    HelpBook hb = aio.getHelpbook(book);
+                    if (hb == null) return;
                     inventory.addItem(hb.getBook());
                 });
             }

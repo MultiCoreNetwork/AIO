@@ -57,13 +57,8 @@ public class AliasCommand extends PluginCommand {
     }
 
     @Override
-    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preCommandProcess(sender, command, args)) return true;
-
-        Bukkit.dispatchCommand(sender, command);
-
-        postCommandProcess(sender, command, args, true);
-        return true;
+    public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
+        return Bukkit.dispatchCommand(sender, command);
     }
 
     @Override
@@ -82,7 +77,7 @@ public class AliasCommand extends PluginCommand {
     }
 
     @Override
-    public boolean preCommandProcess(@NotNull CommandSender sender, @NotNull String command, @NotNull String[] args) {
+    public boolean commandPreProcess(@NotNull CommandSender sender, @NotNull String command, @NotNull String[] args) {
         if (permission != null && !sender.hasPermission(permission)) {
             insufficientPerms(sender);
             return false;
@@ -90,17 +85,17 @@ public class AliasCommand extends PluginCommand {
 
         if (config.commandCosts.costsEnabled && VAULT && isPlayer(sender) && config.commandCosts.hasCommandCost(getName()) && !sender.hasPermission("aio.bypass.costs")) {
             Player player = (Player) sender;
-
             int cost = Math.abs(config.commandCosts.getCommandCost(getName()));
 
-            if (aio.getEconomy().has(player, cost)) {
-                aio.getEconomy().withdrawPlayer(player, cost);
-            } else {
-                Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(localization.insufficientCmdMoney, "{MONEY}", aio.getEconomy().format(cost)), player);
+            if (!aio.getEconomy().has(player, cost)) {
+                Chat.send(placeholdersUtils.replacePlaceholders(
+                        localization.insufficientCmdMoney,
+                        "{MONEY}",
+                        aio.getEconomy().format(cost)
+                ), player);
                 return false;
             }
         }
-
 
         return true;
     }

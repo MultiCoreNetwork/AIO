@@ -86,7 +86,47 @@ public abstract class BasePluginCommand extends Command {
      * @param args   Passed command arguments.
      * @return true if a valid command, otherwise false.
      */
-    public abstract boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args);
+    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
+        boolean preProcessResult = commandPreProcess(sender, getName(), args);
+        boolean executeResult = false;
+        if (preProcessResult) executeResult = run(sender, label, args);
+        Bukkit.getPluginManager().callEvent(new PostCommandEvent(sender, getName(), args, preProcessResult && executeResult));
+        commandPostProcess(sender, getName(), args, preProcessResult && executeResult);
+        return executeResult;
+    }
+
+    /**
+     * Run before the command is executed.
+     *
+     * @param sender  The source of the command.
+     * @param command The command that was executed.
+     * @param args    The arguments passed to the command.
+     * @return true if the command should be executed, otherwise false.
+     */
+    protected abstract boolean commandPreProcess(CommandSender sender, String command, String[] args);
+
+    /**
+     * Run after the command is executed.
+     * Fire the {@link PostCommandEvent} after the command has been executed.
+     *
+     * @param sender  The source of the command.
+     * @param command The command that was executed.
+     * @param args    The arguments passed to the command.
+     * @param success Whether the command was successful or not.
+     */
+    protected abstract void commandPostProcess(CommandSender sender, String command, String[] args, boolean success);
+
+    /**
+     * Executes the given command, returning its success.
+     * If false is returned, then the "usage" plugin.yml entry for this command (if defined) will be sent to the player.
+     * Remember to call postCommandEvent method after the command execution.
+     *
+     * @param sender The source of the command.
+     * @param label  Alias of the command which was used.
+     * @param args   Passed command arguments.
+     * @return true if a valid command, otherwise false.
+     */
+    public abstract boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args);
 
     /**
      * Requests a list of possible completions for a command argument.
@@ -109,18 +149,6 @@ public abstract class BasePluginCommand extends Command {
      */
     protected boolean isPlayer(CommandSender sender) {
         return sender instanceof Player;
-    }
-
-    /**
-     * Fire the {@link PostCommandEvent} after the command has been executed.
-     *
-     * @param sender  The source of the command.
-     * @param command The command that was executed.
-     * @param args    The arguments passed to the command.
-     * @param success Whether the command was successful or not.
-     */
-    protected void postCommandProcess(CommandSender sender, String command, String[] args, boolean success) {
-        Bukkit.getPluginManager().callEvent(new PostCommandEvent(sender, command, args, success));
     }
 
     /**

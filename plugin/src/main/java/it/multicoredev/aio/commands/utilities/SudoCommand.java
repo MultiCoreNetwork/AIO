@@ -41,13 +41,10 @@ public class SudoCommand extends PluginCommand {
     }
 
     @Override
-    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preCommandProcess(sender, getName(), args)) return true;
-
+    public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (args.length < 2) {
             incorrectUsage(sender);
-            postCommandProcess(sender, getName(), args, false);
-            return true;
+            return false;
         }
 
         List<CommandSender> targets = new ArrayList<>(parsePlayers(sender, args[0]));
@@ -55,15 +52,13 @@ public class SudoCommand extends PluginCommand {
             if (args[0].equalsIgnoreCase("console")) {
                 if (!hasSubPerm(sender, "console")) {
                     insufficientPerms(sender);
-                    postCommandProcess(sender, getName(), args, false);
-                    return true;
+                    return false;
                 }
 
                 targets.add(Bukkit.getConsoleSender());
             } else {
-                Chat.send(localization.playerNotFound, sender);
-                postCommandProcess(sender, getName(), args, false);
-                return true;
+                Chat.send(placeholdersUtils.replacePlaceholders(localization.playerNotFound), sender);
+                return false;
             }
         }
 
@@ -88,13 +83,12 @@ public class SudoCommand extends PluginCommand {
             }
 
             if (!success) {
-                postCommandProcess(sender, getName(), args, false);
-                return true;
+                return false;
             }
         }
 
-        Chat.send(localization.sudoSuccess, sender);
-        postCommandProcess(sender, getName(), args, true);
+        Chat.send(placeholdersUtils.replacePlaceholders(localization.sudoSuccess), sender);
+        
         return true;
     }
 

@@ -61,14 +61,12 @@ public abstract class PluginCommand extends BasePluginCommand {
     }
 
     @Override
-    public abstract boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args);
-
-    @Override
     public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
         return new ArrayList<>();
     }
 
-    public boolean preCommandProcess(@NotNull CommandSender sender, @NotNull String command, @NotNull String[] args) {
+    @Override
+    public boolean commandPreProcess(@NotNull CommandSender sender, @NotNull String command, @NotNull String[] args) {
         if (!hasCommandPerm(sender)) {
             insufficientPerms(sender);
             return false;
@@ -76,30 +74,23 @@ public abstract class PluginCommand extends BasePluginCommand {
 
         if (config.commandCosts.costsEnabled && VAULT && isPlayer(sender) && config.commandCosts.hasCommandCost(getName()) && !sender.hasPermission("aio.bypass.costs")) {
             Player player = (Player) sender;
-
             int cost = Math.abs(config.commandCosts.getCommandCost(getName()));
 
-            if (aio.getEconomy().has(player, cost)) {
-                aio.getEconomy().withdrawPlayer(player, cost);
-            } else {
-                Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(localization.insufficientCmdMoney, "{MONEY}", aio.getEconomy().format(cost)), player);
+            if (!aio.getEconomy().has(player, cost)) {
+                Chat.send(placeholdersUtils.replacePlaceholders(
+                        localization.insufficientCmdMoney,
+                        "{MONEY}",
+                        aio.getEconomy().format(cost)
+                ), player);
                 return false;
             }
         }
-
 
         return true;
     }
 
     @Override
-    protected void postCommandProcess(CommandSender sender, String command, String[] args, boolean success) {
-        if (config.commandCosts.costsEnabled && VAULT && isPlayer(sender) && config.commandCosts.hasCommandCost(getName()) && !sender.hasPermission("aio.bypass.costs")) {
-            Player player = (Player) sender;
-            int cost = Math.abs(config.commandCosts.getCommandCost(getName()));
-            aio.getEconomy().depositPlayer(player, cost);
-        }
-
-        super.postCommandProcess(sender, command, args, success);
+    public void commandPostProcess(@NotNull CommandSender sender, @NotNull String command, @NotNull String[] args, boolean success) {
     }
 
     protected boolean hasCommandPerm(CommandSender sender) {
@@ -119,11 +110,11 @@ public abstract class PluginCommand extends BasePluginCommand {
     }
 
     protected void insufficientPerms(CommandSender sender) {
-        Chat.send(localization.insufficientPerms, sender);
+        Chat.send(placeholdersUtils.replacePlaceholders(localization.insufficientPerms), sender);
     }
 
     protected void notImplemented(CommandSender sender) {
-        Chat.send(localization.notImplemented, sender);
+        Chat.send(placeholdersUtils.replacePlaceholders(localization.notImplemented), sender);
     }
 
     private void sendIncorrectUsage(CommandSender sender, List<String> usages) {

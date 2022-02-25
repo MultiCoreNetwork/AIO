@@ -5,13 +5,15 @@ import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.aio.models.HelpBook;
 import it.multicoredev.mbcore.spigot.Chat;
 import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
@@ -42,12 +44,10 @@ public class HelpBookCommand extends PluginCommand {
     }
 
     @Override
-    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preCommandProcess(sender, getName(), args)) return true;
-
+    public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!isPlayer(sender) && args.length < 1) {
-            Chat.send(localization.notPlayer, sender);
-            return true;
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.notPlayer), sender);
+            return false;
         }
 
         String id;
@@ -59,7 +59,7 @@ public class HelpBookCommand extends PluginCommand {
 
             if (!hasSubPerm(sender, "other")) {
                 insufficientPerms(sender);
-                return true;
+                return false;
             }
         } else if (args.length == 1) {
             id = args[0];
@@ -73,31 +73,34 @@ public class HelpBookCommand extends PluginCommand {
 
         if (hb == null) {
             Chat.send(placeholdersUtils.replacePlaceholders(localization.helpbookNotFound), sender);
-            return true;
+            return false;
         }
 
         if (targets.isEmpty()) {
             Chat.send(placeholdersUtils.replacePlaceholders(localization.playerNotFound), sender);
-            return true;
+            return false;
         }
 
         if (hb.permission != null && !hasSubPerm(sender, hb.permission.toLowerCase(Locale.ROOT))) {
             insufficientPerms(sender);
-            return true;
+            return false;
         }
 
         targets.forEach(target -> {
             Inventory inventory = target.getInventory();
             if (!inventory.addItem(hb.getBook()).isEmpty()) {
-                if (target != sender) Chat.send(localization.inventoryFull
-                        .replace("{NAME}", target.getName())
-                        .replace("{DISPLAYNAME}", target.getDisplayName()), sender);
-                else Chat.send(localization.inventoryFullSelf, sender);
+                if (target != sender) Chat.send(placeholdersUtils.replacePlaceholders(
+                        localization.inventoryFull,
+                        new String[]{"{NAME}", "{DISPLAYNAME}"},
+                        new Object[]{target.getName(), target.getDisplayName()}
+                ), sender);
+                else Chat.send(placeholdersUtils.replacePlaceholders(localization.inventoryFullSelf), sender);
             } else {
-                if (target != sender) Chat.send(localization.helpbookGiven
-                        .replace("{BOOK}", hb.name)
-                        .replace("{NAME}", target.getName())
-                        .replace("{DISPLAYNAME}", target.getDisplayName()), sender);
+                if (target != sender) Chat.send(placeholdersUtils.replacePlaceholders(
+                        localization.helpbookGiven,
+                        new String[]{"{BOOK}", "{NAME}", "{DISPLAYNAME}"},
+                        new Object[]{hb.name, target.getName(), target.getDisplayName()}
+                ), sender);
                 else Chat.send(localization.inventoryFullSelf.replace("{BOOK}", hb.name), sender);
             }
         });
