@@ -41,12 +41,10 @@ public class SetWarpCommand extends PluginCommand {
     }
 
     @Override
-    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preCommandProcess(sender, getName(), args)) return true;
-
+    public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!isPlayer(sender)) {
             Chat.send(localization.notPlayer, sender);
-            return true;
+            return false;
         }
 
         Player player = (Player) sender;
@@ -55,7 +53,7 @@ public class SetWarpCommand extends PluginCommand {
 
         if (args.length == 0) {
             incorrectUsage(sender);
-            return true;
+            return false;
         } else {
             if (args.length > 1) {
                 String mode = args[1];
@@ -63,7 +61,7 @@ public class SetWarpCommand extends PluginCommand {
                 if (mode.equalsIgnoreCase("local")) global = false;
                 else if (!mode.equalsIgnoreCase("global")) {
                     Chat.send(localization.invalidWarpMode, sender);
-                    return true;
+                    return false;
                 }
             }
         }
@@ -73,7 +71,7 @@ public class SetWarpCommand extends PluginCommand {
 
         if (warpStorage.existsWarp(name)) {
             Chat.send(localization.warpAlreadyExist, sender);
-            return true;
+            return false;
         }
 
         warpStorage.createWarp(name, player.getLocation(), global);

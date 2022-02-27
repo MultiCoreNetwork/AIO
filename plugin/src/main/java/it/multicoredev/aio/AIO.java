@@ -118,7 +118,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     private Config config;
     private Localization localization;
     private ModuleManager moduleManager;
-    private List<HelpBook> helpbooks;
+    private final List<HelpBook> helpbooks = new ArrayList<>();
     private Commands commands;
     private IStorage storage;
     private Map<String, UUID> usermap;
@@ -147,6 +147,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     //TODO Change command syntax to /command [on|off|toggle] [player]
     //TODO Add postCommandProcess before returns
     //TODO ALL Chat.send must have placeholderutils.replace....
+    //TODO Add the ability to log transactions inside AIOEconomy
 
     @Override
     public void onEnable() {
@@ -207,8 +208,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         if (PAPI) {
             placeholdersUtils = new PAPIPlaceholdersUtils();
             new PAPIPlaceholderHook(this).register();
-        }
-        else placeholdersUtils = new StdPlaceholdersUtils();
+        } else placeholdersUtils = new StdPlaceholdersUtils();
 
         registerListeners();
         registerCommands();

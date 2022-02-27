@@ -5,6 +5,7 @@ import it.multicoredev.aio.api.models.CommandData;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
@@ -86,7 +87,47 @@ public abstract class BasePluginCommand extends Command {
      * @param args   Passed command arguments.
      * @return true if a valid command, otherwise false.
      */
-    public abstract boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args);
+    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
+        boolean preProcessResult = commandPreProcess(sender, getName(), args);
+        boolean executeResult = false;
+        if (preProcessResult) executeResult = run(sender, label, args);
+        Bukkit.getPluginManager().callEvent(new PostCommandEvent(sender, getName(), args, preProcessResult && executeResult));
+        commandPostProcess(sender, getName(), args, preProcessResult && executeResult);
+        return executeResult;
+    }
+
+    /**
+     * Run before the command is executed.
+     *
+     * @param sender  The source of the command.
+     * @param command The command that was executed.
+     * @param args    The arguments passed to the command.
+     * @return true if the command should be executed, otherwise false.
+     */
+    protected abstract boolean commandPreProcess(CommandSender sender, String command, String[] args);
+
+    /**
+     * Run after the command is executed.
+     * Fire the {@link PostCommandEvent} after the command has been executed.
+     *
+     * @param sender  The source of the command.
+     * @param command The command that was executed.
+     * @param args    The arguments passed to the command.
+     * @param success Whether the command was successful or not.
+     */
+    protected abstract void commandPostProcess(CommandSender sender, String command, String[] args, boolean success);
+
+    /**
+     * Executes the given command, returning its success.
+     * If false is returned, then the "usage" plugin.yml entry for this command (if defined) will be sent to the player.
+     * Remember to call postCommandEvent method after the command execution.
+     *
+     * @param sender The source of the command.
+     * @param label  Alias of the command which was used.
+     * @param args   Passed command arguments.
+     * @return true if a valid command, otherwise false.
+     */
+    public abstract boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args);
 
     /**
      * Requests a list of possible completions for a command argument.
@@ -109,116 +150,6 @@ public abstract class BasePluginCommand extends Command {
      */
     protected boolean isPlayer(CommandSender sender) {
         return sender instanceof Player;
-    }
-
-    /**
-     * Fire the {@link PostCommandEvent} after the command has been executed.
-     *
-     * @param sender  The source of the command.
-     * @param command The command that was executed.
-     * @param args    The arguments passed to the command.
-     * @param success Whether the command was successful or not.
-     */
-    protected void postCommandProcess(CommandSender sender, String command, String[] args, boolean success) {
-        Bukkit.getPluginManager().callEvent(new PostCommandEvent(sender, command, args, success));
-    }
-
-    /**
-     * Get a player from an argument.
-     *
-     * @param sender         The source of the command.
-     * @param arg            The argument.
-     * @param allowSelectors Allow the use of Minecraft selectors.
-     * @param allowOffline   Allow the return of offline players.
-     * @return The player.
-     */
-    protected Player parsePlayer(CommandSender sender, String arg, boolean allowSelectors, boolean allowOffline) {
-        Player player = Bukkit.getPlayer(arg);
-        if (player != null) {
-            if (!allowOffline && !player.isOnline()) return null;
-
-            return player;
-        }
-
-        if (allowSelectors) {
-            if (arg.equalsIgnoreCase("@p")) {
-                if (isPlayer(sender)) return (Player) sender;
-                else return null;
-            } else if (arg.equalsIgnoreCase("@r")) {
-                List<Player> onlinePlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
-                return onlinePlayers.get(new Random().nextInt(onlinePlayers.size()));
-            } else if (arg.equalsIgnoreCase("@s")) {
-                if (isPlayer(sender)) return (Player) sender;
-                else return null;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Get a player from an argument.
-     *
-     * @param sender         The source of the command.
-     * @param arg            The argument.
-     * @param allowSelectors Allow the use of Minecraft selectors.
-     * @return The player.
-     */
-    protected Player parsePlayer(CommandSender sender, String arg, boolean allowSelectors) {
-        return parsePlayer(sender, arg, allowSelectors, false);
-    }
-
-    /**
-     * Get a player from an argument.
-     *
-     * @param sender The source of the command.
-     * @param arg    The argument.
-     * @return The player.
-     */
-    protected Player parsePlayer(CommandSender sender, String arg) {
-        return parsePlayer(sender, arg, true, false);
-    }
-
-    /**
-     * Get a list of players from an argument.
-     *
-     * @param sender       The source of the command.
-     * @param arg          The argument.
-     * @param allowOffline Allow the use of offline players.
-     * @return The list of players.
-     */
-    protected List<Player> parsePlayers(CommandSender sender, String arg, boolean allowOffline) {
-        Player player = Bukkit.getPlayer(arg);
-        if (player != null) {
-            if (!allowOffline && !player.isOnline()) return new ArrayList<>();
-            else return Collections.singletonList(player);
-        }
-
-        if (arg.equalsIgnoreCase("@p")) {
-            if (isPlayer(sender)) return Collections.singletonList((Player) sender);
-            else return new ArrayList<>();
-        } else if (arg.equalsIgnoreCase("@r")) {
-            List<Player> onlinePlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
-            return Collections.singletonList(onlinePlayers.get(new Random().nextInt(onlinePlayers.size())));
-        } else if (arg.equalsIgnoreCase("@s")) {
-            if (isPlayer(sender)) return Collections.singletonList((Player) sender);
-            else return new ArrayList<>();
-        } else if (arg.startsWith("@a")) {
-            return new ArrayList<>(Bukkit.getOnlinePlayers());
-        }
-
-        return new ArrayList<>();
-    }
-
-    /**
-     * Get a list of players from an argument.
-     *
-     * @param sender The source of the command.
-     * @param arg    The argument.
-     * @return The list of players.
-     */
-    protected List<Player> parsePlayers(CommandSender sender, String arg) {
-        return parsePlayers(sender, arg, false);
     }
 
     /**

@@ -32,26 +32,24 @@ public class TpyesCommand extends PluginCommand {
     }
 
     @Override
-    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preCommandProcess(sender, getName(), args)) return true;
-
+    public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!isPlayer(sender)) {
             Chat.send(localization.notPlayer, sender);
-            return true;
+            return false;
         }
 
         Player target = (Player) sender;
 
         if (args.length > 1) {
             incorrectUsage(sender);
-            return true;
+            return false;
         }
 
         ITeleportManager teleportManager = aio.getTeleportManager();
 
         if (!teleportManager.hasTargetTeleportRequest(target)) {
             //Chat.send(localization.noPendingTeleportRequest, target);
-            return true;
+            return false;
         }
 
         TeleportRequest request;
@@ -65,21 +63,21 @@ public class TpyesCommand extends PluginCommand {
 
             if (requester == null) {
                 Chat.send(localization.playerNotFound, sender);
-                return true;
+                return false;
             }
 
             TeleportRequest requesterRequest = teleportManager.getRequesterTeleportRequest(requester);
 
             if (requesterRequest == null) {
                 //Chat.send(localization.requesterRequestExpired, sender);
-                return true;
+                return false;
             }
 
             Player requestTarget = requesterRequest.getTarget();
 
             if (requestTarget != target) {
                 //Chat.send(localization.requesterRequestToAnotherTarget);
-                return true;
+                return false;
             }
 
             request = requesterRequest;

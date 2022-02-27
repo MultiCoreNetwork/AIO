@@ -40,18 +40,16 @@ public class RunLaterCommand extends PluginCommand {
     }
 
     @Override
-    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preCommandProcess(sender, getName(), args)) return true;
-
+    public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (args.length < 2) {
             incorrectUsage(sender);
-            return true;
+            return false;
         }
 
         Long delay = Utils.parseTime(args[0]);
         if (delay == null) {
             incorrectUsage(sender);
-            return true;
+            return false;
         }
 
         String command = Chat.builder(args, 1);

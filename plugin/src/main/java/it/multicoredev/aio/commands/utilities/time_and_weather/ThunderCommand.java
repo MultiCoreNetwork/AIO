@@ -42,15 +42,13 @@ public class ThunderCommand extends PluginCommand {
     }
 
     @Override
-    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preCommandProcess(sender, getName(), args)) return true;
-
+    public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         World world = null;
 
         if (!isPlayer(sender)) {
             if (args.length < 1) {
                 incorrectUsage(sender);
-                return true;
+                return false;
             }
         } else {
             if (args.length < 1) {
@@ -64,8 +62,8 @@ public class ThunderCommand extends PluginCommand {
         }
 
         if (world == null) {
-            Chat.send(localization.worldNotFound, sender);
-            return true;
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.worldNotFound), sender);
+            return false;
         }
 
         world.setStorm(true);
@@ -73,7 +71,7 @@ public class ThunderCommand extends PluginCommand {
         world.setWeatherDuration(duration);
         world.setThundering(true);
         world.setThunderDuration(duration);
-        Chat.send(localization.weatherSetThunder.replace("{WORLD}", world.getName()), sender);
+        Chat.send(placeholdersUtils.replacePlaceholders(localization.weatherSetThunder, "{WORLD}", world.getName()), sender);
         return true;
     }
 

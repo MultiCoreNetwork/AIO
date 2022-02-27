@@ -36,19 +36,15 @@ public class TrashCommand extends PluginCommand {
     }
 
     @Override
-    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preCommandProcess(sender, getName(), args)) return true;
-
+    public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!isPlayer(sender)) {
-            Chat.send(localization.notPlayer, sender);
-            postCommandProcess(sender, getName(), args, false);
-            return true;
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.notPlayer), sender);
+            return false;
         }
 
         Player player = (Player) sender;
-        player.openInventory(Bukkit.createInventory(player, 54, Chat.getTranslated(localization.trash)));
+        player.openInventory(Bukkit.createInventory(player, 54, Chat.getTranslated(placeholdersUtils.replacePlaceholders(localization.trash))));
 
-        postCommandProcess(sender, getName(), args, true);
         return true;
     }
 }

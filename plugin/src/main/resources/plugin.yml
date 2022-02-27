@@ -2,6 +2,7 @@ name: AIO
 version: ${project.version}
 main: it.multicoredev.aio.AIO
 api-version: ${apiVersion}
+load: STARTUP
 authors: ["LoreSchaeffer", "DanTTV"]
 description: ${project.description}
 prefix: aio

@@ -304,6 +304,12 @@ public class Localization extends JsonConfig {
     public String tpall;
     @SerializedName("tpall_self")
     public String tpallSelf;
+    @SerializedName("tpa_request_canceled")
+    public String tpaRequestCanceled;
+    @SerializedName("tpa_request_sent")
+    public String tpaRequestSent;
+    @SerializedName("tpa_request_target")
+    public String tpaRequestTarget;
 
     public String trash;
 
@@ -434,7 +440,7 @@ public class Localization extends JsonConfig {
         if (moneyResetSender == null) moneyResetSender = "&e{DISPLAYNAME}&h's balance reset to &e{MONEY}&h.";
         if (moneyResetReceiver == null) moneyResetReceiver = "&hYour balance has been reset to &e{MONEY}&h.";
 
-        if (entityList == null) entityList = "&hThere are {ENTITIES} in world {WORLD}.";
+        if (entityList == null) entityList = "&hThere are {AMOUNT} in world {WORLD}.";
         if (entityListFormat == null) entityListFormat = "#2196f3{ENTITY} &e{AMOUNT}";
 
         if (feed == null) feed = "&h{DISPLAYNAME} has been fed.";
@@ -529,6 +535,9 @@ public class Localization extends JsonConfig {
 
         if (tpall == null) tpall = "&hYou have been teleported!";
         if (tpallSelf == null) tpallSelf = "&hYou teleported everyone to you.";
+        if (tpaRequestCanceled == null) tpaRequestCanceled = "&6{REQUESTER}'s teleport request has been cancelled.";
+        if (tpaRequestSent == null) tpaRequestSent = "&hYou sent a teleport request to {TARGET}";
+        if (tpaRequestTarget == null) tpaRequestTarget = "&hYou received a teleport request to you from {REQUESTER}";
 
         if (trash == null) trash = "Trash Can";
 

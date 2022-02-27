@@ -6,6 +6,7 @@ import it.multicoredev.aio.api.tp.Teleport;
 import it.multicoredev.aio.api.tp.TeleportRequest;
 import it.multicoredev.aio.api.tp.TeleportRequestType;
 import it.multicoredev.aio.utils.Utils;
+import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -195,29 +196,14 @@ public class TeleportManager implements ITeleportManager {
         Preconditions.checkNotNull(request);
 
         TeleportRequest previousRequest = getRequesterTeleportRequest(request.getRequester());
-        if (previousRequest != null) {
-            cancelTeleportRequest(previousRequest); //TODO notify
-        } else {
-            if (previousRequest.getTarget().equals(request.getTarget()) && previousRequest.getType().equals(request.getType())) return;
+        if (previousRequest != null) cancelTeleportRequest(previousRequest);
 
-            teleportRequests.put(request, new Date());
-        }
+        teleportRequests.put(request, new Date());
     }
 
     @Override
     public void requestTeleport(@NotNull TeleportRequestType type, @NotNull Player requester, @NotNull Player target) {
-        Preconditions.checkNotNull(type);
-        Preconditions.checkNotNull(requester);
-        Preconditions.checkNotNull(target);
-
-        TeleportRequest previousRequest = getRequesterTeleportRequest(requester);
-        if (previousRequest != null) {
-            cancelTeleportRequest(previousRequest); //TODO notify
-        } else {
-            if (previousRequest.getTarget().equals(target) && previousRequest.getType().equals(type)) return;
-
-            teleportRequests.put(new TeleportRequest(type, requester, target), new Date());
-        }
+        requestTeleport(new TeleportRequest(type, requester, target));
     }
 
     @Override
@@ -225,7 +211,6 @@ public class TeleportManager implements ITeleportManager {
         Preconditions.checkNotNull(request);
 
         teleportRequests.remove(request);
-        //TODO notify
     }
 
     @Override
@@ -233,7 +218,6 @@ public class TeleportManager implements ITeleportManager {
         Preconditions.checkNotNull(request);
 
         teleportRequests.remove(request);
-        //TODO notify
     }
 
     @Override
@@ -241,7 +225,6 @@ public class TeleportManager implements ITeleportManager {
         Preconditions.checkNotNull(request);
 
         teleportRequests.remove(request);
-        //TODO notify
     }
 
     @Override
@@ -249,7 +232,12 @@ public class TeleportManager implements ITeleportManager {
         Preconditions.checkNotNull(request);
 
         teleportRequests.remove(request);
-        //TODO notify
+
+        Player target = request.getTarget();
+        if (target != null) {
+            AIO aio = (AIO) AIO.getInstance();
+            Chat.send(aio.getLocalization().tpaRequestCanceled, target);
+        }
     }
 
     @Override
@@ -259,7 +247,6 @@ public class TeleportManager implements ITeleportManager {
         TeleportRequest request = getRequesterTeleportRequest(requester);
         if (request != null) {
             teleportRequests.remove(request);
-            //TODO notify
         }
     }
 
@@ -270,7 +257,6 @@ public class TeleportManager implements ITeleportManager {
         TeleportRequest request = getRequesterTeleportRequest(requester);
         if (request != null) {
             teleportRequests.remove(request);
-            //TODO notify
         }
     }
 
@@ -281,7 +267,6 @@ public class TeleportManager implements ITeleportManager {
         TeleportRequest request = getRequesterTeleportRequest(requester);
         if (request != null) {
             teleportRequests.remove(request);
-            //TODO notify
         }
     }
 
@@ -292,7 +277,6 @@ public class TeleportManager implements ITeleportManager {
         TeleportRequest request = getRequesterTeleportRequest(requester);
         if (request != null) {
             teleportRequests.remove(request);
-            //TODO notify
         }
     }
 

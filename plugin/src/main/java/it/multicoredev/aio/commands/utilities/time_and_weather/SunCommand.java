@@ -41,15 +41,13 @@ public class SunCommand extends PluginCommand {
     }
 
     @Override
-    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preCommandProcess(sender, getName(), args)) return true;
-
+    public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         World world = null;
 
         if (!isPlayer(sender)) {
             if (args.length < 1) {
                 incorrectUsage(sender);
-                return true;
+                return false;
             }
         } else {
             if (args.length < 1) {
@@ -63,14 +61,14 @@ public class SunCommand extends PluginCommand {
         }
 
         if (world == null) {
-            Chat.send(localization.worldNotFound, sender);
-            return true;
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.worldNotFound), sender);
+            return false;
         }
 
         world.setStorm(false);
         world.setThundering(false);
         world.setClearWeatherDuration(180000);
-        Chat.send(localization.weatherSetSun.replace("{WORLD}", world.getName()), sender);
+        Chat.send(placeholdersUtils.replacePlaceholders(localization.weatherSetSun, "{WORLD}", world.getName()), sender);
         return true;
     }
 

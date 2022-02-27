@@ -1,10 +1,13 @@
 package it.multicoredev.aio.listeners.aio;
 
-/*import io.papermc.paper.event.server.CommandPostprocessEvent;
 import it.multicoredev.aio.AIO;
+import it.multicoredev.aio.api.events.PostCommandEvent;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;*/
+import org.jetbrains.annotations.NotNull;
+
+import static it.multicoredev.aio.AIO.VAULT;
 
 /**
  * Copyright © 2022 by Lorenzo Magni
@@ -26,15 +29,25 @@ import org.jetbrains.annotations.NotNull;*/
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class PostCommandListener /*extends PluginListenerExecutor<CommandPostprocessEvent>*/ {
+public class PostCommandListener extends PluginListenerExecutor<PostCommandEvent> {
 
-    /*public PostCommandListener(Class<CommandPostprocessEvent> eventClass, AIO aio) {
+    public PostCommandListener(Class<PostCommandEvent> eventClass, AIO aio) {
         super(eventClass, aio);
     }
 
     @Override
-    public void onEvent(@NotNull CommandPostprocessEvent event) {
-        if (!(event.getCommandSender() instanceof Player)) return;
-        if (config.commandCooldown.cooldownEnabled && event.wasSuccess()) aio.addCommandCooldown((Player) event.getCommandSender(), event.getCommand());
-    }*/
+    public void onEvent(@NotNull PostCommandEvent event) {
+        CommandSender sender = event.getCommandSender();
+        boolean isPlayer = sender instanceof Player;
+        String cmd = event.getCommand();
+
+        if (isPlayer && config.commandCooldown.cooldownEnabled && event.isSuccess()) aio.addCommandCooldown((Player) sender, cmd);
+
+
+        if (config.commandCosts.costsEnabled && VAULT && isPlayer && config.commandCosts.hasCommandCost(cmd) && !sender.hasPermission("aio.bypass.costs")) {
+            Player player = (Player) sender;
+            int cost = Math.abs(config.commandCosts.getCommandCost(cmd));
+            aio.getEconomy().withdrawPlayer(player, cost);
+        }
+    }
 }

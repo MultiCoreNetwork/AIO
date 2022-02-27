@@ -39,12 +39,10 @@ public class DelWarpCommand extends PluginCommand {
     }
 
     @Override
-    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preCommandProcess(sender, getName(), args)) return true;
-
+    public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (args.length == 0) {
             incorrectUsage(sender);
-            return true;
+            return false;
         }
 
         String name = args[0];

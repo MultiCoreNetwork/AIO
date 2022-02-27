@@ -43,36 +43,35 @@ public class LightningCommand extends PluginCommand {
     }
 
     @Override
-    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!preCommandProcess(sender, getName(), args)) return true;
-
+    public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!isPlayer(sender) && args.length < 1) {
-            Chat.send(localization.notPlayer, sender);
-            return true;
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.notPlayer), sender);
+            return false;
         }
 
-        List<Location> targets = new ArrayList<>();
+        Location target = null;
+
         if (args.length > 0) {
-            List<Player> players = parsePlayers(sender, args[0]);
-            if (players.isEmpty()) {
-                Chat.send(localization.playerNotFound, sender);
-                return true;
+            Player targetPlayer = Bukkit.getPlayer(args[0]);
+
+            if (targetPlayer == null) {
+                Chat.send(placeholdersUtils.replacePlaceholders(localization.playerNotFound), sender);
+                return false;
             }
 
-            players.forEach(p -> targets.add(p.getLocation()));
+            target = targetPlayer.getLocation();
         } else {
             Player player = (Player) sender;
             Block block = player.getTargetBlockExact(player.getServer().getViewDistance() * 16, FluidCollisionMode.ALWAYS);
-            if (block != null) targets.add(block.getLocation());
+            if (block != null) target = block.getLocation();
         }
 
-        targets.removeIf(l -> l.getWorld() == null);
-        if (targets.isEmpty()) {
-            Chat.send(localization.lightningSummonFailed, sender);
-            return true;
+        if (target == null || target.getWorld() == null) {
+            Chat.send(placeholdersUtils.replacePlaceholders(localization.lightningSummonFailed), sender);
+            return false;
         }
 
-        targets.forEach(t -> t.getWorld().strikeLightning(t));
+        target.getWorld().strikeLightning(target);
         return true;
     }
 

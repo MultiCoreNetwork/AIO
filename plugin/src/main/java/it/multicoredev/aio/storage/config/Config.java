@@ -85,7 +85,7 @@ public class Config extends JsonConfig {
         if (eventPriorities == null) eventPriorities = new HashMap<>();
         if (!eventPriorities.containsKey("PlayerPostTeleportEvent")) eventPriorities.put("PlayerPostTeleportEvent", "LOWEST");
         if (!eventPriorities.containsKey("PlayerTeleportCancelledEvent")) eventPriorities.put("PlayerTeleportCancelledEvent", "NORMAL");
-        if (!eventPriorities.containsKey("PostCommandEvent")) eventPriorities.put("PostCommandEvent", "LOWEST");
+        if (!eventPriorities.containsKey("PostCommandEvent")) eventPriorities.put("PostCommandEvent", "HIGH");
         if (!eventPriorities.containsKey("AfkToggleEvent")) eventPriorities.put("AfkToggleEvent", "LOWEST");
 
         if (!eventPriorities.containsKey("EntityDamageEvent")) eventPriorities.put("EntityDamageEvent", "LOWEST");
