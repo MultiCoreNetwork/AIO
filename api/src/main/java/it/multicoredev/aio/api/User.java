@@ -496,8 +496,13 @@ public class User extends JsonConfig {
      *
      * @param afk true if the player is AFK, false otherwise.
      * @return this object.
+     * @throws IllegalStateException If this method is not called from the main thread.
      */
     public User setAfk(boolean afk) {
+        if (!Bukkit.isPrimaryThread()) {
+            throw new IllegalStateException("User#setAfk must be called from the main thread.");
+        }
+
         if (this.afk && !afk) {
             // If player is leaving AFK mode, then resets afkLastLocation and afkCooldownTimestamp
             this.afkLastLocation = null;
@@ -506,7 +511,7 @@ public class User extends JsonConfig {
             if (player != null) { // Just to be sure
                 Bukkit.getPluginManager().callEvent(new AfkToggleEvent(player, false));
             }
-            this.afk = afk;
+            this.afk = false;
         } else if (!this.afk && afk) {
             // Player is going AFK
             Player player = Bukkit.getPlayer(uuid);
@@ -515,7 +520,7 @@ public class User extends JsonConfig {
                 this.afkCooldownTimestamp = System.currentTimeMillis();
                 Bukkit.getPluginManager().callEvent(new AfkToggleEvent(player, true));
             }
-            this.afk = afk;
+            this.afk = true;
         }
         return this;
     }
