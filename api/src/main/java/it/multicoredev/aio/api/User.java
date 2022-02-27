@@ -54,9 +54,9 @@ public class User extends JsonConfig {
     private Integer rtp;
     private Boolean god;
     private Boolean fly;
-    private transient boolean afk;
+    private transient boolean afk = false;
     private transient long afkCooldownTimestamp = -1; // Initialised with an invalid cooldown
-    private transient Location afkLastLocation;
+    private transient Location afkLastLocation = null;
 
     private volatile Long lastSave = null;
 
