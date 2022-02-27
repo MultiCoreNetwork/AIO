@@ -47,27 +47,27 @@ public class AfkTask implements Runnable {
             if (user == null) continue;
 
             @Nullable Location oldLoc = user.getAfkLastLocation();
-
             Location loc = p.getLocation();
-            if (user.isAfk()) {
-                if (config.afkSection.afkRemoveOnMovement && !loc.equals(oldLoc)) {
-                    user.setAfk(false);
-                    continue;
-                }
-                long oldTime = user.getAfkCooldownTimestamp();
-                if (oldTime + config.afkSection.afkMillisecondsCooldown < time) {
-                    user.setAfk(false);
-                    continue;
-                }
+
+            if (config.afkSection.afkRemoveOnMovement && !loc.equals(oldLoc)) {
                 user.setAfkLastLocation(loc);
-            } else {
-                long oldTime = user.getAfkCooldownTimestamp();
-                if (oldTime < 0 || (config.afkSection.afkRemoveOnMovement && !loc.equals(oldLoc))) {
-                    user.setAfkCooldownTimestamp(time);
-                    user.setAfkLastLocation(loc);
-                    continue;
-                }
+                user.setAfkCooldownTimestamp(time);
+                user.setAfk(false);
+                continue;
+            }
+
+            long oldTime = user.getAfkCooldownTimestamp();
+            if (oldTime < 0) {
+                user.setAfkCooldownTimestamp(time);
+                continue;
+            }
+
+            if (user.isAfk()) {
                 if (oldTime + config.afkSection.afkMillisecondsCooldown > time) {
+                    user.setAfk(false);
+                }
+            } else {
+                if (oldTime + config.afkSection.afkMillisecondsCooldown < time) {
                     user.setAfk(true);
                 }
             }

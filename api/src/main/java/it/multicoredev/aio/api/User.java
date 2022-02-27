@@ -516,8 +516,6 @@ public class User extends JsonConfig {
             // Player is going AFK
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) { // Just to be sure
-                this.afkLastLocation = player.getLocation();
-                this.afkCooldownTimestamp = System.currentTimeMillis();
                 Bukkit.getPluginManager().callEvent(new AfkToggleEvent(player, true));
             }
             this.afk = true;
