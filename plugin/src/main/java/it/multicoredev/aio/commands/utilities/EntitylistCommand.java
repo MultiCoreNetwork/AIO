@@ -54,7 +54,7 @@ public class EntitylistCommand extends PluginCommand {
         else world = Bukkit.getWorld(args[0]);
 
         if (world == null) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.worldNotFound), sender);
+            Chat.send(pu.replacePlaceholders(localization.worldNotFound), sender);
             return false;
         }
 
@@ -67,9 +67,9 @@ public class EntitylistCommand extends PluginCommand {
             else entitiesMap.put(type, 1);
         });
 
-        Chat.send(placeholdersUtils.replacePlaceholders(localization.entityList, new String[]{"{AMOUNT}", "{WORLD}"}, new Object[]{entities.size(), world.getName()}), sender);
+        Chat.send(pu.replacePlaceholders(localization.entityList, new String[]{"{AMOUNT}", "{WORLD}"}, new Object[]{entities.size(), world.getName()}), sender);
         for (Map.Entry<String, Integer> entity : entitiesMap.entrySet()) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.entityListFormat, new String[]{"{ENTITY}", "{AMOUNT}"}, new Object[]{entity.getKey(), entity.getValue()}), sender);
+            Chat.send(pu.replacePlaceholders(localization.entityListFormat, new String[]{"{ENTITY}", "{AMOUNT}"}, new Object[]{entity.getKey(), entity.getValue()}), sender);
         }
 
         return true;

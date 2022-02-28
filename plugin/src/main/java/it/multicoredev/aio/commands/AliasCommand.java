@@ -88,7 +88,7 @@ public class AliasCommand extends PluginCommand {
             int cost = Math.abs(config.commandCosts.getCommandCost(getName()));
 
             if (!aio.getEconomy().has(player, cost)) {
-                Chat.send(placeholdersUtils.replacePlaceholders(
+                Chat.send(pu.replacePlaceholders(
                         localization.insufficientCmdMoney,
                         "{MONEY}",
                         aio.getEconomy().format(cost)

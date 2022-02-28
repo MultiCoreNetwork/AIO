@@ -30,7 +30,7 @@ public class SuicideCommand extends PluginCommand {
     @Override
     public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!isPlayer(sender)) {
-            Chat.send(localization.notPlayer, sender);
+            Chat.send(pu.replacePlaceholders(localization.notPlayer), sender);
             return false;
         }
 
@@ -38,7 +38,7 @@ public class SuicideCommand extends PluginCommand {
         player.setLastDamageCause(new EntityDamageEvent(player, EntityDamageEvent.DamageCause.SUICIDE, Short.MAX_VALUE));
         player.setHealth(0);
 
-        Chat.send(localization.suicideSuccess, sender);
+        Chat.send(pu.replacePlaceholders(localization.suicideSuccess), sender);
         return true;
     }
 }

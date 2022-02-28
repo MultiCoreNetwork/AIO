@@ -53,7 +53,7 @@ public class RTPCommand extends PluginCommand {
             }
         } else {
             if (args.length < 1) {
-                Chat.send(placeholdersUtils.replacePlaceholders(localization.notPlayer), sender);
+                Chat.send(pu.replacePlaceholders(localization.notPlayer), sender);
                 return false;
             }
 
@@ -61,12 +61,12 @@ public class RTPCommand extends PluginCommand {
         }
 
         if (target == null) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.playerNotFound), sender);
+            Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
             return false;
         }
 
         if (config.rtpSection.isWorldBlacklisted(target.getWorld())) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.rtpBlacklistedWorld), sender);
+            Chat.send(pu.replacePlaceholders(localization.rtpBlacklistedWorld), sender);
             return false;
         }
 
@@ -74,12 +74,12 @@ public class RTPCommand extends PluginCommand {
             if ((sender instanceof Player) && !hasSubPerm(sender, "bypass-limits")) {
                 User user = storage.getUser(((Player) sender).getUniqueId());
                 if (user == null) {
-                    Chat.send(placeholdersUtils.replacePlaceholders(localization.playerNotFound), sender);
+                    Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
                     return false;
                 }
 
                 if (user.getRTP() > config.rtpSection.maxRtp) {
-                    Chat.send(placeholdersUtils.replacePlaceholders(localization.maxRtpExceeded), sender);
+                    Chat.send(pu.replacePlaceholders(localization.maxRtpExceeded), sender);
                     return false;
                 }
             }
@@ -94,8 +94,8 @@ public class RTPCommand extends PluginCommand {
                 config.rtpSection.rtpTeleportDelay
         ));
 
-        if (target.equals(sender)) Chat.send(placeholdersUtils.replacePlaceholders(localization.rtpTeleportSelf), target);
-        else Chat.send(placeholdersUtils.replacePlaceholders(
+        if (target.equals(sender)) Chat.send(pu.replacePlaceholders(localization.rtpTeleportSelf), target);
+        else Chat.send(pu.replacePlaceholders(
                 localization.rtpTeleport,
                 new String[]{"{NAME}", "{DISPLAYNAME}"},
                 new Object[]{target.getName(), target.getDisplayName()}

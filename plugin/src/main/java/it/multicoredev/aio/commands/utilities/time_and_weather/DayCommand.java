@@ -61,12 +61,12 @@ public class DayCommand extends PluginCommand {
         }
 
         if (world == null) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.worldNotFound), sender);
+            Chat.send(pu.replacePlaceholders(localization.worldNotFound), sender);
             return false;
         }
 
         world.setTime(0);
-        Chat.send(placeholdersUtils.replacePlaceholders(localization.timeSetDay, "{WORLD}", world.getName()), sender);
+        Chat.send(pu.replacePlaceholders(localization.timeSetDay, "{WORLD}", world.getName()), sender);
         return true;
     }
 

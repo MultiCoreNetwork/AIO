@@ -62,13 +62,13 @@ public class RainCommand extends PluginCommand {
         }
 
         if (world == null) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.worldNotFound), sender);
+            Chat.send(pu.replacePlaceholders(localization.worldNotFound), sender);
             return false;
         }
 
         world.setStorm(true);
         world.setWeatherDuration((int) (new Random().nextFloat() * (0.5) + 0.5) * 24000);
-        Chat.send(placeholdersUtils.replacePlaceholders(localization.weatherSetRain,"{WORLD}", world.getName()), sender);
+        Chat.send(pu.replacePlaceholders(localization.weatherSetRain,"{WORLD}", world.getName()), sender);
         return true;
     }
 

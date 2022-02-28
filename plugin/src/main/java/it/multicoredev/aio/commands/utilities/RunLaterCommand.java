@@ -55,7 +55,7 @@ public class RunLaterCommand extends PluginCommand {
         String command = Chat.builder(args, 1);
         aio.addDeferredCommand(sender, command, delay);
 
-        Chat.send(placeholdersUtils.replacePlaceholders(localization.runLaterScheduled, "{DELAY}", Utils.formatDelay(delay, localization)), sender);
+        Chat.send(pu.replacePlaceholders(localization.runLaterScheduled, "{DELAY}", Utils.formatDelay(delay, localization)), sender);
         return true;
     }
 

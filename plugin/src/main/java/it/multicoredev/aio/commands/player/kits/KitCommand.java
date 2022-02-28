@@ -121,7 +121,7 @@ public class KitCommand extends PluginCommand {
 
         if (!invalidMaterials.isEmpty()) {
             //TODO Try
-            Chat.severe(placeholdersUtils.replacePlaceholders(localization.invalidKit, new String[]{"{KIT}", "{INVALID}"}, new String[]{kit.getName(), String.join(", ", invalidMaterials)}));
+            Chat.severe(pu.replacePlaceholders(localization.invalidKit, new String[]{"{KIT}", "{INVALID}"}, new String[]{kit.getName(), String.join(", ", invalidMaterials)}));
             return true;
         }
 

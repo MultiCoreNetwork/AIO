@@ -62,7 +62,7 @@ public class ThunderCommand extends PluginCommand {
         }
 
         if (world == null) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.worldNotFound), sender);
+            Chat.send(pu.replacePlaceholders(localization.worldNotFound), sender);
             return false;
         }
 
@@ -71,7 +71,7 @@ public class ThunderCommand extends PluginCommand {
         world.setWeatherDuration(duration);
         world.setThundering(true);
         world.setThunderDuration(duration);
-        Chat.send(placeholdersUtils.replacePlaceholders(localization.weatherSetThunder, "{WORLD}", world.getName()), sender);
+        Chat.send(pu.replacePlaceholders(localization.weatherSetThunder, "{WORLD}", world.getName()), sender);
         return true;
     }
 

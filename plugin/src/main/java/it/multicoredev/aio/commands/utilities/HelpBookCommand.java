@@ -12,7 +12,6 @@ import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -47,7 +46,7 @@ public class HelpBookCommand extends PluginCommand {
     @Override
     public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!isPlayer(sender) && args.length < 1) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.notPlayer), sender);
+            Chat.send(pu.replacePlaceholders(localization.notPlayer), sender);
             return false;
         }
 
@@ -73,12 +72,12 @@ public class HelpBookCommand extends PluginCommand {
         HelpBook hb = aio.getHelpbook(id);
 
         if (target == null) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.playerNotFound), sender);
+            Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
             return false;
         }
 
         if (hb == null) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.helpbookNotFound), sender);
+            Chat.send(pu.replacePlaceholders(localization.helpbookNotFound), sender);
             return false;
         }
 
@@ -89,14 +88,14 @@ public class HelpBookCommand extends PluginCommand {
 
         Inventory inventory = target.getInventory();
         if (!inventory.addItem(hb.getBook()).isEmpty()) {
-            if (target != sender) Chat.send(placeholdersUtils.replacePlaceholders(
+            if (target != sender) Chat.send(pu.replacePlaceholders(
                     localization.inventoryFull,
                     new String[]{"{NAME}", "{DISPLAYNAME}"},
                     new Object[]{target.getName(), target.getDisplayName()}
             ), sender);
-            else Chat.send(placeholdersUtils.replacePlaceholders(localization.inventoryFullSelf), sender);
+            else Chat.send(pu.replacePlaceholders(localization.inventoryFullSelf), sender);
         } else {
-            if (target != sender) Chat.send(placeholdersUtils.replacePlaceholders(
+            if (target != sender) Chat.send(pu.replacePlaceholders(
                     localization.helpbookGiven,
                     new String[]{"{BOOK}", "{NAME}", "{DISPLAYNAME}"},
                     new Object[]{hb.name, target.getName(), target.getDisplayName()}

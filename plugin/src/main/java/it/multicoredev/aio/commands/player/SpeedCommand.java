@@ -44,7 +44,7 @@ public class SpeedCommand extends PluginCommand {
     public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (args.length < 1) {
             incorrectUsage(sender);
-            return true;
+            return false;
         }
 
         Player target = Bukkit.getPlayer(args[0]);
@@ -52,8 +52,8 @@ public class SpeedCommand extends PluginCommand {
 
         if (target == null) {
             if (!isPlayer(sender)) {
-                Chat.send(localization.playerNotFound, sender);
-                return true;
+                Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
+                return false;
             }
 
             target = (Player) sender;
@@ -62,7 +62,7 @@ public class SpeedCommand extends PluginCommand {
 
         if (isPlayer(sender) && target != sender && !hasSubPerm(sender, "other")) {
             insufficientPerms(sender);
-            return true;
+            return false;
         }
 
         float speed;
@@ -70,8 +70,8 @@ public class SpeedCommand extends PluginCommand {
         try {
             speed = Float.parseFloat(args[offset]);
         } catch (NumberFormatException ignored) {
-            Chat.send(localization.invalidNumber, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.invalidNumber), sender);
+            return false;
         }
 
         if (speed < 0) speed = 0;
@@ -86,7 +86,7 @@ public class SpeedCommand extends PluginCommand {
                 flying = false;
             } else {
                 incorrectUsage(sender);
-                return true;
+                return false;
             }
         } else {
             flying = target.isFlying();
@@ -94,18 +94,24 @@ public class SpeedCommand extends PluginCommand {
 
         if (flying) {
             target.setFlySpeed(speed / 10);
-            Chat.send(localization.flySpeedSetSelf.replace("{SPEED}", String.valueOf(speed)), target);
-            if (target != sender) Chat.send(localization.flySpeedSet
-                    .replace("{NAME}", target.getName())
-                    .replace("{DISPLAYNAME}", target.getDisplayName())
-                    .replace("{SPEED}", String.valueOf(speed)), sender);
+            Chat.send(pu.replacePlaceholders(
+                    localization.flySpeedSetSelf,
+                    new String[]{"{SPEED}", "{NAME}", "{DISPLAYNAME}"},
+                    new Object[]{speed, target.getName(), target.getDisplayName()}
+            ), target);
+            if (target != sender) Chat.send(pu.replacePlaceholders(
+                    localization.flySpeedSet,
+                    new String[]{"{SPEED}", "{NAME}", "{DISPLAYNAME}"},
+                    new Object[]{speed, target.getName(), target.getDisplayName()}
+            ), sender);
         } else {
             target.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(speed / 10);
-            Chat.send(localization.walkSpeedSetSelf.replace("{SPEED}", String.valueOf(speed)), target);
-            if (target != sender) Chat.send(localization.walkSpeedSet
-                    .replace("{NAME}", target.getName())
-                    .replace("{DISPLAYNAME}", target.getDisplayName())
-                    .replace("{SPEED}", String.valueOf(speed)), sender);
+            Chat.send(pu.replacePlaceholders(pu.replacePlaceholders(localization.walkSpeedSetSelf, "{SPEED}", speed)), target);
+            if (target != sender) Chat.send(pu.replacePlaceholders(
+                    localization.walkSpeedSet,
+                    new String[]{"{SPEED}", "{NAME}", "{DISPLAYNAME}"},
+                    new Object[]{speed, target.getName(), target.getDisplayName()}
+            ), sender);
         }
 
         return true;
