@@ -65,7 +65,7 @@ public class Commands extends JsonConfig {
         if (!commands.containsKey("back")) commands.put("back", new CommandData(
                 true,
                 "Teleport back to previous location",
-                "/back"
+                "/back [player]"
         ));
         if (!commands.containsKey("cleanchat")) commands.put("cleanchat", new CommandData(
                 true,
@@ -206,7 +206,7 @@ public class Commands extends JsonConfig {
         if (!commands.containsKey("repair")) commands.put("repair", new CommandData(
                 true,
                 "Repair a player's item",
-                "/repair [player]"
+                "/repair [player] [hand|all]"
         ));
         if (!commands.containsKey("rtp")) commands.put("rtp", new CommandData(
                 true,

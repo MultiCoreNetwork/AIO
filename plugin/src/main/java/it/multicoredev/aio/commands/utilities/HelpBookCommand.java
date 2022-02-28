@@ -45,7 +45,7 @@ public class HelpBookCommand extends PluginCommand {
 
     @Override
     public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!isPlayer(sender) && args.length < 1) {
+        if (!isPlayer(sender) && args.length < 2) {
             Chat.send(pu.replacePlaceholders(localization.notPlayer), sender);
             return false;
         }
@@ -57,7 +57,7 @@ public class HelpBookCommand extends PluginCommand {
             id = args[0];
             target = Bukkit.getPlayer(args[1]);
 
-            if (!hasSubPerm(sender, "other")) {
+            if (!hasSubPerm(sender, "other") && !sender.equals(target)) {
                 insufficientPerms(sender);
                 return false;
             }
@@ -81,7 +81,7 @@ public class HelpBookCommand extends PluginCommand {
             return false;
         }
 
-        if (hb.permission != null && !hasSubPerm(sender, hb.permission.toLowerCase(Locale.ROOT))) {
+        if (hb.permission && !hasSubPerm(sender, hb.id.toLowerCase(Locale.ROOT))) {
             insufficientPerms(sender);
             return false;
         }
@@ -94,6 +94,8 @@ public class HelpBookCommand extends PluginCommand {
                     new Object[]{target.getName(), target.getDisplayName()}
             ), sender);
             else Chat.send(pu.replacePlaceholders(localization.inventoryFullSelf), sender);
+
+            return false;
         } else {
             if (target != sender) Chat.send(pu.replacePlaceholders(
                     localization.helpbookGiven,
@@ -113,7 +115,7 @@ public class HelpBookCommand extends PluginCommand {
         if (args.length == 1) {
             return TabCompleterUtil.getCompletions(args[0], aio.getHelpbooks()
                     .stream()
-                    .filter(book -> book.permission == null || hasSubPerm(sender, book.permission))
+                    .filter(book -> book.permission == null || hasSubPerm(sender, book.id.toLowerCase(Locale.ROOT)))
                     .map(book -> book.id)
                     .collect(Collectors.toList()));
         } else if (hasSubPerm(sender, "other") && args.length == 2) {

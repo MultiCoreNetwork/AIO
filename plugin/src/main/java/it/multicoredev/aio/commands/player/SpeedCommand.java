@@ -40,6 +40,8 @@ public class SpeedCommand extends PluginCommand {
         super(aio, CMD);
     }
 
+    //TODO Change syntax /speed <speed> [fly|walk] [player]
+
     @Override
     public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (args.length < 1) {

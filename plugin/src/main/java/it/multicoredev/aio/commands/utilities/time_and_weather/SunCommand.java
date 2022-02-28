@@ -55,10 +55,7 @@ public class SunCommand extends PluginCommand {
             }
         }
 
-        if (args.length > 0) {
-            String name = args[0];
-            world = Bukkit.getWorld(name);
-        }
+        if (args.length > 0) world = Bukkit.getWorld(args[0]);
 
         if (world == null) {
             Chat.send(pu.replacePlaceholders(localization.worldNotFound), sender);

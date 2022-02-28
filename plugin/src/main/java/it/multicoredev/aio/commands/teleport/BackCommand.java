@@ -48,12 +48,12 @@ public class BackCommand extends PluginCommand {
             if (args.length < 1) {
                 target = (Player) sender;
             } else {
-                if (!hasSubPerm(sender, "other")) {
+                target = Bukkit.getPlayer(args[0]);
+
+                if (!hasSubPerm(sender, "other") && !sender.equals(target)) {
                     insufficientPerms(sender);
                     return false;
                 }
-
-                target = Bukkit.getPlayer(args[0]);
             }
         } else {
             if (args.length < 1) {
@@ -75,7 +75,7 @@ public class BackCommand extends PluginCommand {
             return false;
         }
 
-        aio.getTeleportManager().teleport(target, user.getLastLocation());
+        aio.getTeleportManager().teleport(target, user.getLastLocation()); //TODO Add delay
         return true;
     }
 

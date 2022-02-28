@@ -52,17 +52,17 @@ public class SpawnCommand extends PluginCommand {
             if (args.length < 1) {
                 target = (Player) sender;
             } else {
-                if (!hasSubPerm(sender, "other")) {
-                    insufficientPerms(sender);
-                    return true;
-                }
-
                 target = Bukkit.getPlayer(args[0]);
+
+                if (!hasSubPerm(sender, "other") && !sender.equals(target)) {
+                    insufficientPerms(sender);
+                    return false;
+                }
             }
         } else {
             if (args.length < 1) {
                 Chat.send(localization.notPlayer, sender);
-                return true;
+                return false;
             }
 
             target = Bukkit.getPlayer(args[0]);
@@ -70,7 +70,7 @@ public class SpawnCommand extends PluginCommand {
 
         if (target == null) {
             Chat.send(localization.playerNotFound, sender);
-            return true;
+            return false;
         }
 
         Location spawn = spawnModule.spawnLocation;
@@ -78,7 +78,7 @@ public class SpawnCommand extends PluginCommand {
 
         if (spawn == null) {
             Chat.send(localization.spawnNotSet, sender);
-            return true;
+            return false;
         }
 
         aio.getTeleportManager().teleport(target, spawn, spawnModule.teleportDelay);

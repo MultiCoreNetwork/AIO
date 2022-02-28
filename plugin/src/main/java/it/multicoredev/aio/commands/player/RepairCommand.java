@@ -59,7 +59,7 @@ public class RepairCommand extends PluginCommand {
             offset = 0;
         }
 
-        if (isPlayer(sender) && target != sender && !hasSubPerm(sender, "other")) {
+        if (!hasSubPerm(sender, "other") && !sender.equals(target)) {
             insufficientPerms(sender);
             return false;
         }

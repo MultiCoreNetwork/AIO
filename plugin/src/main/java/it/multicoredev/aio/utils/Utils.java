@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
  */
 public class Utils {
     private static final Pattern URL_PATTERN = Pattern.compile("((http|https)://)(www.)?[a-zA-Z0-9@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)");
+    private static final int[] MULTIPLIERS = {-1, 1};
 
     public static boolean isVanished(Player player) {
         for (MetadataValue meta : player.getMetadata("vanished")) {
@@ -166,8 +167,10 @@ public class Utils {
         for (int i = 0; i < 10000; i++) {
             double xDistance = random.nextDouble() * (maxDistance - minDistance) + minDistance;
             double zDistance = random.nextDouble() * (maxDistance - minDistance) + minDistance;
+            int xMultiplier = MULTIPLIERS[random.nextInt(2)];
+            int zMultiplier = MULTIPLIERS[random.nextInt(2)];
 
-            Location newLocation = center.clone().add(xDistance, 0, zDistance);
+            Location newLocation = center.clone().add(xMultiplier * xDistance, 0, zMultiplier * zDistance);
             if (!setY(newLocation)) continue;
 
             if (isSafeLocation(newLocation)) return newLocation;
