@@ -76,16 +76,16 @@ public class HomesCommand extends PluginCommand {
         float maxPages = (float) homes.size() / (float) 18;
 
         if (page > maxPages) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.pageNotFound, "{PAGES}", maxPages), sender);
+            Chat.send(pu.replacePlaceholders(localization.pageNotFound, "{PAGES}", maxPages), sender);
             return true;
         }
 
-        Chat.send(placeholdersUtils.replacePlaceholders(localization.availableHomes), sender);
+        Chat.send(pu.replacePlaceholders(localization.availableHomes), sender);
 
         if (homes.size() < 19) {
             for (String home : homes) {
                 RawMessage msg = new RawMessage();
-                TextComponent tc = (TextComponent) new ComponentBuilder().append(TextComponent.fromLegacyText(Chat.getTranslated(placeholdersUtils.replacePlaceholders(localization.homeListFormat, "{HOME}", home)))).create()[0];
+                TextComponent tc = (TextComponent) new ComponentBuilder().append(TextComponent.fromLegacyText(Chat.getTranslated(pu.replacePlaceholders(localization.homeListFormat, "{HOME}", home)))).create()[0];
                 tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/home " + home));
                 msg.append(tc);
 
@@ -100,7 +100,7 @@ public class HomesCommand extends PluginCommand {
                 String home = homes.get(i);
 
                 RawMessage msg = new RawMessage();
-                TextComponent tc = (TextComponent) new ComponentBuilder().append(TextComponent.fromLegacyText(Chat.getTranslated(placeholdersUtils.replacePlaceholders(localization.homeListFormat, "{HOME}", home)))).create()[0];
+                TextComponent tc = (TextComponent) new ComponentBuilder().append(TextComponent.fromLegacyText(Chat.getTranslated(pu.replacePlaceholders(localization.homeListFormat, "{HOME}", home)))).create()[0];
                 tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/home " + home));
                 msg.append(tc);
 
@@ -108,7 +108,7 @@ public class HomesCommand extends PluginCommand {
             }
 
             if (isPlayer(sender)) {
-                String nav = placeholdersUtils.replacePlaceholders(
+                String nav = pu.replacePlaceholders(
                         localization.pageNavigation, new String[]{
                                 "{PREV_PAGE}",
                                 "{CURRENT_PAGE}",

@@ -40,7 +40,7 @@ public class TpallCommand extends PluginCommand {
     public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!isPlayer(sender)) {
             Chat.send(localization.notPlayer, sender);
-            return true;
+            return false;
         }
 
         Location target = ((Player) sender).getLocation();
@@ -53,7 +53,6 @@ public class TpallCommand extends PluginCommand {
         }
 
         Chat.send(localization.tpallSelf, sender);
-
         return true;
     }
 }

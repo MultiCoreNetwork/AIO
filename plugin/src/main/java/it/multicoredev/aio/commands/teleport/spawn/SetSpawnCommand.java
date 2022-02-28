@@ -41,9 +41,9 @@ public class SetSpawnCommand extends PluginCommand {
 
     @Override
     public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!(sender instanceof Player)) {
+        if (!isPlayer(sender)) {
             Chat.send(localization.notPlayer, sender);
-            return true;
+            return false;
         }
 
         Player player = (Player) sender;

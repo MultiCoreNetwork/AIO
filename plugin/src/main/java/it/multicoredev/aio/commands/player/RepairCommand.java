@@ -51,17 +51,17 @@ public class RepairCommand extends PluginCommand {
 
         if (target == null) {
             if (!isPlayer(sender)) {
-                Chat.send(localization.playerNotFound, sender);
-                return true;
+                Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
+                return false;
             }
 
             target = (Player) sender;
             offset = 0;
         }
 
-        if (isPlayer(sender) && target != sender && !hasSubPerm(sender, "other")) {
+        if (!hasSubPerm(sender, "other") && !sender.equals(target)) {
             insufficientPerms(sender);
-            return true;
+            return false;
         }
 
         if (args.length - 1 >= offset) {
@@ -79,30 +79,36 @@ public class RepairCommand extends PluginCommand {
         return true;
     }
 
-    private void repairHand(Player target, CommandSender sender) {
+    private boolean repairHand(Player target, CommandSender sender) {
         ItemStack item = target.getInventory().getItemInMainHand();
 
         if (item.getType().isAir()) {
-            Chat.send(localization.noItemInHand, sender);
-            return;
+            Chat.send(pu.replacePlaceholders(localization.noItemInHand), sender);
+            return false;
         }
 
         if (repair(item)) {
-            Chat.send(localization.itemRepairedSelf
-                    .replace("{NAME}", target.getName())
-                    .replace("{DISPLAYNAME}", target.getDisplayName())
-                    .replace("{ITEM}", Utils.capitalize(item.getType().name())), target);
-            if (target != sender) Chat.send(localization.itemRepaired.replace("{ITEM}", Utils.capitalize(item.getType().name())), sender);
+            Chat.send(pu.replacePlaceholders(
+                    localization.itemRepairedSelf,
+                    new String[]{"{NAME}", "{DISPLAYNAME}", "{ITEM}"},
+                    new Object[]{target.getName(), target.getDisplayName(), Utils.capitalize(item.getType().name())}
+            ), target);
+            if (target != sender)
+                Chat.send(pu.replacePlaceholders(localization.itemRepaired, "{ITEM}", Utils.capitalize(item.getType().name())), sender);
         } else {
-            Chat.send(localization.itemNotRepairedSelf
-                    .replace("{NAME}", target.getName())
-                    .replace("{DISPLAYNAME}", target.getDisplayName())
-                    .replace("{ITEM}", Utils.capitalize(item.getType().name())), target);
-            if (target != sender) Chat.send(localization.itemNotRepaired.replace("{ITEM}", Utils.capitalize(item.getType().name())), sender);
+            Chat.send(pu.replacePlaceholders(
+                    localization.itemNotRepairedSelf,
+                    new String[]{"{NAME}", "{DISPLAYNAME}", "{ITEM}"},
+                    new Object[]{target.getName(), target.getDisplayName(), Utils.capitalize(item.getType().name())}
+            ), target);
+            if (target != sender)
+                Chat.send(pu.replacePlaceholders(localization.itemNotRepaired, "{ITEM}", Utils.capitalize(item.getType().name())), sender);
         }
+
+        return true;
     }
 
-    private void repairAll(Player target, CommandSender sender) {
+    private boolean repairAll(Player target, CommandSender sender) {
         Inventory inventory = target.getInventory();
         int repairedItems = 0;
 
@@ -111,17 +117,22 @@ public class RepairCommand extends PluginCommand {
         }
 
         if (repairedItems > 0) {
-            Chat.send(localization.itemsRepairedSelf
-                    .replace("{NAME}", target.getName())
-                    .replace("{DISPLAYNAME}", target.getDisplayName())
-                    .replace("{ITEMS}", String.valueOf(repairedItems)), target);
-            if (target != sender) Chat.send(localization.itemsRepaired.replace("{ITEMS}", String.valueOf(repairedItems)), sender);
+            Chat.send(pu.replacePlaceholders(
+                    localization.itemsRepairedSelf,
+                    new String[]{"{NAME}", "{DISPLAYNAME}", "{ITEMS}"},
+                    new Object[]{target.getName(), target.getDisplayName(), repairedItems}
+            ), target);
+            if (target != sender) Chat.send(pu.replacePlaceholders(localization.itemsRepaired, "{ITEMS}", String.valueOf(repairedItems)), sender);
         } else {
-            Chat.send(localization.itemsNotRepairedSelf
-                    .replace("{NAME}", target.getName())
-                    .replace("{DISPLAYNAME}", target.getDisplayName()), target);
-            if (target != sender) Chat.send(localization.itemsNotRepaired, sender);
+            Chat.send(pu.replacePlaceholders(
+                    localization.itemsNotRepairedSelf,
+                    new String[]{"{NAME}", "{DISPLAYNAME}"},
+                    new Object[]{target.getName(), target.getDisplayName()}
+            ), target);
+            if (target != sender) Chat.send(pu.replacePlaceholders(localization.itemsNotRepaired), sender);
         }
+
+        return true;
     }
 
     private boolean repair(ItemStack item) {

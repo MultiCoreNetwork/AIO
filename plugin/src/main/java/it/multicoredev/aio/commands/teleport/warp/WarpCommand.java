@@ -67,7 +67,7 @@ public class WarpCommand extends PluginCommand {
             }
         } else {
             if (args.length < 2) {
-                Chat.send(placeholdersUtils.replacePlaceholders(localization.notPlayer), sender);
+                Chat.send(pu.replacePlaceholders(localization.notPlayer), sender);
                 return false;
             }
 
@@ -75,7 +75,7 @@ public class WarpCommand extends PluginCommand {
         }
 
         if (target == null) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.playerNotFound), sender);
+            Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
             return false;
         }
 
@@ -83,7 +83,7 @@ public class WarpCommand extends PluginCommand {
         WarpStorage warpStorage = aio.getWarpStorage();
 
         if (!warpStorage.existsWarp(warpName)) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.warpNotFound), sender);
+            Chat.send(pu.replacePlaceholders(localization.warpNotFound), sender);
             return false;
         }
 
@@ -100,12 +100,12 @@ public class WarpCommand extends PluginCommand {
                 World world = location.getWorld();
 
                 if (world == null) {
-                    Chat.send(placeholdersUtils.replacePlaceholders(localization.warpNotFound), sender);
+                    Chat.send(pu.replacePlaceholders(localization.warpNotFound), sender);
                     return false;
                 }
 
                 if (!Objects.equals(target.getLocation().getWorld(), world)) {
-                    Chat.send(placeholdersUtils.replacePlaceholders(localization.warpNotGlobal, "{WORLD}", world.getName()), sender);
+                    Chat.send(pu.replacePlaceholders(localization.warpNotGlobal, "{WORLD}", world.getName()), sender);
                     return false;
                 }
             }

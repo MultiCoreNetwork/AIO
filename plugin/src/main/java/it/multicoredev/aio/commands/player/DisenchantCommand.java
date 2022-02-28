@@ -57,8 +57,8 @@ public class DisenchantCommand extends PluginCommand {
 
         if (target == null) {
             if (!isPlayer(sender)) {
-                Chat.send(localization.playerNotFound, sender);
-                return true;
+                Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
+                return false;
             }
 
             target = (Player) sender;
@@ -67,37 +67,37 @@ public class DisenchantCommand extends PluginCommand {
 
         if (isPlayer(sender) && target != sender && !hasSubPerm(sender, "other")) {
             insufficientPerms(sender);
-            return true;
+            return false;
         }
 
         String name = args[offset].toLowerCase(Locale.ROOT);
         Enchantment enchantment = Enchantment.getByKey(name.startsWith("minecraft:") ? NamespacedKey.fromString(name) : NamespacedKey.minecraft(name));
 
         if (enchantment == null) {
-            Chat.send(localization.invalidEnchant, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.invalidEnchant), sender);
+            return false;
         }
 
         ItemStack item = target.getInventory().getItemInMainHand();
 
         if (item.getType().isAir()) {
-            Chat.send(localization.noItemInHand, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.noItemInHand), sender);
+            return false;
         }
 
         item.removeEnchantment(enchantment);
 
-        Chat.send(localization.itemDisenchantedSelf
-                .replace("{NAME}", target.getName())
-                .replace("{DISPLAYNAME}", target.getDisplayName())
-                .replace("{ITEM}", Utils.capitalize(item.getType().name()))
-                .replace("{ENCHANTMENT}", enchantment.getKey().toString()), target);
+        Chat.send(pu.replacePlaceholders(
+                localization.itemDisenchantedSelf,
+                new String[]{"{NAME}", "{DISPLAYNAME}", "{ITEM}", "{ENCHANTMENT}"},
+                new String[]{target.getName(), target.getDisplayName(), Utils.capitalize(item.getType().name()), enchantment.getKey().getKey()}
+        ), target);
 
-        if (target != sender) Chat.send(localization.itemDisenchanted
-                .replace("{NAME}", target.getName())
-                .replace("{DISPLAYNAME}", target.getDisplayName())
-                .replace("{ITEM}", Utils.capitalize(item.getType().name()))
-                .replace("{ENCHANTMENT}", enchantment.getKey().toString()), sender);
+        if (target != sender) Chat.send(pu.replacePlaceholders(
+                localization.itemDisenchanted,
+                new String[]{"{NAME}", "{DISPLAYNAME}", "{ITEM}", "{ENCHANTMENT}"},
+                new Object[]{target.getName(), target.getDisplayName(), Utils.capitalize(item.getType().name()), enchantment.getKey().getKey()}
+        ), sender);
         return true;
     }
 

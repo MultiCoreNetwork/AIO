@@ -49,7 +49,7 @@ public class EnchantCommand extends PluginCommand {
     public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (args.length < 1) {
             incorrectUsage(sender);
-            return true;
+            return false;
         }
 
         Player target = Bukkit.getPlayer(args[0]);
@@ -57,8 +57,8 @@ public class EnchantCommand extends PluginCommand {
 
         if (target == null) {
             if (!isPlayer(sender)) {
-                Chat.send(localization.playerNotFound, sender);
-                return true;
+                Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
+                return false;
             }
 
             target = (Player) sender;
@@ -67,15 +67,15 @@ public class EnchantCommand extends PluginCommand {
 
         if (isPlayer(sender) && target != sender && !hasSubPerm(sender, "other")) {
             insufficientPerms(sender);
-            return true;
+            return false;
         }
 
         String name = args[offset].toLowerCase(Locale.ROOT);
         Enchantment enchantment = Enchantment.getByKey(name.startsWith("minecraft:") ? NamespacedKey.fromString(name) : NamespacedKey.minecraft(name));
 
         if (enchantment == null) {
-            Chat.send(localization.invalidEnchant, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.invalidEnchant), sender);
+            return false;
         }
 
         int level;
@@ -86,38 +86,36 @@ public class EnchantCommand extends PluginCommand {
             try {
                 level = Integer.parseInt(args[offset + 1]);
             } catch (NumberFormatException ignored) {
-                Chat.send(localization.invalidNumber, sender);
-                return true;
+                Chat.send(pu.replacePlaceholders(localization.invalidNumber), sender);
+                return false;
             }
         }
 
         if (level < 1) {
-            Chat.send(localization.invalidNumber, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.invalidNumber), sender);
+            return false;
         }
 
         ItemStack item = target.getInventory().getItemInMainHand();
 
         if (item.getType().isAir()) {
-            Chat.send(localization.noItemInHand, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.noItemInHand), sender);
+            return false;
         }
 
         item.addUnsafeEnchantment(enchantment, level);
 
-        Chat.send(localization.itemEnchantedSelf
-                .replace("{NAME}", target.getName())
-                .replace("{DISPLAYNAME}", target.getDisplayName())
-                .replace("{ITEM}", Utils.capitalize(item.getType().name()))
-                .replace("{ENCHANTMENT}", enchantment.getKey().toString())
-                .replace("{LEVEL}", String.valueOf(level)), target);
+        Chat.send(pu.replacePlaceholders(
+                localization.itemEnchantedSelf,
+                new String[]{"{NAME}", "{DISPLAYNAME}", "{ITEM}", "{ENCHANTMENT}", "{LEVEL}"},
+                new Object[]{target.getName(), target.getDisplayName(), Utils.capitalize(item.getType().name()), enchantment.getKey().getKey(), level}
+        ), target);
 
-        if (target != sender) Chat.send(localization.itemEnchanted
-                .replace("{NAME}", target.getName())
-                .replace("{DISPLAYNAME}", target.getDisplayName())
-                .replace("{ITEM}", Utils.capitalize(item.getType().name()))
-                .replace("{ENCHANTMENT}", enchantment.getKey().toString())
-                .replace("{LEVEL}", String.valueOf(level)), sender);
+        if (target != sender) Chat.send(pu.replacePlaceholders(
+                localization.itemEnchanted,
+                new String[]{"{NAME}", "{DISPLAYNAME}", "{ITEM}", "{ENCHANTMENT}", "{LEVEL}"},
+                new Object[]{target.getName(), target.getDisplayName(), Utils.capitalize(item.getType().name()), enchantment.getKey().getKey(), level}
+        ), sender);
         return true;
     }
 

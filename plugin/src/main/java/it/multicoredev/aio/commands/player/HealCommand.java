@@ -51,23 +51,23 @@ public class HealCommand extends PluginCommand {
             } else {
                 if (!hasSubPerm(sender, "other")) {
                     insufficientPerms(sender);
-                    return true;
+                    return false;
                 }
 
                 target = Bukkit.getPlayer(args[0]);
             }
         } else {
             if (args.length < 1) {
-                Chat.send(localization.notPlayer, sender);
-                return true;
+                Chat.send(pu.replacePlaceholders(localization.notPlayer), sender);
+                return false;
             }
 
             target = Bukkit.getPlayer(args[0]);
         }
 
         if (target == null) {
-            Chat.send(localization.playerNotFound, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
+            return false;
         }
 
         AttributeInstance maxHealth = target.getAttribute(Attribute.GENERIC_MAX_HEALTH);
@@ -76,9 +76,11 @@ public class HealCommand extends PluginCommand {
         target.setFireTicks(0);
 
         Chat.send(localization.healSelf, target);
-        if (target != sender) Chat.send(localization.heal
-                .replace("{NAME}", target.getName())
-                .replace("{DISPLAYNAME}", target.getDisplayName()), sender);
+        if (target != sender) Chat.send(pu.replacePlaceholders(
+                localization.heal,
+                new String[]{"{NAME}", "{DISPLAYNAME}"},
+                new Object[]{target.getName(), target.getDisplayName()}
+        ), sender);
 
         return true;
     }

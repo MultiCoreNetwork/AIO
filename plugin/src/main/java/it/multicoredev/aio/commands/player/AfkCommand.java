@@ -51,7 +51,7 @@ public class AfkCommand extends PluginCommand {
             } else {
                 if (!hasSubPerm(sender, "other")) {
                     insufficientPerms(sender);
-                    return true;
+                    return false;
                 }
 
                 target = Bukkit.getPlayer(args[0]);
@@ -59,8 +59,8 @@ public class AfkCommand extends PluginCommand {
             }
         } else {
             if (args.length < 1) {
-                Chat.send(localization.notPlayer, sender);
-                return true;
+                Chat.send(pu.replacePlaceholders(localization.notPlayer), sender);
+                return false;
             }
 
             target = Bukkit.getPlayer(args[0]);
@@ -68,14 +68,14 @@ public class AfkCommand extends PluginCommand {
         }
 
         if (target == null) {
-            Chat.send(localization.playerNotFound, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
+            return false;
         }
 
         User user = storage.getUser(target.getUniqueId());
         if (user == null) {
-            Chat.send(localization.playerNotFound, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
+            return false;
         }
 
         if (args.length - 1 >= offset) {
@@ -97,20 +97,24 @@ public class AfkCommand extends PluginCommand {
     private void enableFly(User user, Player target, CommandSender sender) {
         user.setFly(true);
         target.setAllowFlight(true);
-        Chat.send(localization.flyEnabledSelf, target);
-        if (target != sender) Chat.send(localization.flyEnabled
-                .replace("{NAME}", target.getName())
-                .replace("{DISPLANAME}", target.getDisplayName()), sender);
+        Chat.send(pu.replacePlaceholders(localization.flyEnabledSelf), target);
+        if (target != sender) Chat.send(pu.replacePlaceholders(
+                localization.flyEnabled,
+                new String[]{"{NAME}", "{DISPLAYNAME}"},
+                new Object[]{target.getName(), target.getDisplayName()}
+        ), sender);
     }
 
     private void disableFly(User user, Player target, CommandSender sender) {
         user.setFly(false);
         target.setAllowFlight(false);
         target.setFlying(false);
-        Chat.send(localization.flyDisabledSelf, target);
-        if (target != sender) Chat.send(localization.flyDisabled
-                .replace("{NAME}", target.getName())
-                .replace("{DISPLANAME}", target.getDisplayName()), sender);
+        Chat.send(pu.replacePlaceholders(localization.flyDisabledSelf), target);
+        if (target != sender) Chat.send(pu.replacePlaceholders(
+                localization.flyDisabled,
+                new String[]{"{NAME}", "{DISPLAYNAME}"},
+                new Object[]{target.getName(), target.getDisplayName()}
+        ), sender);
     }
 
     @Override

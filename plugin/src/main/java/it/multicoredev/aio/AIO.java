@@ -127,7 +127,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     private final Map<UUID, User> usersCache = new HashMap<>();
 
     private final Map<String, BukkitTask> tasks = new HashMap<>();
-    private final Map<Integer, BukkitTask> deferredCommands = new HashMap<>();
+    private final Map<UUID, BukkitTask> deferredCommands = new HashMap<>();
 
     private CommandRegistry commandRegistry;
     private ListenerRegistry listenerRegistry;
@@ -148,6 +148,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     //TODO Add postCommandProcess before returns
     //TODO ALL Chat.send must have placeholderutils.replace....
     //TODO Add the ability to log transactions inside AIOEconomy
+    //TODO Use this everywhere !hasSubPerm(sender, "other") && !sender.equals(target)
 
     @Override
     public void onEnable() {
@@ -408,10 +409,10 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     }
 
     public void addDeferredCommand(CommandSender sender, String command, long delay) {
-        int id = deferredCommands.size();
-        deferredCommands.put(id, Bukkit.getScheduler().runTaskLater(this, () -> {
+        UUID uuid = UUID.randomUUID();
+        deferredCommands.put(uuid, Bukkit.getScheduler().runTaskLater(this, () -> {
             Bukkit.dispatchCommand(sender, command);
-            removeCompletedCommand(id);
+            removeCompletedCommand(uuid);
         }, delay * 20));
     }
 
@@ -816,8 +817,8 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         }
     }
 
-    private void removeCompletedCommand(int id) {
-        deferredCommands.remove(id);
+    private void removeCompletedCommand(UUID uuid) {
+        deferredCommands.remove(uuid);
     }
 
     private void registerListeners() {
@@ -906,7 +907,8 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                                 commandData,
                                 alias.command,
                                 alias.permission,
-                                alias.addCompletions
+                                alias.addCompletions,
+                                alias.allowArgs
                         ), this);
             });
         }

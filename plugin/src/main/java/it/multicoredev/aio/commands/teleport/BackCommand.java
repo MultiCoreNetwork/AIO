@@ -48,16 +48,16 @@ public class BackCommand extends PluginCommand {
             if (args.length < 1) {
                 target = (Player) sender;
             } else {
-                if (!hasSubPerm(sender, "other")) {
+                target = Bukkit.getPlayer(args[0]);
+
+                if (!hasSubPerm(sender, "other") && !sender.equals(target)) {
                     insufficientPerms(sender);
                     return false;
                 }
-
-                target = Bukkit.getPlayer(args[0]);
             }
         } else {
             if (args.length < 1) {
-                Chat.send(placeholdersUtils.replacePlaceholders(localization.notPlayer), sender);
+                Chat.send(pu.replacePlaceholders(localization.notPlayer), sender);
                 return false;
             }
 
@@ -65,17 +65,17 @@ public class BackCommand extends PluginCommand {
         }
 
         if (target == null) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.playerNotFound), sender);
+            Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
             return false;
         }
 
         User user = storage.getUser(target.getUniqueId());
         if (user == null || user.getLastLocation() == null) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.locationNotAvailable), sender);
+            Chat.send(pu.replacePlaceholders(localization.locationNotAvailable), sender);
             return false;
         }
 
-        aio.getTeleportManager().teleport(target, user.getLastLocation());
+        aio.getTeleportManager().teleport(target, user.getLastLocation()); //TODO Add delay
         return true;
     }
 

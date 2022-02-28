@@ -51,7 +51,7 @@ public class DelWarpCommand extends PluginCommand {
         warpStorage.deleteWarp(name);
         warpStorage.saveWarps();
 
-        Chat.send(localization.warpDeleted, sender);
+        Chat.send(pu.replacePlaceholders(localization.warpDeleted), sender);
         return true;
     }
 

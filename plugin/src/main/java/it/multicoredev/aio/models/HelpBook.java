@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class HelpBook extends JsonConfig {
     public String id;
-    public String permission;
+    public Boolean permission;
     public String name;
     public String author;
     public List<Page> pages;
@@ -42,6 +42,7 @@ public class HelpBook extends JsonConfig {
 
     @Override
     protected void init() {
+        if (permission == null) permission = false;
         if (name == null) name = "HelpBook";
         if (author == null) author = "AIO";
         if (pages == null) pages = new ArrayList<>();
