@@ -100,8 +100,9 @@ public class RepairCommand extends PluginCommand {
                     localization.itemNotRepairedSelf,
                     new String[]{"{NAME}", "{DISPLAYNAME}", "{ITEM}"},
                     new Object[]{target.getName(), target.getDisplayName(), Utils.capitalize(item.getType().name())}
-                    ), target);
-            if (target != sender) Chat.send(pu.replacePlaceholders(localization.itemNotRepaired, "{ITEM}", Utils.capitalize(item.getType().name())), sender);
+            ), target);
+            if (target != sender)
+                Chat.send(pu.replacePlaceholders(localization.itemNotRepaired, "{ITEM}", Utils.capitalize(item.getType().name())), sender);
         }
 
         return true;
@@ -116,16 +117,19 @@ public class RepairCommand extends PluginCommand {
         }
 
         if (repairedItems > 0) {
-            Chat.send(localization.itemsRepairedSelf
-                    .replace("{NAME}", target.getName())
-                    .replace("{DISPLAYNAME}", target.getDisplayName())
-                    .replace("{ITEMS}", String.valueOf(repairedItems)), target);
-            if (target != sender) Chat.send(localization.itemsRepaired.replace("{ITEMS}", String.valueOf(repairedItems)), sender);
+            Chat.send(pu.replacePlaceholders(
+                    localization.itemsRepairedSelf,
+                    new String[]{"{NAME}", "{DISPLAYNAME}", "{ITEMS}"},
+                    new Object[]{target.getName(), target.getDisplayName(), repairedItems}
+            ), target);
+            if (target != sender) Chat.send(pu.replacePlaceholders(localization.itemsRepaired, "{ITEMS}", String.valueOf(repairedItems)), sender);
         } else {
-            Chat.send(localization.itemsNotRepairedSelf
-                    .replace("{NAME}", target.getName())
-                    .replace("{DISPLAYNAME}", target.getDisplayName()), target);
-            if (target != sender) Chat.send(localization.itemsNotRepaired, sender);
+            Chat.send(pu.replacePlaceholders(
+                    localization.itemsNotRepairedSelf,
+                    new String[]{"{NAME}", "{DISPLAYNAME}"},
+                    new Object[]{target.getName(), target.getDisplayName()}
+            ), target);
+            if (target != sender) Chat.send(pu.replacePlaceholders(localization.itemsNotRepaired), sender);
         }
 
         return true;

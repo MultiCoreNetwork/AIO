@@ -46,8 +46,8 @@ public class KitsCommand extends PluginCommand {
     public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         List<String> kits = aio.getKitStorage().getKitNames(sender);
         if (kits.isEmpty()) {
-            Chat.send(localization.noKits, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.noKits), sender);
+            return false;
         }
 
         int page = 0;
@@ -63,7 +63,7 @@ public class KitsCommand extends PluginCommand {
 
         if (page > maxPages) {
             Chat.send(pu.replacePlaceholders(localization.pageNotFound, "{PAGES}", maxPages), sender);
-            return true;
+            return false;
         }
 
         Chat.send(pu.replacePlaceholders(localization.availableKits), sender);

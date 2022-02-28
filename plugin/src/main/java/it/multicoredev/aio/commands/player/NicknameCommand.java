@@ -51,7 +51,7 @@ public class NicknameCommand extends PluginCommand {
             } else {
                 if (!hasSubPerm(sender, "other")) {
                     insufficientPerms(sender);
-                    return true;
+                    return false;
                 }
 
                 target = Bukkit.getPlayer(args[0]);
@@ -59,8 +59,8 @@ public class NicknameCommand extends PluginCommand {
             }
         } else {
             if (args.length < 1) {
-                Chat.send(localization.notPlayer, sender);
-                return true;
+                Chat.send(pu.replacePlaceholders(localization.notPlayer), sender);
+                return false;
             }
 
             target = Bukkit.getPlayer(args[0]);
@@ -68,14 +68,14 @@ public class NicknameCommand extends PluginCommand {
         }
 
         if (target == null) {
-            Chat.send(localization.playerNotFound, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
+            return false;
         }
 
         User user = storage.getUser(target.getUniqueId());
         if (user == null) {
-            Chat.send(localization.playerNotFound, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
+            return false;
         }
 
         String nickname = args[offset];
@@ -83,13 +83,13 @@ public class NicknameCommand extends PluginCommand {
         if (nickname.equalsIgnoreCase("off")) nickname = target.getName();
 
         if (config.nicknameSection.isBlacklisted(nickname)) {
-            Chat.send(localization.invalidNickname, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.invalidNickname), sender);
+            return false;
         }
 
         if (Chat.getDiscolored(nickname).length() > config.nicknameSection.nicknameMaxLength) {
-            Chat.send(localization.nicknameTooLong.replace("{LENGTH}", String.valueOf(config.nicknameSection.nicknameMaxLength)), sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.nicknameTooLong, "{LENGTH}", String.valueOf(config.nicknameSection.nicknameMaxLength)), sender);
+            return false;
         }
 
         user.setNickname(nickname);
@@ -98,10 +98,12 @@ public class NicknameCommand extends PluginCommand {
         nickname = Chat.getTranslated(nickname);
         target.setDisplayName(nickname);
 
-        Chat.send(localization.nicknameSetSelf.replace("{DISPLAYNAME}", target.getDisplayName()), target);
-        if (target != sender) Chat.send(localization.nicknameSet
-                .replace("{NAME}", target.getName())
-                .replace("{DISPLAYNAME}", target.getDisplayName()), sender);
+        Chat.send(pu.replacePlaceholders(localization.nicknameSetSelf, "{DISPLAYNAME}", target.getDisplayName()), target);
+        if (target != sender) Chat.send(pu.replacePlaceholders(
+                localization.nicknameSet,
+                new String[]{"{DISPLAYNAME}", "{NAME}"},
+                new Object[]{target.getDisplayName(), target.getName()}
+        ), sender);
 
         return true;
     }

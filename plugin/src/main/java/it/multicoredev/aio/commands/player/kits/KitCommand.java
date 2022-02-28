@@ -49,13 +49,13 @@ public class KitCommand extends PluginCommand {
     @Override
     public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!isPlayer(sender) && args.length < 2) {
-            Chat.send(localization.notPlayer, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.notPlayer), sender);
+            return false;
         }
 
         if (args.length == 0) {
             incorrectUsage(sender);
-            return true;
+            return false;
         }
 
         String id;
@@ -67,7 +67,7 @@ public class KitCommand extends PluginCommand {
 
             if (!hasSubPerm(sender, "other")) {
                 insufficientPerms(sender);
-                return true;
+                return false;
             }
         } else {
             id = args[0];
@@ -75,27 +75,27 @@ public class KitCommand extends PluginCommand {
         }
 
         if (target == null || !target.isOnline()) {
-            Chat.send(localization.playerNotFound, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
+            return false;
         }
 
         Kit kit = aio.getKitStorage().getKitByName(id);
 
         if (kit == null) {
-            Chat.send(localization.kitNotFound, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.kitNotFound), sender);
+            return false;
         }
 
         if (!hasSubPerm(sender, id)) {
-            Chat.send(localization.kitNoPerms, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.kitNoPerms), sender);
+            return false;
         }
 
         List<ItemObject> itemObjects = kit.getItems();
 
         if (itemObjects.isEmpty()) {
-            Chat.send(localization.kitEmpty, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.kitEmpty), sender);
+            return false;
         }
 
         List<ItemStack> itemStacks = new ArrayList<>();
@@ -122,14 +122,14 @@ public class KitCommand extends PluginCommand {
         if (!invalidMaterials.isEmpty()) {
             //TODO Try
             Chat.severe(pu.replacePlaceholders(localization.invalidKit, new String[]{"{KIT}", "{INVALID}"}, new String[]{kit.getName(), String.join(", ", invalidMaterials)}));
-            return true;
+            return false;
         }
 
         PlayerInventory playerInventory = target.getInventory();
 
         if (hasSpaceInInventory(target, itemStacks)) {
-            Chat.send(localization.kitNoSpace, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.kitNoSpace), sender);
+            return false;
         }
 
         for (ItemStack itemStack : itemStacks) {
