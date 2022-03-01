@@ -59,10 +59,8 @@ public class AsyncPlayerChatListener extends PluginListenerExecutor<AsyncPlayerC
         Bukkit.getScheduler().callSyncMethod(aio, () -> {
             // AFK
             User user = storage.getUser(event.getPlayer());
-            if (user != null) {
-                if (config.afkSection.afkRemoveOnMessage) {
-                    user.setAfk(false);
-                }
+            if (user != null && config.afkSection.afkRemoveOnMessage) {
+                user.setAfk(false);
             }
             return null;
         });

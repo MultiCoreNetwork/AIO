@@ -93,6 +93,7 @@ public class Config extends JsonConfig {
         if (!eventPriorities.containsKey("AsyncPlayerChatEvent")) eventPriorities.put("AsyncPlayerChatEvent", "LOWEST");
         if (!eventPriorities.containsKey("PlayerCommandPreprocessEvent")) eventPriorities.put("PlayerCommandPreprocessEvent", "LOWEST");
         if (!eventPriorities.containsKey("AsyncPlayerChatEvent")) eventPriorities.put("AsyncPlayerChatEvent", "LOWEST");
+        if (!eventPriorities.containsKey("PlayerInteractEvent")) eventPriorities.put("PlayerInteractEvent", "LOWEST");
         if (!eventPriorities.containsKey("PlayerJoinEvent")) eventPriorities.put("PlayerJoinEvent", "LOWEST");
         if (!eventPriorities.containsKey("PlayerQuitEvent")) eventPriorities.put("PlayerQuitEvent", "LOWEST");
         if (!eventPriorities.containsKey("PlayerRespawnEvent")) eventPriorities.put("PlayerRespawnEvent", "LOWEST");

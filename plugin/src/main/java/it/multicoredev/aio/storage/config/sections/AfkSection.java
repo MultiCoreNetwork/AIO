@@ -37,10 +37,12 @@ public class AfkSection extends JsonConfig {
     public Integer afkSecondsCooldown;
     public transient long afkMillisecondsCooldown;
 
-    @SerializedName("afk_remove_on_message")
-    public Boolean afkRemoveOnMessage;
     @SerializedName("afk_remove_on_movement")
     public Boolean afkRemoveOnMovement;
+    @SerializedName("afk_remove_on_click")
+    public Boolean afkRemoveOnInteract;
+    @SerializedName("afk_remove_on_message")
+    public Boolean afkRemoveOnMessage;
     @SerializedName("afk_remove_on_command")
     public Boolean afkRemoveOnCommand;
 
@@ -81,8 +83,9 @@ public class AfkSection extends JsonConfig {
 
         afkMillisecondsCooldown = afkSecondsCooldown * 1000L;
 
-        if (afkRemoveOnMessage == null) afkRemoveOnMessage = true;
         if (afkRemoveOnMovement == null) afkRemoveOnMovement = true;
+        if (afkRemoveOnInteract == null) afkRemoveOnInteract = true;
+        if (afkRemoveOnMessage == null) afkRemoveOnMessage = true;
         if (afkRemoveOnCommand == null) afkRemoveOnCommand = true;
 
         if (afkInvulnerability == null) afkInvulnerability = true;

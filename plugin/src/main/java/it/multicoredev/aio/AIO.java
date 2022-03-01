@@ -832,6 +832,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         listenerRegistry.registerListener(new AsyncPlayerChatListener(AsyncPlayerChatEvent.class, this), config.getEventPriority("AsyncPlayerChatEvent"), this);
         listenerRegistry.registerListener(new PlayerCommandPreprocessListener(PlayerCommandPreprocessEvent.class, this), config.getEventPriority("PlayerCommandPreprocessEvent"), this);
         listenerRegistry.registerListener(new PlayerDeathListener(PlayerDeathEvent.class, this), config.getEventPriority("PlayerDeathEvent"), this);
+        listenerRegistry.registerListener(new PlayerInteractListener(PlayerInteractEvent.class, this), config.getEventPriority("PlayerInteractEvent"), this);
         listenerRegistry.registerListener(new PlayerJoinListener(PlayerJoinEvent.class, this), config.getEventPriority("PlayerJoinEvent"), this);
         listenerRegistry.registerListener(new PlayerQuitListener(PlayerQuitEvent.class, this), config.getEventPriority("PlayerQuitEvent"), this);
         listenerRegistry.registerListener(new PlayerRespawnListener(PlayerRespawnEvent.class, this), config.getEventPriority("PlayerRespawnEvent"), this);
