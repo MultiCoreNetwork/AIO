@@ -503,28 +503,27 @@ public class User extends JsonConfig {
             throw new IllegalStateException("User#setAfk must be called from the main thread.");
         }
 
+        Player player = Bukkit.getPlayer(uuid);
+        boolean callEvent = false;
         if (!afk) {
             // If player is leaving AFK mode, then resets afkLastLocation and afkCooldownTimestamp
-            this.afkLastLocation = null;
             this.afkCooldownTimestamp = System.currentTimeMillis();
             if (this.afk) {
                 this.afk = false;
-                Player player = Bukkit.getPlayer(uuid);
-                if (player != null) { // Just to be sure
-                    Bukkit.getPluginManager().callEvent(new AfkToggleEvent(player, false));
-                }
+                callEvent = true;
             }
         } else {
             // Player is going AFK
+            this.afkCooldownTimestamp = -1;
             if (!this.afk) {
                 this.afk = true;
-                Player player = Bukkit.getPlayer(uuid);
-                if (player != null) { // Just to be sure
-                    this.afkLastLocation = player.getLocation();
-                    this.afkCooldownTimestamp = -1;
-                    Bukkit.getPluginManager().callEvent(new AfkToggleEvent(player, true));
-                }
+                callEvent = true;
             }
+        }
+
+        if (player != null) { // Just to be sure
+            this.afkLastLocation = player.getLocation().clone();
+            if (callEvent) Bukkit.getPluginManager().callEvent(new AfkToggleEvent(player, afk));
         }
         return this;
     }
@@ -556,7 +555,7 @@ public class User extends JsonConfig {
      */
     @Nullable
     public Location getAfkLastLocation() {
-        return afkLastLocation;
+        return afkLastLocation == null ? null : afkLastLocation.clone();
     }
 
     /**
@@ -566,7 +565,7 @@ public class User extends JsonConfig {
      * @return this object.
      */
     public User setAfkLastLocation(@NotNull Location afkLastLocation) {
-        this.afkLastLocation = afkLastLocation;
+        this.afkLastLocation = afkLastLocation.clone();
         return this;
     }
 }

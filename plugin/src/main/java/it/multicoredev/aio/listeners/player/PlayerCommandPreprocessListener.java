@@ -47,7 +47,6 @@ public class PlayerCommandPreprocessListener extends PluginListenerExecutor<Play
         // AFK
         User user = storage.getUser(player);
         if (user != null && config.afkSection.afkRemoveOnCommand && !isAfkCommand(event.getMessage())) {
-            user.setAfkCooldownTimestamp(System.currentTimeMillis());
             user.setAfk(false);
         }
 

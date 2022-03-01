@@ -61,7 +61,6 @@ public class AsyncPlayerChatListener extends PluginListenerExecutor<AsyncPlayerC
             User user = storage.getUser(event.getPlayer());
             if (user != null) {
                 if (config.afkSection.afkRemoveOnMessage) {
-                    user.setAfkCooldownTimestamp(System.currentTimeMillis());
                     user.setAfk(false);
                 }
             }

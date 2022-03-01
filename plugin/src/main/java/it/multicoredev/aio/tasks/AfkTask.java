@@ -50,8 +50,6 @@ public class AfkTask implements Runnable {
             Location loc = p.getLocation();
 
             if (config.afkSection.afkRemoveOnMovement && !loc.equals(oldLoc)) {
-                user.setAfkLastLocation(loc);
-                user.setAfkCooldownTimestamp(time);
                 user.setAfk(false);
                 continue;
             }
