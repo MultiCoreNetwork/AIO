@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -34,7 +35,7 @@ import java.util.List;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class AfkCommand extends PluginCommand {
-    private static final String CMD = "afk";
+    public static final String CMD = "afk";
 
     public AfkCommand(AIO aio) {
         super(aio, CMD);
@@ -42,30 +43,37 @@ public class AfkCommand extends PluginCommand {
 
     @Override
     public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
+        // /afk [on|off|toggle]
+        // /afk <on|off|toggle> <player>
         Player target;
-        int offset = 0;
+        String action = "toggle";
 
         if (isPlayer(sender)) {
-            if (args.length < 2) {
+            if (args.length <= 1) {
                 target = (Player) sender;
+                if (args.length != 0) {
+                    action = args[0];
+                }
             } else {
-                if (!hasSubPerm(sender, "other")) {
+                target = Bukkit.getPlayer(args[1]);
+                if (target != null && !target.equals(sender) && !hasSubPerm(sender, "other")) {
                     insufficientPerms(sender);
                     return false;
                 }
 
-                target = Bukkit.getPlayer(args[0]);
-                offset = 1;
+                action = args[0];
             }
         } else {
-            if (args.length < 1) {
-                Chat.send(pu.replacePlaceholders(localization.notPlayer), sender);
+            if (args.length < 2) {
+                incorrectUsage(sender);
                 return false;
             }
 
-            target = Bukkit.getPlayer(args[0]);
-            offset = 1;
+            target = Bukkit.getPlayer(args[1]);
+            action = args[0];
         }
+
+        action = action.toLowerCase(Locale.ROOT);
 
         if (target == null) {
             Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
@@ -78,43 +86,16 @@ public class AfkCommand extends PluginCommand {
             return false;
         }
 
-        if (args.length - 1 >= offset) {
-            if (args[offset].equalsIgnoreCase("on")) enableFly(user, target, sender);
-            else if (args[offset].equalsIgnoreCase("off")) disableFly(user, target, sender);
-            else if (args[offset].equalsIgnoreCase("toggle")) toggleFly(user, target, sender);
-            else incorrectUsage(sender);
-        } else toggleFly(user, target, sender);
-
-        storage.updateUser(user);
+        switch (action) {
+            case "on" -> user.setAfk(true);
+            case "off" -> user.setAfk(false);
+            case "toggle" -> user.setAfk(!user.isAfk());
+            default -> {
+                incorrectUsage(sender);
+                return false;
+            }
+        }
         return true;
-    }
-
-    private void toggleFly(User user, Player target, CommandSender sender) {
-        if (!user.hasFly()) enableFly(user, target, sender);
-        else disableFly(user, target, sender);
-    }
-
-    private void enableFly(User user, Player target, CommandSender sender) {
-        user.setFly(true);
-        target.setAllowFlight(true);
-        Chat.send(pu.replacePlaceholders(localization.flyEnabledSelf), target);
-        if (target != sender) Chat.send(pu.replacePlaceholders(
-                localization.flyEnabled,
-                new String[]{"{NAME}", "{DISPLAYNAME}"},
-                new Object[]{target.getName(), target.getDisplayName()}
-        ), sender);
-    }
-
-    private void disableFly(User user, Player target, CommandSender sender) {
-        user.setFly(false);
-        target.setAllowFlight(false);
-        target.setFlying(false);
-        Chat.send(pu.replacePlaceholders(localization.flyDisabledSelf), target);
-        if (target != sender) Chat.send(pu.replacePlaceholders(
-                localization.flyDisabled,
-                new String[]{"{NAME}", "{DISPLAYNAME}"},
-                new Object[]{target.getName(), target.getDisplayName()}
-        ), sender);
     }
 
     @Override
@@ -122,11 +103,12 @@ public class AfkCommand extends PluginCommand {
         if (!hasCommandPerm(sender)) return new ArrayList<>();
 
         if (args.length == 1) {
-            if (hasSubPerm(sender, "other"))
-                return TabCompleterUtil.getPlayers(args[0], sender.hasPermission("pv.see"));
-            else return TabCompleterUtil.getCompletions(args[0], "on", "off", "toggle");
+            return TabCompleterUtil.getCompletions(args[0], "on", "off", "toggle");
         } else if (args.length == 2) {
-            if (hasSubPerm(sender, "other")) return TabCompleterUtil.getCompletions(args[1], "on", "off", "toggle");
+            if (hasSubPerm(sender, "other"))
+                return TabCompleterUtil.getPlayers(args[1], sender.hasPermission("pv.see"));
+            else if (isPlayer(sender))
+                return TabCompleterUtil.getCompletions(args[1], sender.getName());
         }
 
         return new ArrayList<>();

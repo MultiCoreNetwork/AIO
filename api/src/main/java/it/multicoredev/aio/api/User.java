@@ -503,22 +503,28 @@ public class User extends JsonConfig {
             throw new IllegalStateException("User#setAfk must be called from the main thread.");
         }
 
-        if (this.afk && !afk) {
+        if (!afk) {
             // If player is leaving AFK mode, then resets afkLastLocation and afkCooldownTimestamp
             this.afkLastLocation = null;
-            this.afkCooldownTimestamp = -1;
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) { // Just to be sure
-                Bukkit.getPluginManager().callEvent(new AfkToggleEvent(player, false));
+            this.afkCooldownTimestamp = System.currentTimeMillis();
+            if (this.afk) {
+                this.afk = false;
+                Player player = Bukkit.getPlayer(uuid);
+                if (player != null) { // Just to be sure
+                    Bukkit.getPluginManager().callEvent(new AfkToggleEvent(player, false));
+                }
             }
-            this.afk = false;
-        } else if (!this.afk && afk) {
+        } else {
             // Player is going AFK
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) { // Just to be sure
-                Bukkit.getPluginManager().callEvent(new AfkToggleEvent(player, true));
+            if (!this.afk) {
+                this.afk = true;
+                Player player = Bukkit.getPlayer(uuid);
+                if (player != null) { // Just to be sure
+                    this.afkLastLocation = player.getLocation();
+                    this.afkCooldownTimestamp = -1;
+                    Bukkit.getPluginManager().callEvent(new AfkToggleEvent(player, true));
+                }
             }
-            this.afk = true;
         }
         return this;
     }
@@ -545,6 +551,7 @@ public class User extends JsonConfig {
 
     /**
      * Get the last location of the player while they're AFK.
+     *
      * @return the last location of the player while they're AFK, or null if the player was not AFK
      */
     @Nullable
@@ -554,6 +561,7 @@ public class User extends JsonConfig {
 
     /**
      * Set the last location of the player while they're AFK.
+     *
      * @param afkLastLocation the last location of the player while they're AFK, or null if invalid.
      * @return this object.
      */

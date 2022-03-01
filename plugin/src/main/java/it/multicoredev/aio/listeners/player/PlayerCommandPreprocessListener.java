@@ -2,6 +2,7 @@ package it.multicoredev.aio.listeners.player;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.User;
+import it.multicoredev.aio.commands.player.AfkCommand;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.entity.Player;
@@ -32,6 +33,8 @@ import static it.multicoredev.aio.AIO.VAULT;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class PlayerCommandPreprocessListener extends PluginListenerExecutor<PlayerCommandPreprocessEvent> {
+    private static final String AFK_CMD = AfkCommand.CMD;
+    private static final String AFK_CMD_LONG = "aio:" + AfkCommand.CMD;
 
     public PlayerCommandPreprocessListener(Class<PlayerCommandPreprocessEvent> eventClass, AIO aio) {
         super(eventClass, aio);
@@ -43,11 +46,9 @@ public class PlayerCommandPreprocessListener extends PluginListenerExecutor<Play
 
         // AFK
         User user = storage.getUser(player);
-        if (user != null) {
-            if (config.afkSection.afkRemoveOnCommand) {
-                user.setAfkCooldownTimestamp(System.currentTimeMillis());
-                user.setAfk(false);
-            }
+        if (user != null && config.afkSection.afkRemoveOnCommand && !isAfkCommand(event.getMessage())) {
+            user.setAfkCooldownTimestamp(System.currentTimeMillis());
+            user.setAfk(false);
         }
 
         String completeCommand = event.getMessage().substring(1).toLowerCase(Locale.ROOT);
@@ -74,6 +75,20 @@ public class PlayerCommandPreprocessListener extends PluginListenerExecutor<Play
                 Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(localization.insufficientCmdMoney, "{MONEY}", aio.getEconomy().format(cost)), player);
                 event.setCancelled(true);
             }
+        }
+    }
+
+    private boolean isAfkCommand(String cmd) {
+        if (cmd.startsWith("/"))
+            cmd = cmd.substring(1);
+
+        if (cmd.length() == AFK_CMD.length()) {
+            return cmd.equalsIgnoreCase(AFK_CMD);
+        } else if (cmd.length() == AFK_CMD_LONG.length()) {
+            return cmd.equalsIgnoreCase(AFK_CMD_LONG);
+        } else {
+            cmd = cmd.toLowerCase(Locale.ROOT);
+            return cmd.startsWith(AFK_CMD) || cmd.startsWith(AFK_CMD_LONG);
         }
     }
 }

@@ -58,7 +58,6 @@ public class AfkTask implements Runnable {
 
             long oldTime = user.getAfkCooldownTimestamp();
             if (oldTime < 0) {
-                user.setAfkCooldownTimestamp(time);
                 continue;
             }
 

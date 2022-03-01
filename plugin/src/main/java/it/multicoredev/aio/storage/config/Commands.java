@@ -60,7 +60,7 @@ public class Commands extends JsonConfig {
         if (!commands.containsKey("afk")) commands.put("afk", new CommandData(
                 true,
                 "Toggle AFK status",
-                new UsagesBuilder().add("default", "/afk [on|off|toggle]", "/afk <player> [on|off|toggle]").build()
+                new UsagesBuilder().add("default", "/afk [on|off|toggle]", "/afk <on|off|toggle> <player>").build()
         ));
         if (!commands.containsKey("back")) commands.put("back", new CommandData(
                 true,
