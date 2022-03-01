@@ -12,7 +12,6 @@ import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -46,8 +45,8 @@ public class HelpBookCommand extends PluginCommand {
 
     @Override
     public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        if (!isPlayer(sender) && args.length < 1) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.notPlayer), sender);
+        if (!isPlayer(sender) && args.length < 2) {
+            Chat.send(pu.replacePlaceholders(localization.notPlayer), sender);
             return false;
         }
 
@@ -58,7 +57,7 @@ public class HelpBookCommand extends PluginCommand {
             id = args[0];
             target = Bukkit.getPlayer(args[1]);
 
-            if (!hasSubPerm(sender, "other")) {
+            if (!hasSubPerm(sender, "other") && !sender.equals(target)) {
                 insufficientPerms(sender);
                 return false;
             }
@@ -73,30 +72,32 @@ public class HelpBookCommand extends PluginCommand {
         HelpBook hb = aio.getHelpbook(id);
 
         if (target == null) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.playerNotFound), sender);
+            Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
             return false;
         }
 
         if (hb == null) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.helpbookNotFound), sender);
+            Chat.send(pu.replacePlaceholders(localization.helpbookNotFound), sender);
             return false;
         }
 
-        if (hb.permission != null && !hasSubPerm(sender, hb.permission.toLowerCase(Locale.ROOT))) {
+        if (hb.permission && !hasSubPerm(sender, hb.id.toLowerCase(Locale.ROOT))) {
             insufficientPerms(sender);
             return false;
         }
 
         Inventory inventory = target.getInventory();
         if (!inventory.addItem(hb.getBook()).isEmpty()) {
-            if (target != sender) Chat.send(placeholdersUtils.replacePlaceholders(
+            if (target != sender) Chat.send(pu.replacePlaceholders(
                     localization.inventoryFull,
                     new String[]{"{NAME}", "{DISPLAYNAME}"},
                     new Object[]{target.getName(), target.getDisplayName()}
             ), sender);
-            else Chat.send(placeholdersUtils.replacePlaceholders(localization.inventoryFullSelf), sender);
+            else Chat.send(pu.replacePlaceholders(localization.inventoryFullSelf), sender);
+
+            return false;
         } else {
-            if (target != sender) Chat.send(placeholdersUtils.replacePlaceholders(
+            if (target != sender) Chat.send(pu.replacePlaceholders(
                     localization.helpbookGiven,
                     new String[]{"{BOOK}", "{NAME}", "{DISPLAYNAME}"},
                     new Object[]{hb.name, target.getName(), target.getDisplayName()}
@@ -114,7 +115,7 @@ public class HelpBookCommand extends PluginCommand {
         if (args.length == 1) {
             return TabCompleterUtil.getCompletions(args[0], aio.getHelpbooks()
                     .stream()
-                    .filter(book -> book.permission == null || hasSubPerm(sender, book.permission))
+                    .filter(book -> book.permission == null || hasSubPerm(sender, book.id.toLowerCase(Locale.ROOT)))
                     .map(book -> book.id)
                     .collect(Collectors.toList()));
         } else if (hasSubPerm(sender, "other") && args.length == 2) {

@@ -44,7 +44,7 @@ public class CleanChatCommand extends PluginCommand {
             }
         });
 
-        Chat.broadcast(placeholdersUtils.replacePlaceholders(localization.chatCleaned));
+        Chat.broadcast(pu.replacePlaceholders(localization.chatCleaned));
         return true;
     }
 }

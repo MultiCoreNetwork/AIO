@@ -45,12 +45,12 @@ public class GamemodeCommand extends PluginCommand {
     public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (args.length < 1) {
             incorrectUsage(sender);
-            return true;
+            return false;
         }
 
         if (!(sender instanceof Player) && args.length < 2) {
             incorrectUsage(sender);
-            return true;
+            return false;
         }
 
         Player target;
@@ -61,23 +61,23 @@ public class GamemodeCommand extends PluginCommand {
             } else {
                 if (!hasSubPerm(sender, "other")) {
                     insufficientPerms(sender);
-                    return true;
+                    return false;
                 }
 
                 target = Bukkit.getPlayer(args[1]);
             }
         } else {
             if (args.length < 2) {
-                Chat.send(localization.notPlayer, sender);
-                return true;
+                Chat.send(pu.replacePlaceholders(localization.notPlayer), sender);
+                return false;
             }
 
             target = Bukkit.getPlayer(args[1]);
         }
 
         if (target == null) {
-            Chat.send(localization.playerNotFound, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
+            return false;
         }
 
         GameMode gamemode;
@@ -91,22 +91,23 @@ public class GamemodeCommand extends PluginCommand {
         } else if (gm.equalsIgnoreCase("spectator") || gm.equalsIgnoreCase("g") || gm.equals("3")) {
             gamemode = GameMode.SPECTATOR;
         } else {
-            Chat.send(localization.invalidGamemode, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.invalidGamemode), sender);
+            return false;
         }
 
         if (!hasPermission(sender, gamemode.name().toLowerCase(Locale.ROOT))) {
             insufficientPerms(sender);
-            return true;
+            return false;
         }
 
         target.setGameMode(gamemode);
 
-        Chat.send(localization.gamemodeSetSelf.replace("{GAMEMODE}", gamemode.name().toLowerCase(Locale.ROOT)), target);
-        if (target != sender) Chat.send(localization.gamemodeSet
-                .replace("{NAME}", target.getName())
-                .replace("{DISPLAYNAME}", target.getDisplayName())
-                .replace("{GAMEMODE}", gamemode.name().toLowerCase(Locale.ROOT)), sender);
+        Chat.send(pu.replacePlaceholders(localization.gamemodeSetSelf, "{GAMEMODE}", gamemode.name().toLowerCase(Locale.ROOT)), target);
+        if (target != sender) Chat.send(pu.replacePlaceholders(
+                localization.gamemodeSet,
+                new String[]{"{NAME}", "{DISPLAYNAME}", "{GAMEMODE}"},
+                new Object[]{target.getName(), target.getDisplayName(), gamemode.name().toLowerCase(Locale.ROOT)}
+        ), sender);
 
         return true;
     }

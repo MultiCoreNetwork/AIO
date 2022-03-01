@@ -39,13 +39,15 @@ public class AliasCommand extends PluginCommand {
     private final String permission;
     private final String registeredCommand;
     private final boolean addCompletions;
+    private final boolean allowArgs;
 
-    public AliasCommand(AIO aio, String name, CommandData commandData, String command, String permission, boolean addCompletions) {
+    public AliasCommand(AIO aio, String name, CommandData commandData, String command, String permission, boolean addCompletions, boolean allowArgs) {
         super(aio, name, commandData);
 
         this.command = command;
         this.permission = permission;
         this.addCompletions = addCompletions;
+        this.allowArgs = allowArgs;
 
         if (command.contains(" ")) registeredCommand = command.substring(0, command.indexOf(" ")).toLowerCase(Locale.ROOT);
         else registeredCommand = command.toLowerCase(Locale.ROOT);
@@ -58,11 +60,11 @@ public class AliasCommand extends PluginCommand {
 
     @Override
     public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        return Bukkit.dispatchCommand(sender, command);
+        return Bukkit.dispatchCommand(sender, command + (allowArgs ? " " + String.join(" ", args) : ""));
     }
 
     @Override
-    public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
+    public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) { //TODO To test
         if (addCompletions) {
             org.bukkit.command.PluginCommand cmd = aio.getCommand(registeredCommand);
             if (cmd == null) return new ArrayList<>();
@@ -77,26 +79,7 @@ public class AliasCommand extends PluginCommand {
     }
 
     @Override
-    public boolean commandPreProcess(@NotNull CommandSender sender, @NotNull String command, @NotNull String[] args) {
-        if (permission != null && !sender.hasPermission(permission)) {
-            insufficientPerms(sender);
-            return false;
-        }
-
-        if (config.commandCosts.costsEnabled && VAULT && isPlayer(sender) && config.commandCosts.hasCommandCost(getName()) && !sender.hasPermission("aio.bypass.costs")) {
-            Player player = (Player) sender;
-            int cost = Math.abs(config.commandCosts.getCommandCost(getName()));
-
-            if (!aio.getEconomy().has(player, cost)) {
-                Chat.send(placeholdersUtils.replacePlaceholders(
-                        localization.insufficientCmdMoney,
-                        "{MONEY}",
-                        aio.getEconomy().format(cost)
-                ), player);
-                return false;
-            }
-        }
-
-        return true;
+    public boolean hasCommandPerm(@NotNull CommandSender sender) {
+        return sender.hasPermission(permission);
     }
 }

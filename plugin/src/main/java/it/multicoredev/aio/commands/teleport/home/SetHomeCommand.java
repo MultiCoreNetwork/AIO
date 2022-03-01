@@ -42,15 +42,15 @@ public class SetHomeCommand extends PluginCommand {
     @Override
     public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!isPlayer(sender)) {
-            Chat.send(localization.notPlayer, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.notPlayer), sender);
+            return false;
         }
 
         Player player = (Player) sender;
 
         if (args.length == 0) {
             incorrectUsage(sender);
-            return true;
+            return false;
         }
 
         int homesAmount = getHomesAmount(player);
@@ -58,33 +58,29 @@ public class SetHomeCommand extends PluginCommand {
 
         if (homesLimit != 0) {
             if (homesAmount >= homesLimit && !hasSubPerm(player, "limit.bypass")) {
-                Chat.send(localization.homeLimitExceeded, sender);
-                return true;
+                Chat.send(pu.replacePlaceholders(localization.homeLimitExceeded), sender);
+                return false;
             }
         }
 
-        createHome(player, args[0]);
-        return true;
-    }
-
-    private void createHome(Player player, String homeName) {
         User user = storage.getUser(player);
-        if (user == null) return;
+        if (user == null) return false;
 
         List<Home> homes = user.getHomes();
 
         for (Home h : homes) {
-            if (h.getName().equals(homeName)) {
-                Chat.send(localization.homeAlreadyExists, player);
-                return;
+            if (h.getName().equals(args[0])) {
+                Chat.send(pu.replacePlaceholders(localization.homeAlreadyExists), player);
+                return false;
             }
         }
 
-        Home home = new Home(homeName, player.getLocation());
+        Home home = new Home(args[0], player.getLocation());
         user.addHome(home);
 
         storage.updateUser(user);
-        Chat.send(localization.homeCreated, player);
+        Chat.send(pu.replacePlaceholders(localization.homeCreated), player);
+        return true;
     }
 
     private int getHomesAmount(Player player) {

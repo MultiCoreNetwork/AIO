@@ -33,6 +33,8 @@ public class CommandAliases extends JsonConfig {
     public String permission;
     public String description;
     public Map<String, List<String>> usages;
+    @SerializedName("allow_args")
+    public Boolean allowArgs;
     @SerializedName("add_completions")
     public Boolean addCompletions;
 
@@ -44,6 +46,7 @@ public class CommandAliases extends JsonConfig {
     protected void init() {
         if (aliases == null) aliases = new ArrayList<>();
         if (command == null) command = "";
+        if (allowArgs == null) allowArgs = false;
         if (addCompletions == null) addCompletions = true;
     }
 }

@@ -38,12 +38,12 @@ public class TrashCommand extends PluginCommand {
     @Override
     public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!isPlayer(sender)) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.notPlayer), sender);
+            Chat.send(pu.replacePlaceholders(localization.notPlayer), sender);
             return false;
         }
 
         Player player = (Player) sender;
-        player.openInventory(Bukkit.createInventory(player, 54, Chat.getTranslated(placeholdersUtils.replacePlaceholders(localization.trash))));
+        player.openInventory(Bukkit.createInventory(player, 54, Chat.getTranslated(pu.replacePlaceholders(localization.trash))));
 
         return true;
     }

@@ -48,8 +48,8 @@ public class HatCommand extends PluginCommand {
     @Override
     public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!isPlayer(sender)) {
-            Chat.send(localization.notPlayer, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.notPlayer), sender);
+            return false;
         }
 
         Player player = (Player) sender;
@@ -57,14 +57,14 @@ public class HatCommand extends PluginCommand {
         ItemStack item = senderInventory.getItemInMainHand();
 
         if (item.getType() == Material.AIR) {
-            Chat.send(localization.preventHat, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.preventHat), sender);
+            return false;
         }
 
         if (!hasSubPerm(player, "bypass-prevent")) {
             if (hasSubPerm(player, "prevent." + item.getType().getKey().getKey())) {
-                Chat.send(localization.preventHat, sender);
-                return true;
+                Chat.send(pu.replacePlaceholders(localization.preventHat), sender);
+                return false;
             }
         }
 
@@ -72,15 +72,15 @@ public class HatCommand extends PluginCommand {
             Player target = Bukkit.getPlayer(args[0]);
 
             if (target == null) {
-                Chat.send(localization.playerNotFound, sender);
-                return true;
+                Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
+                return false;
             }
 
             PlayerInventory targetInventory = target.getInventory();
 
             if (hasSpaceInInventory(target, item)) {
-                Chat.send(localization.targetHasInventoryFull, sender);
-                return true;
+                Chat.send(pu.replacePlaceholders(localization.targetHasInventoryFull), sender);
+                return false;
             }
 
             ItemStack oldHelmet = targetInventory.getHelmet();
@@ -94,7 +94,7 @@ public class HatCommand extends PluginCommand {
             player.updateInventory();
         }
 
-        Chat.send(localization.hatSuccess, sender);
+        Chat.send(pu.replacePlaceholders(localization.hatSuccess), sender);
         return true;
     }
 

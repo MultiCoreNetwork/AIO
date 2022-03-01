@@ -55,18 +55,15 @@ public class NightCommand extends PluginCommand {
             }
         }
 
-        if (args.length > 0) {
-            String name = args[0];
-            world = Bukkit.getWorld(name);
-        }
+        if (args.length > 0) world = Bukkit.getWorld(args[0]);
 
         if (world == null) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.worldNotFound), sender);
+            Chat.send(pu.replacePlaceholders(localization.worldNotFound), sender);
             return false;
         }
 
         world.setTime(12786);
-        Chat.send(placeholdersUtils.replacePlaceholders(localization.timeSetNight, "{WORLD}", world.getName()), sender);
+        Chat.send(pu.replacePlaceholders(localization.timeSetNight, "{WORLD}", world.getName()), sender);
         return true;
     }
 

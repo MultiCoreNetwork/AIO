@@ -52,23 +52,24 @@ public class EconomyCommand extends PluginCommand {
     public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (args.length < 1) {
             incorrectUsage(sender);
-            return true;
+            return false;
         }
 
         String subcommand = args[0];
-        if (subcommand.equalsIgnoreCase("give")) give(sender, args);
-        else if (subcommand.equalsIgnoreCase("take")) take(sender, args);
-        else if (subcommand.equalsIgnoreCase("set")) set(sender, args);
-        else if (subcommand.equalsIgnoreCase("reset")) reset(sender, args);
+        boolean result = false;
+        if (subcommand.equalsIgnoreCase("give")) result = give(sender, args);
+        else if (subcommand.equalsIgnoreCase("take")) result = take(sender, args);
+        else if (subcommand.equalsIgnoreCase("set")) result = set(sender, args);
+        else if (subcommand.equalsIgnoreCase("reset")) result = reset(sender, args);
         else incorrectUsage(sender);
 
-        return true;
+        return result;
     }
 
-    private void give(CommandSender sender, String[] args) {
+    private boolean give(CommandSender sender, String[] args) {
         if (args.length < 2) {
             incorrectUsage(sender);
-            return;
+            return false;
         }
 
         double amount;
@@ -76,7 +77,7 @@ public class EconomyCommand extends PluginCommand {
             amount = Math.abs(Double.parseDouble(args[1]));
         } catch (NumberFormatException ignored) {
             Chat.send(localization.invalidNumber, sender);
-            return;
+            return false;
         }
 
         UUID targetUuid;
@@ -91,13 +92,13 @@ public class EconomyCommand extends PluginCommand {
                 targetUuid = aio.getUserUUID(args[2]);
             } else {
                 Chat.send(localization.notPlayer, sender);
-                return;
+                return false;
             }
         }
 
         if (targetUuid == null || !storage.userExists(targetUuid)) {
             Chat.send(localization.playerNotFound, sender);
-            return;
+            return false;
         }
 
         EconomyResponse response = economy.depositPlayer(targetUuid, amount);
@@ -128,13 +129,13 @@ public class EconomyCommand extends PluginCommand {
             }
         }
 
-        //TODO Add ability to set it to multiple players
+        return true;
     }
 
-    private void take(CommandSender sender, String[] args) {
+    private boolean take(CommandSender sender, String[] args) {
         if (args.length < 2) {
             incorrectUsage(sender);
-            return;
+            return false;
         }
 
         double amount;
@@ -142,7 +143,7 @@ public class EconomyCommand extends PluginCommand {
             amount = Math.abs(Double.parseDouble(args[1]));
         } catch (NumberFormatException ignored) {
             Chat.send(localization.invalidNumber, sender);
-            return;
+            return false;
         }
 
         UUID targetUuid;
@@ -157,13 +158,13 @@ public class EconomyCommand extends PluginCommand {
                 targetUuid = aio.getUserUUID(args[2]);
             } else {
                 Chat.send(localization.notPlayer, sender);
-                return;
+                return false;
             }
         }
 
         if (targetUuid == null || !storage.userExists(targetUuid)) {
             Chat.send(localization.playerNotFound, sender);
-            return;
+            return false;
         }
 
         EconomyResponse response = economy.withdrawPlayer(targetUuid, amount);
@@ -194,12 +195,13 @@ public class EconomyCommand extends PluginCommand {
         }
 
         //TODO Add ability to set it to multiple players
+        return true;
     }
 
-    private void set(CommandSender sender, String[] args) {
+    private boolean set(CommandSender sender, String[] args) {
         if (args.length < 2) {
             incorrectUsage(sender);
-            return;
+            return false;
         }
 
         double amount;
@@ -207,7 +209,7 @@ public class EconomyCommand extends PluginCommand {
             amount = Double.parseDouble(args[1]);
         } catch (NumberFormatException ignored) {
             Chat.send(localization.invalidNumber, sender);
-            return;
+            return false;
         }
 
         UUID targetUuid;
@@ -222,13 +224,13 @@ public class EconomyCommand extends PluginCommand {
                 targetUuid = aio.getUserUUID(args[2]);
             } else {
                 Chat.send(localization.notPlayer, sender);
-                return;
+                return false;
             }
         }
 
         if (targetUuid == null || !storage.userExists(targetUuid)) {
             Chat.send(localization.playerNotFound, sender);
-            return;
+            return false;
         }
 
         if (amount < economyModule.minMoney) amount = economyModule.minMoney;
@@ -249,9 +251,10 @@ public class EconomyCommand extends PluginCommand {
         }
 
         //TODO Add ability to set it to multiple players
+        return true;
     }
 
-    private void reset(CommandSender sender, String[] args) {
+    private boolean reset(CommandSender sender, String[] args) {
         UUID targetUuid;
         if (isPlayer(sender)) {
             if (args.length > 2) {
@@ -264,13 +267,13 @@ public class EconomyCommand extends PluginCommand {
                 targetUuid = aio.getUserUUID(args[1]);
             } else {
                 Chat.send(localization.notPlayer, sender);
-                return;
+                return false;
             }
         }
 
         if (targetUuid == null || !storage.userExists(targetUuid)) {
             Chat.send(localization.playerNotFound, sender);
-            return;
+            return false;
         }
 
         double amount = economyModule.startingBalance;
@@ -289,6 +292,7 @@ public class EconomyCommand extends PluginCommand {
         }
 
         //TODO Add ability to set it to multiple players
+        return true;
     }
 
     @NotNull

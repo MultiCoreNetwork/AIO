@@ -57,13 +57,13 @@ public class SudoCommand extends PluginCommand {
 
                 target = Bukkit.getConsoleSender();
             } else {
-                Chat.send(placeholdersUtils.replacePlaceholders(localization.playerNotFound), sender);
+                Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
                 return false;
             }
         }
 
         if (hasSubPerm(target, "prevent")) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.sudoPrevent), sender);
+            Chat.send(pu.replacePlaceholders(localization.sudoPrevent), sender);
             return false;
         }
 
@@ -74,7 +74,7 @@ public class SudoCommand extends PluginCommand {
             if (isPlayer(target)) {
                 ((Player) target).chat(input);
             } else {
-                Chat.send(placeholdersUtils.replacePlaceholders(
+                Chat.send(pu.replacePlaceholders(
                         localization.sudoFailed,
                         new String[]{"{NAME}", "{DISPLAYNAME}"},
                         new Object[]{target.getName(), isPlayer(target) ? target.getName() : ((Player) target).getDisplayName()}
@@ -83,12 +83,12 @@ public class SudoCommand extends PluginCommand {
             }
         }
 
-        Chat.send(placeholdersUtils.replacePlaceholders(localization.sudoSuccess), sender);
+        Chat.send(pu.replacePlaceholders(localization.sudoSuccess), sender);
         return true;
     }
 
     @Override
-    public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
+    public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) { //TODO To fix
         if (!hasCommandPerm(sender)) return new ArrayList<>();
 
         if (args.length == 1) {

@@ -51,7 +51,7 @@ public class GodCommand extends PluginCommand {
             } else {
                 if (!hasSubPerm(sender, "other")) {
                     insufficientPerms(sender);
-                    return true;
+                    return false;
                 }
 
                 target = Bukkit.getPlayer(args[0]);
@@ -59,8 +59,8 @@ public class GodCommand extends PluginCommand {
             }
         } else {
             if (args.length < 1) {
-                Chat.send(localization.notPlayer, sender);
-                return true;
+                Chat.send(pu.replacePlaceholders(localization.notPlayer), sender);
+                return false;
             }
 
             target = Bukkit.getPlayer(args[0]);
@@ -68,14 +68,14 @@ public class GodCommand extends PluginCommand {
         }
 
         if (target == null) {
-            Chat.send(localization.playerNotFound, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
+            return false;
         }
 
         User user = storage.getUser(target.getUniqueId());
         if (user == null) {
-            Chat.send(localization.playerNotFound, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
+            return false;
         }
 
         if (args.length - 1 >= offset) {
@@ -97,19 +97,23 @@ public class GodCommand extends PluginCommand {
     private void enableGod(User user, Player target, CommandSender sender) {
         user.setGod(true);
         target.setInvulnerable(true);
-        Chat.send(localization.godEnabledSelf, target);
-        if (target != sender) Chat.send(localization.godEnabled
-                .replace("{NAME}", target.getName())
-                .replace("{DISPLANAME}", target.getDisplayName()), sender);
+        Chat.send(pu.replacePlaceholders(localization.godEnabledSelf), target);
+        if (target != sender) Chat.send(pu.replacePlaceholders(
+                localization.godEnabled,
+                new String[]{"{NAME}", "{DISPLAYNAME}"},
+                new Object[]{target.getName(), target.getDisplayName()}
+        ), sender);
     }
 
     private void disableGod(User user, Player target, CommandSender sender) {
         user.setGod(false);
         target.setInvulnerable(false);
-        Chat.send(localization.godDisabledSelf, target);
-        if (target != sender) Chat.send(localization.godDisabled
-                .replace("{NAME}", target.getName())
-                .replace("{DISPLANAME}", target.getDisplayName()), sender);
+        Chat.send(pu.replacePlaceholders(localization.godDisabledSelf), target);
+        if (target != sender) Chat.send(pu.replacePlaceholders(
+                localization.godDisabled,
+                new String[]{"{NAME}", "{DISPLAYNAME}"},
+                new Object[]{target.getName(), target.getDisplayName()}
+        ), sender);
     }
 
     @Override

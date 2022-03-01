@@ -45,7 +45,7 @@ public class LightningCommand extends PluginCommand {
     @Override
     public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!isPlayer(sender) && args.length < 1) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.notPlayer), sender);
+            Chat.send(pu.replacePlaceholders(localization.notPlayer), sender);
             return false;
         }
 
@@ -55,7 +55,7 @@ public class LightningCommand extends PluginCommand {
             Player targetPlayer = Bukkit.getPlayer(args[0]);
 
             if (targetPlayer == null) {
-                Chat.send(placeholdersUtils.replacePlaceholders(localization.playerNotFound), sender);
+                Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
                 return false;
             }
 
@@ -67,7 +67,7 @@ public class LightningCommand extends PluginCommand {
         }
 
         if (target == null || target.getWorld() == null) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.lightningSummonFailed), sender);
+            Chat.send(pu.replacePlaceholders(localization.lightningSummonFailed), sender);
             return false;
         }
 

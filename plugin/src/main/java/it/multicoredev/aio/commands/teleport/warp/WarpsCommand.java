@@ -63,16 +63,16 @@ public class WarpsCommand extends PluginCommand {
         float maxPages = (float) warps.size() / (float) 18;
 
         if (page > maxPages) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.pageNotFound, "{PAGES}", maxPages), sender);
+            Chat.send(pu.replacePlaceholders(localization.pageNotFound, "{PAGES}", maxPages), sender);
             return false;
         }
 
-        Chat.send(placeholdersUtils.replacePlaceholders(localization.availableWarps), sender);
+        Chat.send(pu.replacePlaceholders(localization.availableWarps), sender);
 
         if (warps.size() < 19) {
             for (String warp : warps) {
                 RawMessage msg = new RawMessage();
-                TextComponent tc = (TextComponent) new ComponentBuilder().append(TextComponent.fromLegacyText(Chat.getTranslated(placeholdersUtils.replacePlaceholders(localization.warpListFormat, "{WARP}", warp)))).create()[0];
+                TextComponent tc = (TextComponent) new ComponentBuilder().append(TextComponent.fromLegacyText(Chat.getTranslated(pu.replacePlaceholders(localization.warpListFormat, "{WARP}", warp)))).create()[0];
                 tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/warp " + warp));
                 msg.append(tc);
 
@@ -86,7 +86,7 @@ public class WarpsCommand extends PluginCommand {
                 String warp = warps.get(i);
 
                 RawMessage msg = new RawMessage();
-                TextComponent tc = (TextComponent) new ComponentBuilder().append(TextComponent.fromLegacyText(Chat.getTranslated(placeholdersUtils.replacePlaceholders(localization.warpListFormat, "{WARP}", warp)))).create()[0];
+                TextComponent tc = (TextComponent) new ComponentBuilder().append(TextComponent.fromLegacyText(Chat.getTranslated(pu.replacePlaceholders(localization.warpListFormat, "{WARP}", warp)))).create()[0];
                 tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/warp " + warp));
                 msg.append(tc);
 
@@ -94,7 +94,7 @@ public class WarpsCommand extends PluginCommand {
             }
 
             if (isPlayer(sender)) {
-                String nav = placeholdersUtils.replacePlaceholders(
+                String nav = pu.replacePlaceholders(
                         localization.pageNavigation, new String[]{
                                 "{PREV_PAGE}",
                                 "{CURRENT_PAGE}",

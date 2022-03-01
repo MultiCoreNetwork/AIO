@@ -46,8 +46,8 @@ public class KitsCommand extends PluginCommand {
     public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         List<String> kits = aio.getKitStorage().getKitNames(sender);
         if (kits.isEmpty()) {
-            Chat.send(localization.noKits, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.noKits), sender);
+            return false;
         }
 
         int page = 0;
@@ -62,15 +62,15 @@ public class KitsCommand extends PluginCommand {
         float maxPages = (float) kits.size() / (float) 18;
 
         if (page > maxPages) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.pageNotFound, "{PAGES}", maxPages), sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.pageNotFound, "{PAGES}", maxPages), sender);
+            return false;
         }
 
-        Chat.send(placeholdersUtils.replacePlaceholders(localization.availableKits), sender);
+        Chat.send(pu.replacePlaceholders(localization.availableKits), sender);
 
         if (kits.size() < 19) {
             for (String kit : kits) {
-                Chat.send(placeholdersUtils.replacePlaceholders(localization.kitListFormat, "{KIT}", kit), sender);
+                Chat.send(pu.replacePlaceholders(localization.kitListFormat, "{KIT}", kit), sender);
             }
         } else {
             int minIndex = page * 18;
@@ -78,11 +78,11 @@ public class KitsCommand extends PluginCommand {
             int maxIndex = remaining <= 19 ? minIndex + remaining : minIndex + 18;
 
             for (int i = minIndex; i < maxIndex; i++) {
-                Chat.send(placeholdersUtils.replacePlaceholders(localization.kitListFormat, "{KIT}", kits.get(i)), sender);
+                Chat.send(pu.replacePlaceholders(localization.kitListFormat, "{KIT}", kits.get(i)), sender);
             }
 
             if (isPlayer(sender)) {
-                String nav = placeholdersUtils.replacePlaceholders(
+                String nav = pu.replacePlaceholders(
                         localization.pageNavigation, new String[]{
                                 "{PREV_PAGE}",
                                 "{CURRENT_PAGE}",
@@ -149,7 +149,7 @@ public class KitsCommand extends PluginCommand {
                 Chat.sendRaw(msg, (Player) sender);
 
             } else {
-                Chat.send(placeholdersUtils.replacePlaceholders(
+                Chat.send(pu.replacePlaceholders(
                         localization.pageNavigation, new String[]{
                                 "{PREV_PAGE}",
                                 "{CURRENT_PAGE}",

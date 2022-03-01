@@ -12,7 +12,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -54,7 +57,7 @@ public class EntitylistCommand extends PluginCommand {
         else world = Bukkit.getWorld(args[0]);
 
         if (world == null) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.worldNotFound), sender);
+            Chat.send(pu.replacePlaceholders(localization.worldNotFound), sender);
             return false;
         }
 
@@ -62,14 +65,22 @@ public class EntitylistCommand extends PluginCommand {
         Map<String, Integer> entitiesMap = new HashMap<>();
 
         entities.forEach(entity -> {
-            String type = Utils.capitalize(entity.getType().name().toLowerCase(Locale.ROOT));
+            String type = Utils.capitalize(entity.getType().name());
             if (entitiesMap.containsKey(type)) entitiesMap.put(type, entitiesMap.get(type) + 1);
             else entitiesMap.put(type, 1);
         });
 
-        Chat.send(placeholdersUtils.replacePlaceholders(localization.entityList, new String[]{"{AMOUNT}", "{WORLD}"}, new Object[]{entities.size(), world.getName()}), sender);
+        Chat.send(pu.replacePlaceholders(
+                localization.entityList,
+                new String[]{"{AMOUNT}", "{WORLD}"},
+                new Object[]{entities.size(), world.getName()}
+        ), sender);
         for (Map.Entry<String, Integer> entity : entitiesMap.entrySet()) {
-            Chat.send(placeholdersUtils.replacePlaceholders(localization.entityListFormat, new String[]{"{ENTITY}", "{AMOUNT}"}, new Object[]{entity.getKey(), entity.getValue()}), sender);
+            Chat.send(pu.replacePlaceholders(
+                    localization.entityListFormat,
+                    new String[]{"{ENTITY}", "{AMOUNT}"},
+                    new Object[]{entity.getKey(), entity.getValue()}
+            ), sender);
         }
 
         return true;

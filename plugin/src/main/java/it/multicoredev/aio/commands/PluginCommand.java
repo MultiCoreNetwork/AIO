@@ -44,7 +44,7 @@ public abstract class PluginCommand extends BasePluginCommand {
     protected final Localization localization;
     protected final IStorage storage;
     protected final CommandData commandData;
-    protected final IPlaceholdersUtils placeholdersUtils;
+    protected final IPlaceholdersUtils pu;
 
     public PluginCommand(AIO aio, String name, CommandData commandData) {
         super(name, commandData);
@@ -53,7 +53,7 @@ public abstract class PluginCommand extends BasePluginCommand {
         this.localization = aio.getLocalization();
         this.storage = aio.getStorage();
         this.commandData = commandData;
-        this.placeholdersUtils = aio.getPlaceholdersUtils();
+        this.pu = aio.getPlaceholdersUtils();
     }
 
     public PluginCommand(AIO aio, String name) {
@@ -77,7 +77,7 @@ public abstract class PluginCommand extends BasePluginCommand {
             int cost = Math.abs(config.commandCosts.getCommandCost(getName()));
 
             if (!aio.getEconomy().has(player, cost)) {
-                Chat.send(placeholdersUtils.replacePlaceholders(
+                Chat.send(pu.replacePlaceholders(
                         localization.insufficientCmdMoney,
                         "{MONEY}",
                         aio.getEconomy().format(cost)
@@ -110,11 +110,11 @@ public abstract class PluginCommand extends BasePluginCommand {
     }
 
     protected void insufficientPerms(CommandSender sender) {
-        Chat.send(placeholdersUtils.replacePlaceholders(localization.insufficientPerms), sender);
+        Chat.send(pu.replacePlaceholders(localization.insufficientPerms), sender);
     }
 
     protected void notImplemented(CommandSender sender) {
-        Chat.send(placeholdersUtils.replacePlaceholders(localization.notImplemented), sender);
+        Chat.send(pu.replacePlaceholders(localization.notImplemented), sender);
     }
 
     private void sendIncorrectUsage(CommandSender sender, List<String> usages) {

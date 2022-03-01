@@ -49,33 +49,35 @@ public class FeedCommand extends PluginCommand {
             } else {
                 if (!hasSubPerm(sender, "other")) {
                     insufficientPerms(sender);
-                    return true;
+                    return false;
                 }
 
                 target = Bukkit.getPlayer(args[0]);
             }
         } else {
             if (args.length < 1) {
-                Chat.send(localization.notPlayer, sender);
-                return true;
+                Chat.send(pu.replacePlaceholders(localization.notPlayer), sender);
+                return false;
             }
 
             target = Bukkit.getPlayer(args[0]);
         }
 
         if (target == null) {
-            Chat.send(localization.playerNotFound, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
+            return false;
         }
 
         target.setFoodLevel(20);
         target.setSaturation(10);
         target.setExhaustion(0);
 
-        Chat.send(localization.feedSelf, target);
-        if (target != sender) Chat.send(localization.feed
-                .replace("{NAME}", target.getName())
-                .replace("{DISPLAYNAME}", target.getDisplayName()), sender);
+        Chat.send(pu.replacePlaceholders(localization.feedSelf), target);
+        if (target != sender) Chat.send(pu.replacePlaceholders(
+                localization.feed,
+                new String[]{"{NAME}", "{DISPLAYNAME}"},
+                new Object[]{target.getName(), target.getDisplayName()}
+        ), sender);
 
         return true;
     }
