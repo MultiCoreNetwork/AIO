@@ -27,7 +27,7 @@ import java.util.Locale;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class AfkSection extends JsonConfig {
-    public static final int AFK_SECONDS_COOLDOWN = 5;
+    public static final int AFK_SECONDS_COOLDOWN = 60;
 
     public static final String BROADCAST_EVERYBODY = "everybody";
     public static final String BROADCAST_WITH_PERM = "perm";
