@@ -57,6 +57,8 @@ public class Config extends JsonConfig {
     public Integer defaultHomeLimit;
     @SerializedName("home_teleport_delay")
     public Long homeTeleportDelay;
+    @SerializedName("teleport_request_delay")
+    public Long teleportRequestDelay;
     @SerializedName("warp_teleport_delay")
     public Long warpTeleportDelay;
     @SerializedName("disable_player_death_messages")
@@ -117,6 +119,8 @@ public class Config extends JsonConfig {
         if (backTeleportDelay == null) backTeleportDelay = -1L;
         if (defaultHomeLimit == null) defaultHomeLimit = 3;
         if (homeTeleportDelay == null) homeTeleportDelay = -1L;
+        //TODO Fix unit
+        if (teleportRequestDelay == null) teleportRequestDelay = 300L;
         if (warpTeleportDelay == null) warpTeleportDelay = -1L;
         if (disablePlayerDeathMessages == null) disablePlayerDeathMessages = false;
         if (disableGodOnJoin == null) disableGodOnJoin = false;

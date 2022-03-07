@@ -26,10 +26,10 @@ import java.util.List;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class TpyesCommand extends PluginCommand {
-    private static final String CMD = "tpyes";
+public class TpnoCommand extends PluginCommand {
+    private static final String CMD = "tpno";
 
-    public TpyesCommand(AIO aio) {
+    public TpnoCommand(AIO aio) {
         super(aio, CMD);
     }
 
@@ -84,7 +84,8 @@ public class TpyesCommand extends PluginCommand {
             request = requesterRequest;
         }
 
-        teleportManager.executeRequest(request, true);
+        //TODO Implement Economy Chance
+        teleportManager.executeRequest(request, false);
         return true;
     }
 

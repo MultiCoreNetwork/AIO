@@ -71,6 +71,8 @@ public class Localization extends JsonConfig {
     public String playerNotFound;
     public String second;
     public String seconds;
+    @SerializedName("stay_still_tp_cancelled")
+    public String stayStillTpCancelled;
     @SerializedName("teleport_cancelled")
     public String teleportCancelled;
     @SerializedName("teleport_with_delay")
@@ -300,6 +302,30 @@ public class Localization extends JsonConfig {
     @SerializedName("time_set_night")
     public String timeSetNight;
 
+    @SerializedName(("another_request_in_pending"))
+    public String anotherRequestInPending;
+    @SerializedName("damage_on_teleport")
+    public String damageOnTeleport;
+    @SerializedName("no_pending_teleport_request")
+    public String noPendingTeleportRequest;
+    @SerializedName("no_teleport_request_yourself")
+    public String noTeleportRequestYourself;
+    @SerializedName("no_request_from_yourself")
+    public String noRequestFromYourSelf;
+    @SerializedName("requester_request_expired")
+    public String requesterRequestExpired;
+    @SerializedName("stay_still_for")
+    public String stayStillFor;
+    @SerializedName("target_accepted_request")
+    public String targetAcceptedRequest;
+    @SerializedName("target_rejected_request")
+    public String targetRejectedRequest;
+    @SerializedName("teleport_request_accepted")
+    public String teleportRequestAccepted;
+    @SerializedName("teleport_request_rejected")
+    public String teleportRequestRejected;
+    @SerializedName("teleport_request_not_found")
+    public String teleportRequestNotFound;
     @SerializedName("tpall")
     public String tpall;
     @SerializedName("tpall_self")
@@ -310,6 +336,12 @@ public class Localization extends JsonConfig {
     public String tpaRequestSent;
     @SerializedName("tpa_request_target")
     public String tpaRequestTarget;
+    @SerializedName("tpahere_request_sent")
+    public String tpahereRequestSent;
+    @SerializedName("tpahere_request_target")
+    public String tpahereRequestTarget;
+    @SerializedName("no_sent_tprequest")
+    public String noSentTpRequest;
 
     public String trash;
 
@@ -369,8 +401,7 @@ public class Localization extends JsonConfig {
     protected void init() {
         if (localization == null) localization = "us";
         if (commandCooldown == null) commandCooldown = "&cYou have to wait {TIME} to use this command again.";
-        if (commandException == null)
-            commandException = "&cThis command throw an exception! Check the console for more info.";
+        if (commandException == null) commandException = "&cThis command throw an exception! Check the console for more info.";
         if (currencySingular == null) currencySingular = "$";
         if (currencyPlural == null) currencyPlural = "$";
         if (day == null) day = "day";
@@ -378,8 +409,7 @@ public class Localization extends JsonConfig {
         if (hour == null) hour = "hour";
         if (hours == null) hours = "hours";
         if (incorrectUsage == null) incorrectUsage = "&cIncorrect usage! Usage:\n&e{USAGE}\n&cAlias: &e{ALIAS}";
-        if (insufficientCmdMoney == null)
-            insufficientCmdMoney = "&cInsufficient money! You need {MONEY} to execute this command.";
+        if (insufficientCmdMoney == null) insufficientCmdMoney = "&cInsufficient money! You need {MONEY} to execute this command.";
         if (insufficientPerms == null) insufficientPerms = "&cInsufficient permissions!";
         if (invalidEnchant == null) invalidEnchant = "&cEnchantment not found.";
         if (invalidNumber == null) invalidNumber = "&cInvalid number!";
@@ -398,6 +428,7 @@ public class Localization extends JsonConfig {
         if (playerNotFound == null) playerNotFound = "&cPlayer not found.";
         if (second == null) second = "second";
         if (seconds == null) seconds = "seconds";
+        if (stayStillTpCancelled == null) stayStillTpCancelled = "You moved during teleport!";
         if (teleportCancelled == null) teleportCancelled = "&cYour teleport has been cancelled. &e{REASON}";
         if (teleportWithDelay == null) teleportWithDelay = "&hYou will be teleported in #2196f3{DELAY} &hseconds.";
         if (worldNotFound == null) worldNotFound = "&cWorld not found!";
@@ -410,14 +441,11 @@ public class Localization extends JsonConfig {
 
         if (chatCleaned == null) chatCleaned = "&hChat cleaned by the staff.";
 
-        if (itemDisenchanted == null)
-            itemDisenchanted = "&hYou removed &e{ENCHANTMENT} &hform &e{DISPLAYNAME}&h's &e{ITEM} &h.";
+        if (itemDisenchanted == null) itemDisenchanted = "&hYou removed &e{ENCHANTMENT} &hform &e{DISPLAYNAME}&h's &e{ITEM} &h.";
         if (itemDisenchantedSelf == null) itemDisenchantedSelf = "&hYou removed &e{ENCHANTMENT} &hfrom &e{ITEM} &h.";
 
-        if (itemEnchanted == null)
-            itemEnchanted = "&hYou enchanted &e{DISPLAYNAME}&h's &e{ITEM} &hwith &e{ENCHANTMENT} {LEVEL}&h.";
-        if (itemEnchantedSelf == null)
-            itemEnchantedSelf = "&hYour &e{ITEM} &hhas been enchanted with &e{ENCHANTMENT} {LEVEL}&h.";
+        if (itemEnchanted == null) itemEnchanted = "&hYou enchanted &e{DISPLAYNAME}&h's &e{ITEM} &hwith &e{ENCHANTMENT} {LEVEL}&h.";
+        if (itemEnchantedSelf == null) itemEnchantedSelf = "&hYour &e{ITEM} &hhas been enchanted with &e{ENCHANTMENT} {LEVEL}&h.";
 
         if (insufficientMoney == null) insufficientMoney = "Insufficient money";
         if (maxMoneyReached == null) maxMoneyReached = "Max money reached";
@@ -428,13 +456,10 @@ public class Localization extends JsonConfig {
         if (moneySet == null) moneySet = "Money set";
         if (moneyNotSet == null) moneyNotSet = "Money not set";
 
-        if (moneyDepositedSender == null)
-            moneyDepositedSender = "&e{MONEY}&h deposited to &e{DISPLAYNAME}&h's balance.";
+        if (moneyDepositedSender == null) moneyDepositedSender = "&e{MONEY}&h deposited to &e{DISPLAYNAME}&h's balance.";
         if (moneyDepositedReceiver == null) moneyDepositedReceiver = "&e{MONEY}&h has been deposited to your balance.";
-        if (moneyWithdrawnSender == null)
-            moneyWithdrawnSender = "&e{MONEY}&h withdrawn from &e{DISPLAYNAME}&h's balance.";
-        if (moneyWithdrawnReceiver == null)
-            moneyWithdrawnReceiver = "&e{MONEY}&h has been withdrawn from your balance.";
+        if (moneyWithdrawnSender == null) moneyWithdrawnSender = "&e{MONEY}&h withdrawn from &e{DISPLAYNAME}&h's balance.";
+        if (moneyWithdrawnReceiver == null) moneyWithdrawnReceiver = "&e{MONEY}&h has been withdrawn from your balance.";
         if (moneySetSender == null) moneySetSender = "&e{DISPLAYNAME}&h's balance set to &e{MONEY}&h.";
         if (moneySetReceiver == null) moneySetReceiver = "&hYour balance has been set to &e{MONEY}&h.";
         if (moneyResetSender == null) moneyResetSender = "&e{DISPLAYNAME}&h's balance reset to &e{MONEY}&h.";
@@ -533,11 +558,28 @@ public class Localization extends JsonConfig {
         if (timeSetDay == null) timeSetDay = "&eTime set to day in world {WORLD}.";
         if (timeSetNight == null) timeSetNight = "&hTime set to night in world {WORLD}.";
 
+        if (anotherRequestInPending == null) anotherRequestInPending = "&cYou have another request in pending!";
+        if (damageOnTeleport == null) damageOnTeleport = "&cYou took damage! Teleport cancelled!";
         if (tpall == null) tpall = "&hYou have been teleported!";
         if (tpallSelf == null) tpallSelf = "&hYou teleported everyone to you.";
         if (tpaRequestCanceled == null) tpaRequestCanceled = "&6{REQUESTER}'s teleport request has been cancelled.";
-        if (tpaRequestSent == null) tpaRequestSent = "&hYou sent a teleport request to {TARGET}. &e(/tpacancel for cancel)";
-        if (tpaRequestTarget == null) tpaRequestTarget = "&hYou received a teleport request to you from {REQUESTER}. &e(/tpyes - /tpno)";
+        if (tpaRequestSent == null) tpaRequestSent = "&hYou sent a teleport request to {TARGET}. \n&e(/tpacancel for cancel)";
+        if (tpaRequestTarget == null) tpaRequestTarget = "&hYou received a teleport request to you from {REQUESTER}. \n&e(/tpyes - /tpno)";
+        if (tpahereRequestSent == null) tpahereRequestSent = "&hYou sent a teleport request to {TARGET}. \n&e(/tpacancel for cancel)";
+        if (tpahereRequestTarget == null) tpahereRequestTarget = "&hYou received a teleport request to {REQUESTER}. \n&e(/tpyes - /tpno)";
+        if (noSentTpRequest == null) noSentTpRequest = "&cYou don't have sent teleport requests!";
+
+        if (noPendingTeleportRequest == null) noPendingTeleportRequest = "&cYou haven't pending teleport requests.";
+        if (noTeleportRequestYourself == null) noTeleportRequestYourself = "&cYou can't send a teleport request to yourself.";
+        if (noRequestFromYourSelf == null) noRequestFromYourSelf = "&cYou can't have teleport requests from yourself.";
+
+        if (stayStillFor == null) stayStillFor = "&6Stay still for {SECONDS} seconds.";
+        if (targetAcceptedRequest == null) targetAcceptedRequest = "&6{DISPLAYNAME} has accepted the request!";
+        if (targetRejectedRequest == null) targetRejectedRequest = "&c{DISPLAYNAME} has rejected the request!";
+        if (teleportRequestAccepted == null) teleportRequestAccepted = "&6You have accepted the request!";
+        if (teleportRequestRejected == null) teleportRequestRejected = "&6You have rejected the request!";
+        if (teleportRequestNotFound == null) teleportRequestNotFound = "&cNo teleport requests found by this player.";
+        if (requesterRequestExpired == null) requesterRequestExpired = "&cLa richiesta";
 
         if (trash == null) trash = "Trash Can";
 

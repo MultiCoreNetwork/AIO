@@ -2,7 +2,9 @@ package it.multicoredev.aio.listeners.entity;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.User;
+import it.multicoredev.aio.api.tp.ITeleportManager;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
+import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.jetbrains.annotations.NotNull;
@@ -43,5 +45,12 @@ public class EntityDamageListener extends PluginListenerExecutor<EntityDamageEve
 
         boolean shouldDoAfkInvulnerability = config.afkSection.afkInvulnerability && user.isAfk();
         if (user.hasGod() || shouldDoAfkInvulnerability) event.setCancelled(true);
+
+        ITeleportManager teleportManager = aio.getTeleportManager();
+
+        if (teleportManager.hasPendingTeleport(player)) {
+            teleportManager.cancelTeleport(player);
+            Chat.send(localization.damageOnTeleport, player);
+        }
     }
 }

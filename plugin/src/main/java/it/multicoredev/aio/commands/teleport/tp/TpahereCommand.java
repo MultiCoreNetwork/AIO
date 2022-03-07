@@ -27,10 +27,10 @@ import java.util.List;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class TpaCommand extends PluginCommand {
-    private static final String CMD = "tpa";
+public class TpahereCommand extends PluginCommand {
+    private static final String CMD = "tpahere";
 
-    public TpaCommand(AIO aio) {
+    public TpahereCommand(AIO aio) {
         super(aio, CMD);
     }
 
@@ -67,11 +67,11 @@ public class TpaCommand extends PluginCommand {
             return true;
         }
 
-        teleportManager.requestTeleport(TeleportRequestType.TPA, requester, target);
+        teleportManager.requestTeleport(TeleportRequestType.TPAHERE, requester, target);
 
         IPlaceholdersUtils placeholdersUtils = aio.getPlaceholdersUtils();
-        Chat.send(placeholdersUtils.replacePlaceholders(localization.tpaRequestSent, "{TARGET}", target.getName()), sender);
-        Chat.send(placeholdersUtils.replacePlaceholders(localization.tpaRequestTarget, "{REQUESTER}", requester.getName()), target);
+        Chat.send(placeholdersUtils.replacePlaceholders(localization.tpahereRequestSent, "{TARGET}", target.getName()), sender);
+        Chat.send(placeholdersUtils.replacePlaceholders(localization.tpahereRequestTarget, "{REQUESTER}", requester.getName()), target);
         return true;
     }
 

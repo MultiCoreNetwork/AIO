@@ -178,6 +178,14 @@ public interface ITeleportManager {
 
     /**
      * Cancel the teleport of a player.
+     * @param player the player whose teleport to be cancelled.
+     * @param reason the reason of the cancellation.
+     * @param notify if he has to be notified.
+     */
+    void cancelTeleport(@NotNull Player player, String reason, boolean notify);
+
+    /**
+     * Cancel the teleport of a player.
      *
      * @param player the player whose teleport to be cancelled.
      */
@@ -287,6 +295,14 @@ public interface ITeleportManager {
     void cancelTeleportRequest(@NotNull Player requester);
 
     /**
+     * Execute a teleport request.
+     *
+     * @param request the request
+     * @param accept  if the request must be accepted
+     */
+    void executeRequest(TeleportRequest request, boolean accept);
+
+    /**
      * Get the teleport requests of a requester.
      *
      * @param requester the requester.
@@ -332,4 +348,11 @@ public interface ITeleportManager {
      * @return the teleport requests of the requester.
      */
     @Nullable Date getTeleportRequestTimestamp(@NotNull TeleportRequest request);
+
+    /**
+     * Get the names of the requesters of target
+     * @param target the target of requests
+     * @return the list of names of requesters
+     */
+    List<String> getRequesterNames(Player target);
 }

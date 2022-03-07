@@ -24,8 +24,7 @@ import it.multicoredev.aio.commands.teleport.RTPCommand;
 import it.multicoredev.aio.commands.teleport.home.*;
 import it.multicoredev.aio.commands.teleport.spawn.SetSpawnCommand;
 import it.multicoredev.aio.commands.teleport.spawn.SpawnCommand;
-import it.multicoredev.aio.commands.teleport.tp.TpaCommand;
-import it.multicoredev.aio.commands.teleport.tp.TpallCommand;
+import it.multicoredev.aio.commands.teleport.tp.*;
 import it.multicoredev.aio.commands.teleport.warp.DelWarpCommand;
 import it.multicoredev.aio.commands.teleport.warp.SetWarpCommand;
 import it.multicoredev.aio.commands.teleport.warp.WarpCommand;
@@ -49,8 +48,8 @@ import it.multicoredev.aio.storage.config.sections.StorageSection;
 import it.multicoredev.aio.storage.data.FileStorage;
 import it.multicoredev.aio.storage.data.KitStorage;
 import it.multicoredev.aio.storage.data.WarpStorage;
-import it.multicoredev.aio.tasks.AfkTask;
 import it.multicoredev.aio.tasks.ClearCacheTask;
+import it.multicoredev.aio.tasks.PlayerMoveTask;
 import it.multicoredev.aio.tasks.SavePlayerDataTask;
 import it.multicoredev.aio.utils.ReflectionUtils;
 import it.multicoredev.aio.utils.perms.PermissionHandler;
@@ -639,7 +638,8 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         File[] helpbooks = helpbooksDir.listFiles();
         if (helpbooks != null) {
             for (File helpbookFile : helpbooks) {
-                if (!helpbookFile.isFile() || !helpbookFile.getName().toLowerCase(Locale.ROOT).endsWith(".json")) continue;
+                if (!helpbookFile.isFile() || !helpbookFile.getName().toLowerCase(Locale.ROOT).endsWith(".json"))
+                    continue;
 
                 try {
                     HelpBook helpbook = deserialize(helpbookFile, HelpBook.class);
@@ -883,7 +883,10 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         if (commands.isEnabled("sun")) commandRegistry.registerCommand(new SunCommand(this), this);
         if (commands.isEnabled("thunder")) commandRegistry.registerCommand(new ThunderCommand(this), this);
         if (commands.isEnabled("tpa")) commandRegistry.registerCommand(new TpaCommand(this), this);
+        if (commands.isEnabled("tpahere")) commandRegistry.registerCommand(new TpahereCommand(this), this);
         if (commands.isEnabled("tpall")) commandRegistry.registerCommand(new TpallCommand(this), this);
+        if (commands.isEnabled("tpyes")) commandRegistry.registerCommand(new TpyesCommand(this), this);
+        if (commands.isEnabled("tpno")) commandRegistry.registerCommand(new TpnoCommand(this), this);
         if (commands.isEnabled("trash")) commandRegistry.registerCommand(new TrashCommand(this), this);
         if (commands.isEnabled("warp")) commandRegistry.registerCommand(new WarpCommand(this), this);
         if (commands.isEnabled("warps")) commandRegistry.registerCommand(new WarpsCommand(this), this);
@@ -916,7 +919,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     }
 
     private void startTasks() {
-        tasks.put("afk", getServer().getScheduler().runTaskTimer(this, new AfkTask(this), 20, 20));
+        tasks.put("player_move_task", getServer().getScheduler().runTaskTimer(this, new PlayerMoveTask(this), 20, 20));
         tasks.put("clear_player_cache", getServer().getScheduler().runTaskTimerAsynchronously(this, new ClearCacheTask(this), config.clearPlayersCache, config.clearPlayersCache));
         tasks.put("save_payer_data", getServer().getScheduler().runTaskTimerAsynchronously(this, new SavePlayerDataTask(this), config.savePlayersData, config.savePlayersData));
     }

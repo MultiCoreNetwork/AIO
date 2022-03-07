@@ -41,12 +41,18 @@ public class PostCommandListener extends PluginListenerExecutor<PostCommandEvent
         boolean isPlayer = sender instanceof Player;
         String cmd = event.getCommand();
 
-        if (isPlayer && config.commandCooldown.cooldownEnabled && event.isSuccess()) aio.addCommandCooldown((Player) sender, cmd);
+        if (isPlayer && config.commandCooldown.cooldownEnabled && event.isSuccess())
+            aio.addCommandCooldown((Player) sender, cmd);
 
 
         if (config.commandCosts.costsEnabled && VAULT && isPlayer && config.commandCosts.hasCommandCost(cmd) && !sender.hasPermission("aio.bypass.costs")) {
             Player player = (Player) sender;
-            int cost = Math.abs(config.commandCosts.getCommandCost(cmd));
+            double cost = Math.abs(config.commandCosts.getCommandCost(cmd));
+
+            if (cmd.equalsIgnoreCase("tpa") || cmd.equalsIgnoreCase("tpahere")) {
+                cost = cost / 2;
+            }
+
             aio.getEconomy().withdrawPlayer(player, cost);
         }
     }

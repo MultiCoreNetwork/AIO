@@ -272,10 +272,25 @@ public class Commands extends JsonConfig {
                 "Request to a player to be teleported to him",
                 "/tpa [player]"
         ));
+        if (!commands.containsKey("tpahere")) commands.put("tpahere", new CommandData(
+                true,
+                "Request to a player to be teleported to yourself",
+                "/tpahere [player]"
+        ));
         if (!commands.containsKey("tpall")) commands.put("tpall", new CommandData(
                 true,
                 "Teleport all players to your location",
                 "/tpall"
+        ));
+        if (!commands.containsKey("tpyes")) commands.put("tpyes", new CommandData(
+                true,
+                "Accept a teleport request",
+                "/tpyes [player]"
+        ));
+        if (!commands.containsKey("tpno")) commands.put("tpno", new CommandData(
+                true,
+                "Reject a teleport request",
+                "/tpno [player]"
         ));
         if (!commands.containsKey("trash")) commands.put("trash", new CommandData(
                 true,

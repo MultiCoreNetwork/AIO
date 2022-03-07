@@ -1,10 +1,14 @@
 package it.multicoredev.aio;
 
 import com.google.common.base.Preconditions;
+import it.multicoredev.aio.api.IEconomy;
 import it.multicoredev.aio.api.tp.ITeleportManager;
 import it.multicoredev.aio.api.tp.Teleport;
 import it.multicoredev.aio.api.tp.TeleportRequest;
 import it.multicoredev.aio.api.tp.TeleportRequestType;
+import it.multicoredev.aio.api.utils.IPlaceholdersUtils;
+import it.multicoredev.aio.storage.config.Config;
+import it.multicoredev.aio.storage.config.Localization;
 import it.multicoredev.aio.utils.Utils;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.Bukkit;
@@ -14,6 +18,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+
+import static it.multicoredev.aio.AIO.VAULT;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -161,6 +167,13 @@ public class TeleportManager implements ITeleportManager {
     }
 
     @Override
+    public void cancelTeleport(@NotNull Player player, String reason, boolean notify) {
+        Preconditions.checkNotNull(player);
+
+        if (hasPendingTeleport(player)) getPendingTeleport(player).cancel(reason, notify);
+    }
+
+    @Override
     public void cancelTeleport(@NotNull Player player) {
         Preconditions.checkNotNull(player);
 
@@ -281,6 +294,51 @@ public class TeleportManager implements ITeleportManager {
     }
 
     @Override
+    public void executeRequest(@NotNull TeleportRequest request, boolean accept) {
+        teleportRequests.remove(request);
+
+        AIO aio = (AIO) AIO.getInstance();
+        Config config = aio.getConfiguration();
+        Localization localization = aio.getLocalization();
+        IPlaceholdersUtils pu = aio.getPlaceholdersUtils();
+        IEconomy economy = aio.getEconomy();
+
+        Player requester = request.getRequester();
+        Player target = request.getTarget();
+
+        if (accept) {
+            //TODO Fix unit delay
+            long delay = aio.getConfiguration().teleportRequestDelay;
+            String seconds = String.valueOf(delay / 20);
+            TeleportRequestType type = request.getType();
+            double cost = config.commandCosts.getCommandCost(type.name().toLowerCase(Locale.ROOT)) / 2f;
+
+            if (config.commandCosts.costsEnabled && VAULT && config.commandCosts.hasCommandCost(type.name().toLowerCase(Locale.ROOT)) && !requester.hasPermission("aio.bypass.costs")) {
+                if (!economy.has(requester, cost / 2)) {
+                    Chat.send(localization.insufficientCmdMoney, requester);
+                    return;
+                }
+
+                economy.withdrawPlayer(requester, cost);
+            }
+
+            if (type == TeleportRequestType.TPA) {
+                Chat.send(pu.replacePlaceholders(localization.teleportRequestAccepted + " " + localization.stayStillFor, new String[]{"{NAME}", "{DISPLAYNAME}", "{SECONDS}"}, new Object[]{target.getName(), target.getDisplayName(), seconds}), target);
+                Chat.send(pu.replacePlaceholders(localization.targetAcceptedRequest, new String[]{"{NAME}", "{DISPLAYNAME}", "{SECONDS}"}, new Object[]{target.getName(), target.getDisplayName(), seconds}), requester);
+                teleport(requester, target.getLocation(), delay);
+            } else if (type == TeleportRequestType.TPAHERE) {
+                Chat.send(pu.replacePlaceholders(localization.teleportRequestAccepted + " " + localization.stayStillFor, new String[]{"{NAME}", "{DISPLAYNAME}", "{SECONDS}"}, new Object[]{target.getName(), target.getDisplayName(), seconds}), target);
+                Chat.send(pu.replacePlaceholders(localization.targetAcceptedRequest, new String[]{"{NAME}", "{DISPLAYNAME}", "{SECONDS}"}, new Object[]{target.getName(), target.getDisplayName(), seconds}), requester);
+                teleport(target, requester.getLocation(), delay);
+            }
+
+        } else {
+            Chat.send(localization.teleportRequestRejected, target);
+            Chat.send(pu.replacePlaceholders(localization.targetRejectedRequest, new String[]{"{NAME}", "{DISPLAYNAME}"}, new Object[]{target.getName(), target.getDisplayName()}), requester);
+        }
+    }
+
+    @Override
     public boolean hasRequesterTeleportRequest(@NotNull Player requester) {
         return getRequesterTeleportRequest(requester) != null;
     }
@@ -328,5 +386,17 @@ public class TeleportManager implements ITeleportManager {
         Preconditions.checkNotNull(request);
 
         return teleportRequests.get(request);
+    }
+
+    @Override
+    public List<String> getRequesterNames(Player target) {
+        List<String> names = new ArrayList<>();
+        List<TeleportRequest> targetRequests = getTargetTeleportRequests(target);
+
+        for (TeleportRequest request : targetRequests) {
+            names.add(request.getRequester().getName());
+        }
+
+        return names;
     }
 }
