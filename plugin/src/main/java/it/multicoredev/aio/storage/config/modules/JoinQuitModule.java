@@ -54,7 +54,7 @@ public class JoinQuitModule extends Module {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         if (motdDelay == null) motdDelay = 3L;
         if (overrideJoinMessage == null) overrideJoinMessage = true;
         if (overrideQuitMessage == null) overrideQuitMessage = true;

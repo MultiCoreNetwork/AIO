@@ -43,7 +43,7 @@ public class CommandAliases extends JsonConfig {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         if (aliases == null) aliases = new ArrayList<>();
         if (command == null) command = "";
         if (allowArgs == null) allowArgs = false;

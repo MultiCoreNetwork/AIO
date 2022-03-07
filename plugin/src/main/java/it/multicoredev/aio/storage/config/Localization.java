@@ -398,7 +398,7 @@ public class Localization extends JsonConfig {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         if (localization == null) localization = "us";
         if (commandCooldown == null) commandCooldown = "&cYou have to wait {TIME} to use this command again.";
         if (commandException == null) commandException = "&cThis command throw an exception! Check the console for more info.";

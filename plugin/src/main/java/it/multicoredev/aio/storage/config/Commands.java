@@ -49,7 +49,7 @@ public class Commands extends JsonConfig {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         if (commands == null) commands = new HashMap<>();
 
         if (!commands.containsKey("aio")) commands.put("aio", new CommandData(

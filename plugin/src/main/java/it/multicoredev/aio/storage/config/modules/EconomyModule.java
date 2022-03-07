@@ -46,7 +46,7 @@ public class EconomyModule extends Module {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         if (enabled == null) enabled = true;
         if (startingBalance == null) startingBalance = 0d;
         if (commandCosts == null) commandCosts = new HashMap<>();

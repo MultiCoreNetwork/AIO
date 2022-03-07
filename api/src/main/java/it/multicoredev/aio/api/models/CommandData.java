@@ -114,7 +114,7 @@ public class CommandData extends JsonConfig {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         if (enabled == null) enabled = false;
         if (description == null) description = "";
         if (usages == null) usages = new HashMap<>();

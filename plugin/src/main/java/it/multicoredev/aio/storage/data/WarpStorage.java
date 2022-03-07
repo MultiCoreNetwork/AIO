@@ -41,7 +41,7 @@ public class WarpStorage extends JsonConfig implements IWarpStorage {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         if (warps == null) warps = new ArrayList<>();
     }
 

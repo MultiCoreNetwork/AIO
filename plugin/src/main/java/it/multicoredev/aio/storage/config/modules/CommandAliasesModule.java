@@ -39,7 +39,7 @@ public class CommandAliasesModule extends Module {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         if (aliases == null) aliases = new ArrayList<>();
     }
 }

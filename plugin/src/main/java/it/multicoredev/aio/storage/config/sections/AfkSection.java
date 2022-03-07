@@ -74,7 +74,7 @@ public class AfkSection extends JsonConfig {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         if (afkSecondsCooldown == null) {
             afkSecondsCooldown = AFK_SECONDS_COOLDOWN;
         } else if (afkSecondsCooldown <= 0) {

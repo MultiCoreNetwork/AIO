@@ -65,7 +65,7 @@ public abstract class Module extends JsonConfig {
      * Initialize class variables with default values.
      * This will be the default values if one of this is missing.
      */
-    protected abstract void init();
+    public abstract void init();
 
     public static class Adapter implements JsonSerializer<Module>, JsonDeserializer<Module> {
 

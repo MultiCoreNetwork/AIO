@@ -41,7 +41,7 @@ public class PingModule extends Module {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         if (pingPlayers == null) pingPlayers = true;
         if (pingStaff == null) pingStaff = true;
         if (pingGroups == null) pingGroups = true;

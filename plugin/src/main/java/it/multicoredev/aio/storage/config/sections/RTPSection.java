@@ -48,7 +48,7 @@ public class RTPSection extends JsonConfig {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         if (centerX == null) centerX = 0d;
         if (centerZ == null) centerZ = 0d;
         if (spreadDistance == null) spreadDistance = 100;

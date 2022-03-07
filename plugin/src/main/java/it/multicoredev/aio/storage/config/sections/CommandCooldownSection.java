@@ -37,7 +37,7 @@ public class CommandCooldownSection extends JsonConfig {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         if (cooldownEnabled == null) cooldownEnabled = false;
         if (commandsCooldown == null) commandsCooldown = new HashMap<>();
     }

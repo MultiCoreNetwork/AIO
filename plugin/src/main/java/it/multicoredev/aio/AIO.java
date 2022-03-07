@@ -2,13 +2,13 @@ package it.multicoredev.aio;
 
 import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import it.multicoredev.aio.api.Module;
 import it.multicoredev.aio.api.*;
 import it.multicoredev.aio.api.events.AfkToggleEvent;
 import it.multicoredev.aio.api.events.PlayerPostTeleportEvent;
 import it.multicoredev.aio.api.events.PlayerTeleportCancelledEvent;
+import it.multicoredev.aio.api.events.PostCommandEvent;
 import it.multicoredev.aio.api.listeners.IListenerRegistry;
 import it.multicoredev.aio.api.models.CommandData;
 import it.multicoredev.aio.api.tp.ITeleportManager;
@@ -34,6 +34,7 @@ import it.multicoredev.aio.commands.utilities.time_and_weather.*;
 import it.multicoredev.aio.listeners.aio.AfkListener;
 import it.multicoredev.aio.listeners.aio.PlayerPostTeleportListener;
 import it.multicoredev.aio.listeners.aio.PlayerTeleportCancelledListener;
+import it.multicoredev.aio.listeners.aio.PostCommandListener;
 import it.multicoredev.aio.listeners.entity.EntityDamageListener;
 import it.multicoredev.aio.listeners.player.*;
 import it.multicoredev.aio.models.HelpBook;
@@ -57,6 +58,7 @@ import it.multicoredev.aio.utils.placeholders.PAPIPlaceholderHook;
 import it.multicoredev.aio.utils.placeholders.PAPIPlaceholdersUtils;
 import it.multicoredev.aio.utils.placeholders.StdPlaceholdersUtils;
 import it.multicoredev.mbcore.spigot.Chat;
+import it.multicoredev.mclib.json.GsonHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -70,10 +72,9 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -97,9 +98,12 @@ import java.util.*;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class AIO extends it.multicoredev.aio.api.AIO {
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().registerTypeAdapter(Location.class, new LocationAdapter()).create();
+    public static final GsonHelper GSON = new GsonHelper(new GsonBuilder()
+            .setPrettyPrinting()
+            .disableHtmlEscaping()
+            .registerTypeAdapter(Location.class, new LocationAdapter())
+            .create());
 
-    private static final Map<Module, File> modules = new HashMap<>();
     public static boolean VAULT;
     public static boolean LUCKPERMS;
     public static boolean PAPI;
@@ -138,13 +142,11 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
     public static boolean debug = true;
 
-    //TODO Improve argument parsing and completions
+    //TODO Improve argument completions
     //TODO Enchant disenchant commands change output msg enchant name
     //TODO Fly speed (Save also walk speed and set on Join)
-    //TODO Add to commands like heal or feed... the ability to user selectors
     //TODO Reset module name when loading
     //TODO Change command syntax to /command [on|off|toggle] [player]
-    //TODO Add postCommandProcess before returns
     //TODO ALL Chat.send must have placeholderutils.replace....
     //TODO Add the ability to log transactions inside AIOEconomy
     //TODO Use this everywhere !hasSubPerm(sender, "other") && !sender.equals(target)
@@ -225,7 +227,6 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         stopDeferredCommands();
         stopTasks();
 
-        modules.clear();
         usersCache.clear();
 
         HandlerList.unregisterAll(this);
@@ -309,27 +310,11 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         return commands.getCommand(command);
     }
 
-    public static <T> T deserialize(File file, Type type) throws Exception {
-        try (InputStreamReader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)) {
-            return gson.fromJson(reader, type);
-        }
-    }
-
-    public static synchronized void serialize(File file, Object obj) throws Exception {
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
-            writer.write(gson.toJson(obj));
-            writer.flush();
-        }
-    }
-
-    public static void serializeAsync(File file, Object obj) {
+    public static void saveAsync(Object obj, File file) {
         new Thread(() -> {
             try {
-                try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
-                    writer.write(gson.toJson(obj));
-                    writer.flush();
-                }
-            } catch (Exception e) {
+                GSON.save(obj, file);
+            } catch (IOException e) {
                 Chat.warning("&c" + e.getMessage());
                 if (debug) e.printStackTrace();
             }
@@ -400,11 +385,11 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
     public void addToUsermap(String name, UUID uuid) {
         usermap.put(name, uuid);
-        serializeAsync(usermapFile, usermap);
+        saveAsync(usermap, usermapFile);
     }
 
-    public void saveWarps() throws Exception {
-        serialize(warpsFile, warpStorage);
+    public void saveWarps() {
+        saveAsync(warpStorage, warpsFile);
     }
 
     public void addDeferredCommand(CommandSender sender, String command, long delay) {
@@ -425,17 +410,18 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
         if (!configFile.exists() || !configFile.isFile()) {
             config = new Config();
+            config.init();
 
             try {
-                serialize(configFile, config);
-            } catch (Exception e) {
+                GSON.save(config, configFile);
+            } catch (IOException e) {
                 Chat.severe("&4" + e.getMessage());
                 if (debug) e.printStackTrace();
                 return false;
             }
         } else {
             try {
-                config = deserialize(configFile, Config.class);
+                config = GSON.load(configFile, Config.class);
                 if (config == null) throw new NullPointerException("Config is null");
             } catch (Exception e) {
                 Chat.severe("&4" + e.getMessage());
@@ -445,10 +431,11 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                 Chat.warning("&4Config file is corrupted, creating new one");
 
                 config = new Config();
+                config.init();
 
                 try {
-                    serialize(configFile, config);
-                } catch (Exception e1) {
+                    GSON.save(config, configFile);
+                } catch (IOException e1) {
                     Chat.severe("&4" + e.getMessage());
                     if (debug) e1.printStackTrace();
                     return false;
@@ -457,8 +444,8 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
             if (config.completeMissing()) {
                 try {
-                    serialize(configFile, config);
-                } catch (Exception e) {
+                    GSON.save(config, configFile);
+                } catch (IOException e) {
                     Chat.severe("&4" + e.getMessage());
                     if (debug) e.printStackTrace();
                     return false;
@@ -468,17 +455,18 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
         if (!localizationFile.exists() || !localizationFile.isFile()) {
             localization = new Localization();
+            localization.init();
 
             try {
-                serialize(localizationFile, localization);
-            } catch (Exception e) {
+                GSON.save(localization, localizationFile);
+            } catch (IOException e) {
                 Chat.severe("&4" + e.getMessage());
                 if (debug) e.printStackTrace();
                 return false;
             }
         } else {
             try {
-                localization = deserialize(localizationFile, Localization.class);
+                localization = GSON.load(localizationFile, Localization.class);
                 if (localization == null) throw new NullPointerException("Localization is null");
             } catch (Exception e) {
                 Chat.severe("&4" + e.getMessage());
@@ -488,10 +476,11 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                 Chat.warning("&4Localization file is corrupted, creating new one");
 
                 localization = new Localization();
+                localization.init();
 
                 try {
-                    serialize(localizationFile, localization);
-                } catch (Exception e1) {
+                    GSON.save(localization, localizationFile);
+                } catch (IOException e1) {
                     Chat.severe("&4" + e.getMessage());
                     if (debug) e1.printStackTrace();
                     return false;
@@ -500,8 +489,8 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
             if (localization.completeMissing()) {
                 try {
-                    serialize(localizationFile, localization);
-                } catch (Exception e) {
+                    GSON.save(localization, localizationFile);
+                } catch (IOException e) {
                     Chat.severe("&4" + e.getMessage());
                     if (debug) e.printStackTrace();
                     return false;
@@ -511,9 +500,10 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
         if (!commandsFile.exists() || !commandsFile.isFile()) {
             commands = new Commands();
+            commands.init();
 
             try {
-                serialize(commandsFile, commands);
+                GSON.save(commands, commandsFile);
             } catch (Exception e) {
                 Chat.severe("&4" + e.getMessage());
                 if (debug) e.printStackTrace();
@@ -521,7 +511,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             }
         } else {
             try {
-                commands = deserialize(commandsFile, Commands.class);
+                commands = GSON.load(commandsFile, Commands.class);
                 if (commands == null) throw new NullPointerException("commands is null");
             } catch (Exception e) {
                 Chat.severe("&4" + e.getMessage());
@@ -531,10 +521,11 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                 Chat.warning("&4commands file is corrupted, creating new one");
 
                 commands = new Commands();
+                commands.init();
 
                 try {
-                    serialize(commandsFile, commands);
-                } catch (Exception e1) {
+                    GSON.save(commands, commandsFile);
+                } catch (IOException e1) {
                     Chat.severe("&4" + e.getMessage());
                     if (debug) e1.printStackTrace();
                     return false;
@@ -543,8 +534,8 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
             if (commands.completeMissing()) {
                 try {
-                    serialize(commandsFile, commands);
-                } catch (Exception e) {
+                    GSON.save(commands, commandsFile);
+                } catch (IOException e) {
                     Chat.severe("&4" + e.getMessage());
                     if (debug) e.printStackTrace();
                     return false;
@@ -568,16 +559,17 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                 Module module;
 
                 try {
-                    module = clazz.newInstance();
-                } catch (InstantiationException | IllegalAccessException e) {
+                    module = clazz.getDeclaredConstructor().newInstance();
+                    module.init();
+                } catch (Exception e) {
                     Chat.severe("&4" + e.getMessage());
                     if (debug) e.printStackTrace();
                     return false;
                 }
 
                 try {
-                    serialize(moduleFile, module);
-                } catch (Exception e) {
+                    GSON.save(module, moduleFile);
+                } catch (IOException e) {
                     Chat.severe("&4" + e.getMessage());
                     if (debug) e.printStackTrace();
                     return false;
@@ -588,7 +580,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                 Module module;
 
                 try {
-                    module = deserialize(moduleFile, clazz);
+                    module = GSON.load(moduleFile, clazz);
                     if (module == null) throw new NullPointerException("Module is null");
                 } catch (Exception e) {
                     Chat.severe("&4" + e.getMessage());
@@ -598,16 +590,17 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                     Chat.warning("&4Module " + name + " file is corrupted, creating new one");
 
                     try {
-                        module = clazz.newInstance();
-                    } catch (InstantiationException | IllegalAccessException e1) {
+                        module = clazz.getDeclaredConstructor().newInstance();
+                        module.init();
+                    } catch (Exception e1) {
                         Chat.severe("&4" + e1.getMessage());
                         if (debug) e1.printStackTrace();
                         return false;
                     }
 
                     try {
-                        serialize(moduleFile, module);
-                    } catch (Exception e1) {
+                        GSON.save(module, moduleFile);
+                    } catch (IOException e1) {
                         Chat.severe("&4" + e1.getMessage());
                         if (debug) e1.printStackTrace();
                         return false;
@@ -616,7 +609,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
                 if (module.completeMissing()) {
                     try {
-                        serialize(moduleFile, module);
+                        GSON.save(module, moduleFile);
                     } catch (Exception e) {
                         Chat.severe("&4" + e.getMessage());
                         if (debug) e.printStackTrace();
@@ -637,26 +630,116 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
         File[] helpbooks = helpbooksDir.listFiles();
         if (helpbooks != null) {
-            for (File helpbookFile : helpbooks) {
-                if (!helpbookFile.isFile() || !helpbookFile.getName().toLowerCase(Locale.ROOT).endsWith(".json"))
+            for (File hbf : helpbooks) {
+                if (!hbf.isFile() || !hbf.getName().toLowerCase(Locale.ROOT).endsWith(".json"))
                     continue;
 
                 try {
-                    HelpBook helpbook = deserialize(helpbookFile, HelpBook.class);
-                    if (helpbook == null) throw new NullPointerException("Helpbook is null");
+                    HelpBook hb = GSON.load(hbf, HelpBook.class);
+                    if (hb == null) throw new NullPointerException("Helpbook " + hbf.getName() + " is null");
 
-                    if (helpbook.completeMissing()) {
+                    if (hb.completeMissing()) {
                         try {
-                            serialize(helpbookFile, helpbook);
-                        } catch (Exception e) {
+                            GSON.save(hb, hbf);
+                        } catch (IOException e) {
                             Chat.warning("&4" + e.getMessage());
                             if (debug) e.printStackTrace();
                         }
                     }
 
-                    this.helpbooks.add(helpbook);
+                    this.helpbooks.add(hb);
                 } catch (Exception e) {
-                    Chat.warning("&eHelpbook " + helpbookFile.getName() + " is corrupted or has an invalid format.");
+                    Chat.warning("&eHelpbook " + hbf.getName() + " is corrupted or has an invalid format.");
+                }
+            }
+        }
+
+        if (!warpsFile.exists() || !warpsFile.isFile()) {
+            warpStorage = new WarpStorage();
+            warpStorage.init();
+
+            try {
+                GSON.save(warpStorage, warpsFile);
+            } catch (IOException e) {
+                Chat.severe("&4" + e.getMessage());
+                if (debug) e.printStackTrace();
+                return false;
+            }
+        } else {
+            try {
+                warpStorage = GSON.load(warpsFile, WarpStorage.class);
+                if (warpStorage == null) throw new NullPointerException("WarpStorage is null");
+            } catch (Exception e) {
+                Chat.severe("&4" + e.getMessage());
+                if (debug) e.printStackTrace();
+
+                if (!backupFile(warpsFile)) return false;
+                Chat.warning("&4WarpStorage file is corrupted, creating new one");
+
+                warpStorage = new WarpStorage();
+                warpStorage.init();
+
+                try {
+                    GSON.save(warpStorage, warpsFile);
+                } catch (IOException e1) {
+                    Chat.severe("&4" + e1.getMessage());
+                    if (debug) e1.printStackTrace();
+                    return false;
+                }
+            }
+
+            if (warpStorage.completeMissing()) {
+                try {
+                    GSON.save(warpStorage, warpsFile);
+                } catch (IOException e) {
+                    Chat.severe("&4" + e.getMessage());
+                    if (debug) e.printStackTrace();
+                    return false;
+                }
+            }
+        }
+
+        if (!kitsFile.exists() || !kitsFile.isFile()) {
+            kitStorage = new KitStorage();
+            kitStorage.init();
+
+            try {
+                GSON.save(kitStorage, kitsFile);
+            } catch (IOException e) {
+                Chat.severe("&4" + e.getMessage());
+                if (debug) e.printStackTrace();
+                return false;
+            }
+        } else {
+            try {
+                kitStorage = GSON.load(kitsFile, KitStorage.class);
+                if (kitStorage == null) throw new NullPointerException(("KitStorage is null"));
+            } catch (Exception e) {
+                Chat.severe("&4" + e.getMessage());
+                if (debug) e.printStackTrace();
+
+                if (!backupFile(kitsFile)) return false;
+                Chat.warning("&4KitStorage file is corrupted, creating new one");
+
+                kitStorage = new KitStorage();
+                kitStorage.init();
+
+                try {
+                    GSON.save(kitStorage, kitsFile);
+                } catch (IOException e1) {
+                    Chat.severe("&4" + e1.getMessage());
+                    if (debug) e1.printStackTrace();
+                    return false;
+                }
+            }
+
+            if (kitStorage.completeMissing()) {
+                try {
+                    GSON.save(kitStorage, kitsFile);
+                } catch (IOException e) {
+                    Chat.severe("&4" + e.getMessage());
+                    if (debug) e.printStackTrace();
+                    return false;
                 }
             }
         }
@@ -665,15 +748,15 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             usermap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
             try {
-                serialize(usermapFile, usermap);
-            } catch (Exception e) {
+                GSON.save(usermap, usermapFile);
+            } catch (IOException e) {
                 Chat.severe("&cCannot save usermap.json");
                 Chat.severe("&4" + e.getMessage());
                 return false;
             }
         } else {
             try {
-                usermap = deserialize(usermapFile, HashMap.class);
+                usermap = GSON.load(usermapFile, TreeMap.class);
                 if (usermap == null) throw new NullPointerException("Usermap is null");
             } catch (Exception e) {
                 Chat.severe("&4" + e.getMessage());
@@ -685,96 +768,10 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                 usermap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
                 try {
-                    serialize(usermapFile, usermap);
-                } catch (Exception e1) {
+                    GSON.save(usermap, usermapFile);
+                } catch (IOException e1) {
                     Chat.severe("&cCannot save usermap.json");
                     if (debug) e1.printStackTrace();
-                    return false;
-                }
-            }
-        }
-
-        if (!warpsFile.exists() || !warpsFile.isFile()) {
-            warpStorage = new WarpStorage();
-
-            try {
-                serialize(warpsFile, warpStorage);
-            } catch (Exception e) {
-                Chat.severe("&4" + e.getMessage());
-                if (debug) e.printStackTrace();
-                return false;
-            }
-        } else {
-            try {
-                warpStorage = deserialize(warpsFile, WarpStorage.class);
-                if (warpStorage == null) throw new NullPointerException("WarpStorage is null");
-            } catch (Exception e) {
-                Chat.severe("&4" + e.getMessage());
-                if (debug) e.printStackTrace();
-
-                if (!backupFile(warpsFile)) return false;
-                Chat.warning("&4WarpStorage file is corrupted, creating new one");
-
-                warpStorage = new WarpStorage();
-
-                try {
-                    serialize(warpsFile, warpStorage);
-                } catch (Exception e1) {
-                    Chat.severe("&4" + e1.getMessage());
-                    if (debug) e1.printStackTrace();
-                    return false;
-                }
-            }
-
-            if (warpStorage.completeMissing()) {
-                try {
-                    serialize(warpsFile, warpStorage);
-                } catch (Exception e) {
-                    Chat.severe("&4" + e.getMessage());
-                    if (debug) e.printStackTrace();
-                    return false;
-                }
-            }
-        }
-
-        if (!kitsFile.exists() || !kitsFile.isFile()) {
-            kitStorage = new KitStorage();
-
-            try {
-                serialize(kitsFile, kitStorage);
-            } catch (Exception e) {
-                Chat.severe("&4" + e.getMessage());
-                if (debug) e.printStackTrace();
-                return false;
-            }
-        } else {
-            try {
-                kitStorage = deserialize(kitsFile, KitStorage.class);
-                if (kitStorage == null) throw new NullPointerException(("KitStorage is null"));
-            } catch (Exception e) {
-                Chat.severe("&4" + e.getMessage());
-                if (debug) e.printStackTrace();
-
-                if (!backupFile(kitsFile)) return false;
-                Chat.warning("&4KitStorage file is corrupted, creating new one");
-
-                kitStorage = new KitStorage();
-
-                try {
-                    serialize(kitsFile, kitStorage);
-                } catch (Exception e1) {
-                    Chat.severe("&4" + e1.getMessage());
-                    if (debug) e1.printStackTrace();
-                    return false;
-                }
-            }
-
-            if (kitStorage.completeMissing()) {
-                try {
-                    serialize(kitsFile, kitStorage);
-                } catch (Exception e) {
-                    Chat.severe("&4" + e.getMessage());
-                    if (debug) e.printStackTrace();
                     return false;
                 }
             }
@@ -824,7 +821,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     private void registerListeners() {
         listenerRegistry.registerListener(new PlayerPostTeleportListener(PlayerPostTeleportEvent.class, this), config.getEventPriority("PlayerPostTeleportEvent"), this);
         listenerRegistry.registerListener(new PlayerTeleportCancelledListener(PlayerTeleportCancelledEvent.class, this), config.getEventPriority("PlayerTeleportCancelledEvent"), this);
-        //listenerRegistry.registerListener(new PostCommandListener(CommandPostprocessEvent.class, this), config.getEventPriority("PostCommandEvent"), this);
+        listenerRegistry.registerListener(new PostCommandListener(PostCommandEvent.class, this), config.getEventPriority("PostCommandEvent"), this);
         listenerRegistry.registerListener(new AfkListener(AfkToggleEvent.class, this), config.getEventPriority("AfkToggleEvent"), this);
 
         listenerRegistry.registerListener(new EntityDamageListener(EntityDamageEvent.class, this), config.getEventPriority("EntityDamageEvent"), this);

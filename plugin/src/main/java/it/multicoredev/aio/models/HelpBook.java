@@ -41,7 +41,7 @@ public class HelpBook extends JsonConfig {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         if (permission == null) permission = false;
         if (name == null) name = "HelpBook";
         if (author == null) author = "AIO";
@@ -71,7 +71,7 @@ public class HelpBook extends JsonConfig {
         }
 
         @Override
-        protected void init() {
+        public void init() {
             if (lines == null) lines = new String[0];
         }
     }

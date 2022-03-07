@@ -71,7 +71,7 @@ public class FileStorage implements IStorage {
         if (!file.exists() || !file.isFile()) return false;
 
         try {
-            User user = AIO.deserialize(file, User.class);
+            User user = AIO.GSON.load(file, User.class);
             return user.validate();
         } catch (Exception e) {
             if (AIO.debug) e.printStackTrace();
@@ -116,7 +116,7 @@ public class FileStorage implements IStorage {
         File file = new File(usersDir, uuid + ".json");
 
         try {
-            return AIO.deserialize(file, User.class);
+            return AIO.GSON.load(file, User.class);
         } catch (Exception e) {
             if (AIO.debug) e.printStackTrace();
             return null;
@@ -145,7 +145,7 @@ public class FileStorage implements IStorage {
 
         for (File file : files) {
             try {
-                User user = AIO.deserialize(file, User.class);
+                User user = AIO.GSON.load(file, User.class);
                 if (user.getName().equalsIgnoreCase(name)) return user;
             } catch (Exception ignored) {
             }
@@ -168,9 +168,9 @@ public class FileStorage implements IStorage {
         File file = new File(usersDir, user.getUniqueId() + ".json");
 
         try {
-            AIO.serialize(file, user);
+            AIO.GSON.save(user, file);
             return true;
-        } catch (Exception e) {
+        } catch (IOException e) {
             if (AIO.debug) e.printStackTrace();
             return false;
         }
@@ -188,9 +188,9 @@ public class FileStorage implements IStorage {
         File file = new File(usersDir, user.getUniqueId() + ".json");
 
         try {
-            AIO.serialize(file, user);
+            AIO.GSON.save(user, file);
             return true;
-        } catch (Exception e) {
+        } catch (IOException e) {
             if (AIO.debug) e.printStackTrace();
             return false;
         }

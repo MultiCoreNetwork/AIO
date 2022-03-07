@@ -28,7 +28,7 @@ public class KitStorage extends JsonConfig {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         if (kits == null) kits = new ArrayList<>();
     }
 

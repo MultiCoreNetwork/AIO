@@ -36,7 +36,7 @@ public class StorageSection extends JsonConfig {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         if (storageType == null || (!storageType.equalsIgnoreCase(FILE) && !storageType.equalsIgnoreCase(MYSQL) && !storageType.equalsIgnoreCase(SQLITE))) storageType = FILE;
     }
 }

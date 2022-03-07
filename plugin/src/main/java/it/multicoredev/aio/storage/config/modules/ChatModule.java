@@ -39,7 +39,7 @@ public class ChatModule extends Module {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         if (chatFormat == null) chatFormat = "&f<&7{DISPLAYNAME}&f>&r {MESSAGE}";
         if (groupFormats == null) {
             groupFormats = new HashMap<>();

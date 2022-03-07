@@ -38,7 +38,7 @@ public class NicknameSection extends JsonConfig {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         if (nicknameBlacklist == null) nicknameBlacklist = new ArrayList<>();
         if (nicknameMaxLength == null) nicknameMaxLength = 32;
     }

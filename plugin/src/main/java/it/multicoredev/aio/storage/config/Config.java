@@ -79,7 +79,7 @@ public class Config extends JsonConfig {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         if (help == null) help = "https://github.com/MultiCoreNetwork/AIO/wiki"; //TODO
 
         if (modules == null) modules = ModuleManager.DEF_MODULES.values().stream().collect(Collectors.toMap(s -> s, s -> true));

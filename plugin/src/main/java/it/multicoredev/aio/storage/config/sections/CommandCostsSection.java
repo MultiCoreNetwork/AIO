@@ -37,7 +37,7 @@ public class CommandCostsSection extends JsonConfig {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         if (costsEnabled == null) costsEnabled = false;
         if (commandCosts == null) commandCosts = new HashMap<>();
     }

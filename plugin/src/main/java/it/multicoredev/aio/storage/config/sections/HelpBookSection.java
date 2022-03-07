@@ -37,7 +37,7 @@ public class HelpBookSection extends JsonConfig {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         if (defBook == null) defBook = "rules";
         if (firstJoinBooks == null) firstJoinBooks = new ArrayList<>();
     }

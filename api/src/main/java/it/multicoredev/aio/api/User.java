@@ -73,7 +73,7 @@ public class User extends JsonConfig {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         if (nickname == null) nickname = name;
         if (logins == null) logins = 1;
         if (playTime == null) playTime = 0L;

@@ -39,7 +39,7 @@ public class SpawnModule extends Module {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         if (respawnOverride == null) respawnOverride = false;
         if (spawnOnJoin == null) spawnOnJoin = false;
         if (teleportDelay == null) teleportDelay = -1L;
