@@ -323,8 +323,8 @@ public class TeleportManager implements ITeleportManager {
             }
 
             if (type == TeleportRequestType.TPA) {
-                Chat.send(pu.replacePlaceholders(localization.teleportRequestAccepted + " " + localization.stayStillFor, new String[]{"{NAME}", "{DISPLAYNAME}", "{SECONDS}"}, new Object[]{target.getName(), target.getDisplayName(), seconds}), target);
-                Chat.send(pu.replacePlaceholders(localization.targetAcceptedRequest, new String[]{"{NAME}", "{DISPLAYNAME}", "{SECONDS}"}, new Object[]{target.getName(), target.getDisplayName(), seconds}), requester);
+                Chat.send(pu.replacePlaceholders(localization.teleportRequestAccepted, new String[]{"{NAME}", "{DISPLAYNAME}", "{SECONDS}"}, new Object[]{target.getName(), target.getDisplayName(), seconds}), target);
+                Chat.send(pu.replacePlaceholders(localization.targetAcceptedRequest + " " + localization.stayStillFor, new String[]{"{NAME}", "{DISPLAYNAME}", "{SECONDS}"}, new Object[]{target.getName(), target.getDisplayName(), seconds}), requester);
                 teleport(requester, target.getLocation(), delay);
             } else if (type == TeleportRequestType.TPAHERE) {
                 Chat.send(pu.replacePlaceholders(localization.teleportRequestAccepted + " " + localization.stayStillFor, new String[]{"{NAME}", "{DISPLAYNAME}", "{SECONDS}"}, new Object[]{target.getName(), target.getDisplayName(), seconds}), target);
