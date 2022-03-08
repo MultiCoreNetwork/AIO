@@ -272,6 +272,11 @@ public class Commands extends JsonConfig {
                 "Request to a player to be teleported to him",
                 "/tpa [player]"
         ));
+        if (!commands.containsKey("tpacancel")) commands.put("tpacancel", new CommandData(
+                true,
+                "Cancel the last teleport request sent",
+                "/tpacancel"
+        ));
         if (!commands.containsKey("tpahere")) commands.put("tpahere", new CommandData(
                 true,
                 "Request to a player to be teleported to yourself",

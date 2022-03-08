@@ -14,7 +14,5 @@ package it.multicoredev.aio.api.tp;
  */
 public enum TeleportRequestType {
     TPA,
-    TPAHERE,
-    TPO,
-    TPOHERE
+    TPAHERE
 }

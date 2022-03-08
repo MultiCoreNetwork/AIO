@@ -880,6 +880,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         if (commands.isEnabled("sun")) commandRegistry.registerCommand(new SunCommand(this), this);
         if (commands.isEnabled("thunder")) commandRegistry.registerCommand(new ThunderCommand(this), this);
         if (commands.isEnabled("tpa")) commandRegistry.registerCommand(new TpaCommand(this), this);
+        if (commands.isEnabled("tpacancel")) commandRegistry.registerCommand(new TpacancelCommand(this), this);
         if (commands.isEnabled("tpahere")) commandRegistry.registerCommand(new TpahereCommand(this), this);
         if (commands.isEnabled("tpall")) commandRegistry.registerCommand(new TpallCommand(this), this);
         if (commands.isEnabled("tpyes")) commandRegistry.registerCommand(new TpyesCommand(this), this);

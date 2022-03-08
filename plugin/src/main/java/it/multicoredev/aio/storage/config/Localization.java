@@ -330,8 +330,10 @@ public class Localization extends JsonConfig {
     public String tpall;
     @SerializedName("tpall_self")
     public String tpallSelf;
+    @SerializedName("tp_request_canceled")
+    public String tpRequestCanceledRequester;
     @SerializedName("tpa_request_canceled")
-    public String tpaRequestCanceled;
+    public String tpRequestCanceledTarget;
     @SerializedName("tpa_request_sent")
     public String tpaRequestSent;
     @SerializedName("tpa_request_target")
@@ -562,7 +564,8 @@ public class Localization extends JsonConfig {
         if (damageOnTeleport == null) damageOnTeleport = "&cYou took damage! Teleport cancelled!";
         if (tpall == null) tpall = "&hYou have been teleported!";
         if (tpallSelf == null) tpallSelf = "&hYou teleported everyone to you.";
-        if (tpaRequestCanceled == null) tpaRequestCanceled = "&6{REQUESTER}'s teleport request has been cancelled.";
+        if (tpRequestCanceledRequester == null) tpRequestCanceledRequester = "&6You have canceled the request.";
+        if (tpRequestCanceledTarget == null) tpRequestCanceledTarget = "&6{REQUESTER}'s teleport request has been cancelled.";
         if (tpaRequestSent == null) tpaRequestSent = "&hYou sent a teleport request to {TARGET}. \n&e(/tpacancel for cancel)";
         if (tpaRequestTarget == null) tpaRequestTarget = "&hYou received a teleport request to you from {REQUESTER}. \n&e(/tpyes - /tpno)";
         if (tpahereRequestSent == null) tpahereRequestSent = "&hYou sent a teleport request to {TARGET}. \n&e(/tpacancel for cancel)";

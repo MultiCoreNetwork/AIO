@@ -2,6 +2,7 @@ package it.multicoredev.aio.commands.teleport.tp;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.tp.ITeleportManager;
+import it.multicoredev.aio.api.tp.TeleportRequest;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.command.CommandSender;
@@ -43,10 +44,14 @@ public class TpacancelCommand extends PluginCommand {
             return true;
         }
 
-        if (args.length < 1) {
-            //TODO
+        TeleportRequest request = aio.getTeleportManager().getRequesterTeleportRequest(requester);
+        if (request == null) {
+            Chat.send(localization.noSentTpRequest, requester);
+            return true;
         }
 
+        teleportManager.cancelTeleportRequest(request);
+        Chat.send(localization.tpRequestCanceledRequester, requester);
         return true;
     }
 }

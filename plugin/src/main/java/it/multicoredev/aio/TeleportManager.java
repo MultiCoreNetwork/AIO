@@ -249,7 +249,8 @@ public class TeleportManager implements ITeleportManager {
         Player target = request.getTarget();
         if (target != null) {
             AIO aio = (AIO) AIO.getInstance();
-            Chat.send(aio.getLocalization().tpaRequestCanceled, target);
+            IPlaceholdersUtils pu = aio.getPlaceholdersUtils();
+            Chat.send(pu.replacePlaceholders(aio.getLocalization().tpRequestCanceledTarget, "{REQUESTER}", request.getRequester().getName()), target);
         }
     }
 
