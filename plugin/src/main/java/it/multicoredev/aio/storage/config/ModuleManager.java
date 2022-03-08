@@ -1,13 +1,19 @@
 package it.multicoredev.aio.storage.config;
 
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonSyntaxException;
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.IModuleManager;
 import it.multicoredev.aio.api.Module;
-import it.multicoredev.aio.storage.config.modules.*;
+import it.multicoredev.mbcore.spigot.Chat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,21 +38,118 @@ import java.util.Map;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class ModuleManager implements IModuleManager {
-    public static final Map<Class<? extends Module>, String> DEF_MODULES = new HashMap<>();
     private final AIO aio;
+    private final File modulesDir;
     private final Map<String, Module> modules = new HashMap<>();
 
-    static {
-        DEF_MODULES.put(ChatModule.class, "chat");
-        DEF_MODULES.put(CommandAliasesModule.class, "command_aliases");
-        DEF_MODULES.put(EconomyModule.class, "economy");
-        DEF_MODULES.put(JoinQuitModule.class, "join_quit");
-        DEF_MODULES.put(PingModule.class, "ping");
-        DEF_MODULES.put(SpawnModule.class, "spawn");
+    public ModuleManager(AIO aio, File modulesDir) {
+        this.aio = aio;
+        this.modulesDir = modulesDir;
     }
 
-    public ModuleManager(AIO aio) {
-        this.aio = aio;
+    @Override
+    public boolean registerModule(@NotNull Module module) {
+        Preconditions.checkNotNull(module);
+
+        if (modules.containsKey(module.getName())) return false;
+        modules.put(module.getName(), module);
+        return true;
+    }
+
+    @Override
+    @Nullable
+    @SuppressWarnings("unchecked")
+    public <T extends Module> T getModule(@NotNull Class<T> module) {
+        Preconditions.checkNotNull(module);
+        return (T) modules.values()
+                .stream()
+                .filter(m -> m.getClass().equals(module))
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
+    @Nullable
+    @SuppressWarnings("unchecked")
+    public <T extends Module> T getModule(@NotNull String module) {
+        Preconditions.checkNotNull(module);
+
+        return (T) modules.getOrDefault(module, null);
+    }
+
+    @Override
+    public Collection<Module> getModules() {
+        return Collections.unmodifiableCollection(modules.values());
+    }
+
+    @Override
+    public boolean saveModule(@NotNull Class<? extends Module> module) {
+        Preconditions.checkNotNull(module);
+
+        Module mod = getModule(module);
+        if (mod == null) return false;
+
+        File moduleFile = new File(modulesDir, mod.getName() + ".json");
+        try {
+            AIO.gson.save(module, moduleFile);
+            return true;
+        } catch (IOException e) {
+            Chat.warning("&c" + e.getMessage());
+            if (AIO.debug) e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean saveModule(@NotNull String module) {
+        Preconditions.checkNotNull(module);
+
+        Module mod = modules.getOrDefault(module, null);
+        if (mod == null) return false;
+
+        File moduleFile = new File(modulesDir, mod.getName() + ".json");
+        try {
+            AIO.gson.save(module, moduleFile);
+            return true;
+        } catch (IOException e) {
+            Chat.warning("&c" + e.getMessage());
+            if (AIO.debug) e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean loadModule(@NotNull Class<? extends Module> module) {
+        Preconditions.checkNotNull(module);
+
+        Module mod = getModule(module);
+        if (mod == null) return false;
+
+        try {
+            modules.put(mod.getName(), AIO.gson.load(new File(modulesDir, mod.getName() + ".json"), module));
+            return true;
+        } catch (IOException | JsonSyntaxException e) {
+            Chat.warning("&c" + e.getMessage());
+            if (AIO.debug) e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean loadModule(@NotNull String module) {
+        Preconditions.checkNotNull(module);
+
+        Module mod = getModule(module);
+        if (mod == null) return false;
+
+        try {
+            modules.put(mod.getName(), AIO.gson.load(new File(modulesDir, mod.getName() + ".json"), mod.getClass()));
+            return true;
+        } catch (IOException | JsonSyntaxException e) {
+            Chat.warning("&c" + e.getMessage());
+            if (AIO.debug) e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
@@ -60,31 +163,56 @@ public class ModuleManager implements IModuleManager {
     }
 
     @Override
-    @Nullable
-    @SuppressWarnings("unchecked")
-    public <T> T getModule(@NotNull Class<? extends Module> type) {
-        Preconditions.checkNotNull(type);
+    public boolean isModuleEnabled(@NotNull Class<? extends Module> module) {
+        Preconditions.checkNotNull(module);
 
-        for (Module module : modules.values()) {
-            if (module.getClass().equals(type)) return (T) module;
-        }
-
-        return null;
+        Module mod = getModule(module);
+        if (mod == null) return false;
+        return aio.getConfiguration().modules.get(mod.getName());
     }
 
     @Override
-    public boolean registerModule(@NotNull Module module) {
+    public boolean isModuleEnabled(@NotNull String module) {
         Preconditions.checkNotNull(module);
 
-        if (modules.containsKey(module.getName())) return false;
-        modules.put(module.getName(), module);
-        return true;
+        Module mod = getModule(module);
+        if (mod == null) return false;
+        return aio.getConfiguration().modules.get(mod.getName());
     }
 
-    public boolean isModuleEnabled(@NotNull Class<? extends Module> type) {
-        Preconditions.checkNotNull(type);
-        Preconditions.checkArgument(DEF_MODULES.containsKey(type));
+    @Override
+    public File getModuleFile(@NotNull Class<? extends Module> module) {
+        Preconditions.checkNotNull(module);
 
-        return aio.getConfiguration().modules.get(DEF_MODULES.get(type));
+        Module mod = getModule(module);
+        if (mod == null) return null;
+        return new File(modulesDir, mod.getName() + ".json");
+    }
+
+    @Override
+    public File getModuleFile(@NotNull String module) {
+        Preconditions.checkNotNull(module);
+
+        Module mod = getModule(module);
+        if (mod == null) return null;
+        return new File(modulesDir, mod.getName() + ".json");
+    }
+
+    @Override
+    public boolean moduleFileExists(@NotNull Class<? extends Module> module) {
+        Preconditions.checkNotNull(module);
+
+        File file = getModuleFile(module);
+        if (file == null) return false;
+        return file.exists() && file.isFile();
+    }
+
+    @Override
+    public boolean moduleFileExists(@NotNull String module) {
+        Preconditions.checkNotNull(module);
+
+        File file = getModuleFile(module);
+        if (file == null) return false;
+        return file.exists() && file.isFile();
     }
 }

@@ -42,7 +42,6 @@ public abstract class Module extends JsonConfig {
         Preconditions.checkArgument(!name.trim().isEmpty());
 
         this.name = name.trim().toLowerCase();
-        this.init();
     }
 
     /**

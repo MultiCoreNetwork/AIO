@@ -3,6 +3,9 @@ package it.multicoredev.aio.api;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.util.Collection;
+
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
  * This file is part of AIO.
@@ -26,6 +29,73 @@ import org.jetbrains.annotations.Nullable;
 public interface IModuleManager {
 
     /**
+     * Register a module.
+     *
+     * @param module the module class to be registered.
+     * @return true if the module has been registered, false if a module with the same name is already registered.
+     */
+    boolean registerModule(@NotNull Module module);
+
+    /**
+     * Get the module instance given the type of the module.
+     * Return null if no module is found with that type.
+     *
+     * @param module the name of the module.
+     * @param <T>  the instance of the module.
+     * @return The instance of the module.
+     */
+    @Nullable <T extends Module> T getModule(@NotNull String module);
+
+    /**
+     * Get the module instance given the type of the module.
+     * Return null if no module is found with that type.
+     *
+     * @param module the class of the module.
+     * @param <T>  the instance of the module.
+     * @return The instance of the module.
+     */
+    @Nullable <T extends Module> T getModule(@NotNull Class<T> module);
+
+    /**
+     * Get a collection of all the modules registered.
+     *
+     * @return a collection of all the modules registered.
+     */
+    Collection<Module> getModules();
+
+    /**
+     * Save a module to file.
+     *
+     * @param module the class of the module to be saved.
+     * @return true if the module has been saved, otherwise false.
+     */
+    boolean saveModule(@NotNull Class<? extends Module> module);
+
+    /**
+     * Save a module to file.
+     *
+     * @param module the name of the module to be saved.
+     * @return true if the module has been saved, otherwise false.
+     */
+    boolean saveModule(@NotNull String module);
+
+    /**
+     * Load a module from file.
+     *
+     * @param module the class of the module to be loaded.
+     * @return true if the module has been loaded, otherwise false.
+     */
+    boolean loadModule(@NotNull Class<? extends Module> module);
+
+    /**
+     * Load a module from file.
+     *
+     * @param module the name of the module to be loaded.
+     * @return true if the module has been loaded, otherwise false.
+     */
+    boolean loadModule(@NotNull String module);
+
+    /**
      * Get the class of the module given the name.
      * Return null if no module is found with that name.
      *
@@ -35,20 +105,50 @@ public interface IModuleManager {
     @Nullable Class<? extends Module> getModuleClass(@NotNull String name);
 
     /**
-     * Get the module instance given the type of the module.
-     * Return null if no module is found with that type.
+     * Check if a module is enabled.
      *
-     * @param type the type of the module.
-     * @param <T>  the instance of the module.
-     * @return The instance of the module.
+     * @param module the class of the module.
+     * @return true if the module is enabled, otherwise false.
      */
-    @Nullable <T> T getModule(@NotNull Class<? extends Module> type);
+    boolean isModuleEnabled(@NotNull Class<? extends Module> module);
 
     /**
-     * Register a module.
+     * Check if a module is enabled.
      *
-     * @param module     the instance of the module to be registered.
-     * @return true if the module has been registered, false if it's not.
+     * @param module the name of the module.
+     * @return true if the module is enabled, otherwise false.
      */
-    boolean registerModule(@NotNull Module module);
+    boolean isModuleEnabled(@NotNull String module);
+
+    /**
+     * Get the file of a module.
+     *
+     * @param module the class of the module.
+     * @return the file of the module.
+     */
+    File getModuleFile(@NotNull Class<? extends Module> module);
+
+    /**
+     * Get the file of a module.
+     *
+     * @param module the name of the module.
+     * @return the file of the module.
+     */
+    File getModuleFile(@NotNull String module);
+
+    /**
+     * Check if a module file exists.
+     *
+     * @param module the class of the module.
+     * @return the name of the module.
+     */
+    boolean moduleFileExists(@NotNull Class<? extends Module> module);
+
+    /**
+     * Check if a module file exists.
+     *
+     * @param module
+     * @return
+     */
+    boolean moduleFileExists(@NotNull String module);
 }
