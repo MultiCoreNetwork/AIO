@@ -98,7 +98,7 @@ import java.util.*;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class AIO extends it.multicoredev.aio.api.AIO {
-    public static final GsonHelper GSON = new GsonHelper(new GsonBuilder()
+    public static final GsonHelper gson = new GsonHelper(new GsonBuilder()
             .setPrettyPrinting()
             .disableHtmlEscaping()
             .registerTypeAdapter(Location.class, new LocationAdapter())
@@ -145,7 +145,6 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     //TODO Improve argument completions
     //TODO Enchant disenchant commands change output msg enchant name
     //TODO Fly speed (Save also walk speed and set on Join)
-    //TODO Reset module name when loading
     //TODO Change command syntax to /command [on|off|toggle] [player]
     //TODO ALL Chat.send must have placeholderutils.replace....
     //TODO Add the ability to log transactions inside AIOEconomy
@@ -155,7 +154,8 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     public void onEnable() {
         aio = this;
 
-        moduleManager = new ModuleManager(this);
+        moduleManager = new ModuleManager(this, modulesDir);
+        registerModules();
 
         if (!initConfigs()) {
             onDisable();
@@ -313,7 +313,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     public static void saveAsync(Object obj, File file) {
         new Thread(() -> {
             try {
-                GSON.save(obj, file);
+                gson.save(obj, file);
             } catch (IOException e) {
                 Chat.warning("&c" + e.getMessage());
                 if (debug) e.printStackTrace();
@@ -400,6 +400,10 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         }, delay * 20));
     }
 
+    private void registerModules() {
+
+    }
+
     private boolean initConfigs() {
         if (!root.exists() || !root.isDirectory()) {
             if (!root.mkdirs()) {
@@ -413,7 +417,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             config.init();
 
             try {
-                GSON.save(config, configFile);
+                gson.save(config, configFile);
             } catch (IOException e) {
                 Chat.severe("&4" + e.getMessage());
                 if (debug) e.printStackTrace();
@@ -421,7 +425,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             }
         } else {
             try {
-                config = GSON.load(configFile, Config.class);
+                config = gson.load(configFile, Config.class);
                 if (config == null) throw new NullPointerException("Config is null");
             } catch (Exception e) {
                 Chat.severe("&4" + e.getMessage());
@@ -434,7 +438,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                 config.init();
 
                 try {
-                    GSON.save(config, configFile);
+                    gson.save(config, configFile);
                 } catch (IOException e1) {
                     Chat.severe("&4" + e.getMessage());
                     if (debug) e1.printStackTrace();
@@ -444,7 +448,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
             if (config.completeMissing()) {
                 try {
-                    GSON.save(config, configFile);
+                    gson.save(config, configFile);
                 } catch (IOException e) {
                     Chat.severe("&4" + e.getMessage());
                     if (debug) e.printStackTrace();
@@ -458,7 +462,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             localization.init();
 
             try {
-                GSON.save(localization, localizationFile);
+                gson.save(localization, localizationFile);
             } catch (IOException e) {
                 Chat.severe("&4" + e.getMessage());
                 if (debug) e.printStackTrace();
@@ -466,7 +470,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             }
         } else {
             try {
-                localization = GSON.load(localizationFile, Localization.class);
+                localization = gson.load(localizationFile, Localization.class);
                 if (localization == null) throw new NullPointerException("Localization is null");
             } catch (Exception e) {
                 Chat.severe("&4" + e.getMessage());
@@ -479,7 +483,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                 localization.init();
 
                 try {
-                    GSON.save(localization, localizationFile);
+                    gson.save(localization, localizationFile);
                 } catch (IOException e1) {
                     Chat.severe("&4" + e.getMessage());
                     if (debug) e1.printStackTrace();
@@ -489,7 +493,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
             if (localization.completeMissing()) {
                 try {
-                    GSON.save(localization, localizationFile);
+                    gson.save(localization, localizationFile);
                 } catch (IOException e) {
                     Chat.severe("&4" + e.getMessage());
                     if (debug) e.printStackTrace();
@@ -503,7 +507,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             commands.init();
 
             try {
-                GSON.save(commands, commandsFile);
+                gson.save(commands, commandsFile);
             } catch (Exception e) {
                 Chat.severe("&4" + e.getMessage());
                 if (debug) e.printStackTrace();
@@ -511,7 +515,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             }
         } else {
             try {
-                commands = GSON.load(commandsFile, Commands.class);
+                commands = gson.load(commandsFile, Commands.class);
                 if (commands == null) throw new NullPointerException("commands is null");
             } catch (Exception e) {
                 Chat.severe("&4" + e.getMessage());
@@ -524,7 +528,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                 commands.init();
 
                 try {
-                    GSON.save(commands, commandsFile);
+                    gson.save(commands, commandsFile);
                 } catch (IOException e1) {
                     Chat.severe("&4" + e.getMessage());
                     if (debug) e1.printStackTrace();
@@ -534,7 +538,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
             if (commands.completeMissing()) {
                 try {
-                    GSON.save(commands, commandsFile);
+                    gson.save(commands, commandsFile);
                 } catch (IOException e) {
                     Chat.severe("&4" + e.getMessage());
                     if (debug) e.printStackTrace();
@@ -549,6 +553,10 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                 return false;
             }
         }
+
+        moduleManager.getModules().forEach(module -> {
+            if (moduleManager.moduleFileExists(module))
+        });
 
         for (Map.Entry<Class<? extends Module>, String> entry : ModuleManager.DEF_MODULES.entrySet()) {
             String name = entry.getValue();
@@ -568,7 +576,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                 }
 
                 try {
-                    GSON.save(module, moduleFile);
+                    gson.save(module, moduleFile);
                 } catch (IOException e) {
                     Chat.severe("&4" + e.getMessage());
                     if (debug) e.printStackTrace();
@@ -580,7 +588,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                 Module module;
 
                 try {
-                    module = GSON.load(moduleFile, clazz);
+                    module = gson.load(moduleFile, clazz);
                     if (module == null) throw new NullPointerException("Module is null");
                 } catch (Exception e) {
                     Chat.severe("&4" + e.getMessage());
@@ -599,7 +607,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                     }
 
                     try {
-                        GSON.save(module, moduleFile);
+                        gson.save(module, moduleFile);
                     } catch (IOException e1) {
                         Chat.severe("&4" + e1.getMessage());
                         if (debug) e1.printStackTrace();
@@ -609,7 +617,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
                 if (module.completeMissing()) {
                     try {
-                        GSON.save(module, moduleFile);
+                        gson.save(module, moduleFile);
                     } catch (Exception e) {
                         Chat.severe("&4" + e.getMessage());
                         if (debug) e.printStackTrace();
@@ -635,12 +643,12 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                     continue;
 
                 try {
-                    HelpBook hb = GSON.load(hbf, HelpBook.class);
+                    HelpBook hb = gson.load(hbf, HelpBook.class);
                     if (hb == null) throw new NullPointerException("Helpbook " + hbf.getName() + " is null");
 
                     if (hb.completeMissing()) {
                         try {
-                            GSON.save(hb, hbf);
+                            gson.save(hb, hbf);
                         } catch (IOException e) {
                             Chat.warning("&4" + e.getMessage());
                             if (debug) e.printStackTrace();
@@ -659,7 +667,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             warpStorage.init();
 
             try {
-                GSON.save(warpStorage, warpsFile);
+                gson.save(warpStorage, warpsFile);
             } catch (IOException e) {
                 Chat.severe("&4" + e.getMessage());
                 if (debug) e.printStackTrace();
@@ -667,7 +675,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             }
         } else {
             try {
-                warpStorage = GSON.load(warpsFile, WarpStorage.class);
+                warpStorage = gson.load(warpsFile, WarpStorage.class);
                 if (warpStorage == null) throw new NullPointerException("WarpStorage is null");
             } catch (Exception e) {
                 Chat.severe("&4" + e.getMessage());
@@ -680,7 +688,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                 warpStorage.init();
 
                 try {
-                    GSON.save(warpStorage, warpsFile);
+                    gson.save(warpStorage, warpsFile);
                 } catch (IOException e1) {
                     Chat.severe("&4" + e1.getMessage());
                     if (debug) e1.printStackTrace();
@@ -690,7 +698,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
             if (warpStorage.completeMissing()) {
                 try {
-                    GSON.save(warpStorage, warpsFile);
+                    gson.save(warpStorage, warpsFile);
                 } catch (IOException e) {
                     Chat.severe("&4" + e.getMessage());
                     if (debug) e.printStackTrace();
@@ -704,7 +712,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             kitStorage.init();
 
             try {
-                GSON.save(kitStorage, kitsFile);
+                gson.save(kitStorage, kitsFile);
             } catch (IOException e) {
                 Chat.severe("&4" + e.getMessage());
                 if (debug) e.printStackTrace();
@@ -712,7 +720,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             }
         } else {
             try {
-                kitStorage = GSON.load(kitsFile, KitStorage.class);
+                kitStorage = gson.load(kitsFile, KitStorage.class);
                 if (kitStorage == null) throw new NullPointerException(("KitStorage is null"));
             } catch (Exception e) {
                 Chat.severe("&4" + e.getMessage());
@@ -725,7 +733,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                 kitStorage.init();
 
                 try {
-                    GSON.save(kitStorage, kitsFile);
+                    gson.save(kitStorage, kitsFile);
                 } catch (IOException e1) {
                     Chat.severe("&4" + e1.getMessage());
                     if (debug) e1.printStackTrace();
@@ -735,7 +743,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
             if (kitStorage.completeMissing()) {
                 try {
-                    GSON.save(kitStorage, kitsFile);
+                    gson.save(kitStorage, kitsFile);
                 } catch (IOException e) {
                     Chat.severe("&4" + e.getMessage());
                     if (debug) e.printStackTrace();
@@ -748,7 +756,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             usermap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
             try {
-                GSON.save(usermap, usermapFile);
+                gson.save(usermap, usermapFile);
             } catch (IOException e) {
                 Chat.severe("&cCannot save usermap.json");
                 Chat.severe("&4" + e.getMessage());
@@ -756,7 +764,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             }
         } else {
             try {
-                usermap = GSON.load(usermapFile, TreeMap.class);
+                usermap = gson.load(usermapFile, TreeMap.class);
                 if (usermap == null) throw new NullPointerException("Usermap is null");
             } catch (Exception e) {
                 Chat.severe("&4" + e.getMessage());
@@ -768,7 +776,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
                 usermap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
                 try {
-                    GSON.save(usermap, usermapFile);
+                    gson.save(usermap, usermapFile);
                 } catch (IOException e1) {
                     Chat.severe("&cCannot save usermap.json");
                     if (debug) e1.printStackTrace();
