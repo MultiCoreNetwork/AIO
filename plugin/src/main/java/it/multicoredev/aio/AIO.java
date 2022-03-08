@@ -555,10 +555,14 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         }
 
         moduleManager.getModules().forEach(module -> {
-            if (moduleManager.moduleFileExists(module))
+            if (moduleManager.moduleFileExists(module.getName())) {
+
+            } else {
+
+            }
         });
 
-        for (Map.Entry<Class<? extends Module>, String> entry : ModuleManager.DEF_MODULES.entrySet()) {
+        /*for (Map.Entry<Class<? extends Module>, String> entry : ModuleManager.DEF_MODULES.entrySet()) {
             String name = entry.getValue();
             Class<? extends Module> clazz = entry.getKey();
             File moduleFile = new File(modulesDir, name + ".json");
@@ -627,7 +631,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
                 if (config.modules.get(module.getName())) moduleManager.registerModule(module);
             }
-        }
+        }*/
 
         if (!helpbooksDir.exists() || !helpbooksDir.isDirectory()) {
             if (!helpbooksDir.mkdir()) {

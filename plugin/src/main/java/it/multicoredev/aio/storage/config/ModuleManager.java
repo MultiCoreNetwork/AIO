@@ -181,12 +181,38 @@ public class ModuleManager implements IModuleManager {
     }
 
     @Override
-    public boolean
-
-    boolean moduleFileExists(@NotNull Module module) {
+    public File getModuleFile(@NotNull Class<? extends Module> module) {
         Preconditions.checkNotNull(module);
 
-        File file = new File(modulesDir, module.getName() + ".json");
+        Module mod = getModule(module);
+        if (mod == null) return null;
+        return new File(modulesDir, mod.getName() + ".json");
+    }
+
+    @Override
+    public File getModuleFile(@NotNull String module) {
+        Preconditions.checkNotNull(module);
+
+        Module mod = getModule(module);
+        if (mod == null) return null;
+        return new File(modulesDir, mod.getName() + ".json");
+    }
+
+    @Override
+    public boolean moduleFileExists(@NotNull Class<? extends Module> module) {
+        Preconditions.checkNotNull(module);
+
+        File file = getModuleFile(module);
+        if (file == null) return false;
+        return file.exists() && file.isFile();
+    }
+
+    @Override
+    public boolean moduleFileExists(@NotNull String module) {
+        Preconditions.checkNotNull(module);
+
+        File file = getModuleFile(module);
+        if (file == null) return false;
         return file.exists() && file.isFile();
     }
 }
