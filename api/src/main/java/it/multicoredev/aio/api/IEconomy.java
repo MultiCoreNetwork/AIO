@@ -1,7 +1,9 @@
 package it.multicoredev.aio.api;
 
+import it.multicoredev.aio.api.models.User;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.OfflinePlayer;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.UUID;
@@ -214,7 +216,7 @@ public interface IEconomy {
      * @param amount Amount to withdraw
      * @return Detailed response of transaction
      */
-    EconomyResponse withdrawPlayer(User user, double amount);
+    EconomyResponse withdrawPlayer(@NotNull User user, double amount);
 
     /**
      * Withdraw an amount from a player - DO NOT USE NEGATIVE AMOUNTS
@@ -264,7 +266,7 @@ public interface IEconomy {
      * @param amount Amount to deposit
      * @return Detailed response of transaction
      */
-    EconomyResponse depositPlayer(User user, double amount);
+    EconomyResponse depositPlayer(@NotNull User user, double amount);
 
     /**
      * Deposit an amount to a player - DO NOT USE NEGATIVE AMOUNTS

@@ -1,7 +1,7 @@
 package it.multicoredev.aio.listeners.player;
 
 import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.api.User;
+import it.multicoredev.aio.api.models.User;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
 import it.multicoredev.aio.models.HelpBook;
 import it.multicoredev.aio.storage.config.modules.JoinQuitModule;
@@ -107,11 +107,11 @@ public class PlayerJoinListener extends PluginListenerExecutor<PlayerJoinEvent> 
 
         aio.addUserToCache(user);
 
-        if (config.modules.get("spawn")) {
+        if (aio.getModuleManager().isModuleEnabled(AIO.SPAWN_MODULE)) {
             if (!spawnModule(player, isNew)) return;
         }
 
-        if (config.modules.get("join_quit")) {
+        if (aio.getModuleManager().isModuleEnabled(AIO.JOIN_QUIT_MODULE)) {
             if (!joinQuitModule(event, isNew)) return;
         }
     }

@@ -3,7 +3,7 @@ package it.multicoredev.aio.storage.data;
 import com.google.common.base.Preconditions;
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.IStorage;
-import it.multicoredev.aio.api.User;
+import it.multicoredev.aio.api.models.User;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;

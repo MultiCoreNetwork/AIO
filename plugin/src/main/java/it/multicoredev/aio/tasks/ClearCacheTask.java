@@ -1,7 +1,7 @@
 package it.multicoredev.aio.tasks;
 
 import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.api.User;
+import it.multicoredev.aio.api.models.User;
 
 import java.util.ArrayList;
 import java.util.List;

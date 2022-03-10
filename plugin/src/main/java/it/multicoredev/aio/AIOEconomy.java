@@ -1,17 +1,17 @@
 package it.multicoredev.aio;
 
+import com.google.common.base.Preconditions;
 import it.multicoredev.aio.api.IEconomy;
 import it.multicoredev.aio.api.IStorage;
-import it.multicoredev.aio.api.User;
+import it.multicoredev.aio.api.models.User;
 import it.multicoredev.aio.storage.config.modules.EconomyModule;
+import it.multicoredev.mbcore.spigot.Chat;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.OfflinePlayer;
+import org.jetbrains.annotations.NotNull;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -79,21 +79,17 @@ public class AIOEconomy implements IEconomy {
 
     @Override
     public String formatWithCurrency(double amount) {
-        if (amount == 1) {
-            return format(amount) + currencyNameSingular();
-        } else {
-            return format(amount) + currencyNamePlural();
-        }
+        return format(amount) + economyModule.getCurrency(amount);
     }
 
     @Override
     public String currencyNamePlural() {
-        return aio.getLocalization().currencyPlural;
+        return economyModule.currencyPlural;
     }
 
     @Override
     public String currencyNameSingular() {
-        return aio.getLocalization().currencySingular;
+        return economyModule.currencySingular;
     }
 
     @Override
@@ -116,54 +112,119 @@ public class AIOEconomy implements IEconomy {
         return storage.userExists(offlinePlayer);
     }
 
+    /**
+     * Return 0 if the player is null.
+     */
     @Override
     public double getBalance(UUID uuid) {
-        return storage.getUser(uuid).getMoney();
+        try {
+            return Objects.requireNonNull(storage.getUser(uuid)).getMoney();
+        } catch (NullPointerException ignored) {
+            return 0;
+        }
     }
 
+    /**
+     * Return 0 if the player is null.
+     */
     @Override
     public double getBalance(String playerName) {
-        return storage.getUser(playerName).getMoney();
+        try {
+            return Objects.requireNonNull(storage.getUser(playerName)).getMoney();
+        } catch (NullPointerException ignored) {
+            return 0;
+        }
     }
 
+    /**
+     * Return 0 if the player is null.
+     */
     @Override
     public double getBalance(OfflinePlayer offlinePlayer) {
-        return storage.getUser(offlinePlayer).getMoney();
+        try {
+            return Objects.requireNonNull(storage.getUser(offlinePlayer)).getMoney();
+        } catch (NullPointerException ignored) {
+            return 0;
+        }
     }
 
+    /**
+     * Return 0 if the player is null.
+     */
     @Override
     public double getBalance(String playerName, String world) {
-        return storage.getUser(playerName).getMoney();
+        try {
+            return Objects.requireNonNull(storage.getUser(playerName)).getMoney();
+        } catch (NullPointerException ignored) {
+            return 0;
+        }
     }
 
+    /**
+     * Return 0 if the player is null.
+     */
     @Override
     public double getBalance(OfflinePlayer offlinePlayer, String world) {
-        return storage.getUser(offlinePlayer).getMoney();
+        try {
+            return Objects.requireNonNull(storage.getUser(offlinePlayer)).getMoney();
+        } catch (NullPointerException ignored) {
+            return 0;
+        }
     }
 
+    /**
+     * Return false if the player is null.
+     */
     @Override
     public boolean has(String playerName, double amount) {
-        return storage.getUser(playerName).getMoney() >= amount;
+        try {
+            return Objects.requireNonNull(storage.getUser(playerName)).getMoney() >= amount;
+        } catch (NullPointerException ignored) {
+            return false;
+        }
     }
 
+    /**
+     * Return false if the player is null.
+     */
     @Override
     public boolean has(OfflinePlayer offlinePlayer, double amount) {
-        return storage.getUser(offlinePlayer).getMoney() >= amount;
+        try {
+            return Objects.requireNonNull(storage.getUser(offlinePlayer)).getMoney() >= amount;
+        } catch (NullPointerException ignored) {
+            return false;
+        }
     }
 
+    /**
+     * Return false if the player is null.
+     */
     @Override
     public boolean has(String playerName, String worldName, double amount) {
-        return storage.getUser(playerName).getMoney() >= amount;
+        try {
+            return Objects.requireNonNull(storage.getUser(playerName)).getMoney() >= amount;
+        } catch (NullPointerException ignored) {
+            return false;
+        }
     }
 
+    /**
+     * Return false if the player is null.
+     */
     @Override
     public boolean has(OfflinePlayer offlinePlayer, String worldName, double amount) {
-        return storage.getUser(offlinePlayer).getMoney() >= amount;
+        try {
+            return Objects.requireNonNull(storage.getUser(offlinePlayer)).getMoney() >= amount;
+        } catch (NullPointerException ignored) {
+            return false;
+        }
     }
 
     @Override
     public EconomyResponse setPlayerMoney(UUID uuid, double amount) {
         User user = storage.getUser(uuid);
+        if (user == null) return new EconomyResponse(amount, 0, EconomyResponse.ResponseType.FAILURE, aio.getLocalization().playerNotFound);
+
         user.setMoney(amount);
         boolean result = storage.updateUser(user);
         if (result) return new EconomyResponse(amount, amount, EconomyResponse.ResponseType.SUCCESS, aio.getLocalization().moneySet);
@@ -171,7 +232,9 @@ public class AIOEconomy implements IEconomy {
     }
 
     @Override
-    public EconomyResponse withdrawPlayer(User user, double amount) {
+    public EconomyResponse withdrawPlayer(@NotNull User user, double amount) {
+        Preconditions.checkNotNull(user);
+
         double newMoney = user.getMoney() - amount;
 
         if (newMoney < economyModule.minMoney) return new EconomyResponse(
@@ -182,37 +245,58 @@ public class AIOEconomy implements IEconomy {
 
         user.withdrawMoney(amount);
         boolean result = storage.updateUser(user);
-        if (result) return new EconomyResponse(amount, newMoney, EconomyResponse.ResponseType.SUCCESS, aio.getLocalization().moneyWithdrawn);
-        else return new EconomyResponse(amount, user.getMoney(), EconomyResponse.ResponseType.FAILURE, aio.getLocalization().moneyNotWithdrawn);
+        if (result) {
+            if (economyModule.logTransactions) Chat.info(String.format("&3%s withdrawn from %s's account. Current balance: %s", formatWithCurrency(amount), user.getName(), formatWithCurrency(user.getMoney())));
+            return new EconomyResponse(amount, newMoney, EconomyResponse.ResponseType.SUCCESS, aio.getLocalization().moneyWithdrawn);
+        } else {
+            return new EconomyResponse(amount, user.getMoney(), EconomyResponse.ResponseType.FAILURE, aio.getLocalization().moneyNotWithdrawn);
+        }
     }
 
     @Override
     public EconomyResponse withdrawPlayer(UUID uuid, double amount) {
-        return withdrawPlayer(storage.getUser(uuid), amount);
+        User user = storage.getUser(uuid);
+        if (user == null) return new EconomyResponse(amount, 0, EconomyResponse.ResponseType.FAILURE, aio.getLocalization().playerNotFound);
+
+        return withdrawPlayer(user, amount);
     }
 
     @Override
     public EconomyResponse withdrawPlayer(String playerName, double amount) {
-        return withdrawPlayer(storage.getUser(playerName), amount);
+        User user = storage.getUser(playerName);
+        if (user == null) return new EconomyResponse(amount, 0, EconomyResponse.ResponseType.FAILURE, aio.getLocalization().playerNotFound);
+
+        return withdrawPlayer(user, amount);
     }
 
     @Override
     public EconomyResponse withdrawPlayer(OfflinePlayer offlinePlayer, double amount) {
-        return withdrawPlayer(storage.getUser(offlinePlayer), amount);
+        User user = storage.getUser(offlinePlayer);
+        if (user == null) return new EconomyResponse(amount, 0, EconomyResponse.ResponseType.FAILURE, aio.getLocalization().playerNotFound);
+
+        return withdrawPlayer(user, amount);
     }
 
     @Override
     public EconomyResponse withdrawPlayer(String playerName, String worldName, double amount) {
-        return withdrawPlayer(storage.getUser(playerName), amount);
+        User user = storage.getUser(playerName);
+        if (user == null) return new EconomyResponse(amount, 0, EconomyResponse.ResponseType.FAILURE, aio.getLocalization().playerNotFound);
+
+        return withdrawPlayer(user, amount);
     }
 
     @Override
     public EconomyResponse withdrawPlayer(OfflinePlayer offlinePlayer, String worldName, double amount) {
-        return withdrawPlayer(storage.getUser(offlinePlayer), amount);
+        User user = storage.getUser(offlinePlayer);
+        if (user == null) return new EconomyResponse(amount, 0, EconomyResponse.ResponseType.FAILURE, aio.getLocalization().playerNotFound);
+
+        return withdrawPlayer(user, amount);
     }
 
     @Override
-    public EconomyResponse depositPlayer(User user, double amount) {
+    public EconomyResponse depositPlayer(@NotNull User user, double amount) {
+        Preconditions.checkNotNull(user);
+
         double newMoney = user.getMoney() + amount;
 
         if (newMoney > economyModule.maxMoney) return new EconomyResponse(
@@ -224,33 +308,52 @@ public class AIOEconomy implements IEconomy {
 
         user.depositMoney(amount);
         boolean result = storage.updateUser(user);
-        if (result) return new EconomyResponse(amount, newMoney, EconomyResponse.ResponseType.SUCCESS, aio.getLocalization().moneyDeposited);
-        else return new EconomyResponse(amount, user.getMoney(), EconomyResponse.ResponseType.FAILURE, aio.getLocalization().moneyNotDeposited);
+        if (result) {
+            if (economyModule.logTransactions) Chat.info(String.format("&3%s deposited to %s's account. Current balance: %s", formatWithCurrency(amount), user.getName(), formatWithCurrency(user.getMoney())));
+            return new EconomyResponse(amount, newMoney, EconomyResponse.ResponseType.SUCCESS, aio.getLocalization().moneyDeposited);
+        } else {
+            return new EconomyResponse(amount, user.getMoney(), EconomyResponse.ResponseType.FAILURE, aio.getLocalization().moneyNotDeposited);
+        }
     }
 
     @Override
     public EconomyResponse depositPlayer(UUID uuid, double amount) {
-        return depositPlayer(storage.getUser(uuid), amount);
+        User user = storage.getUser(uuid);
+        if (user == null) return new EconomyResponse(amount, 0, EconomyResponse.ResponseType.FAILURE, aio.getLocalization().playerNotFound);
+
+        return depositPlayer(user, amount);
     }
 
     @Override
     public EconomyResponse depositPlayer(String playerName, double amount) {
-        return depositPlayer(storage.getUser(playerName), amount);
+        User user = storage.getUser(playerName);
+        if (user == null) return new EconomyResponse(amount, 0, EconomyResponse.ResponseType.FAILURE, aio.getLocalization().playerNotFound);
+
+        return depositPlayer(user, amount);
     }
 
     @Override
     public EconomyResponse depositPlayer(OfflinePlayer offlinePlayer, double amount) {
-        return depositPlayer(storage.getUser(offlinePlayer), amount);
+        User user = storage.getUser(offlinePlayer);
+        if (user == null) return new EconomyResponse(amount, 0, EconomyResponse.ResponseType.FAILURE, aio.getLocalization().playerNotFound);
+
+        return depositPlayer(user, amount);
     }
 
     @Override
     public EconomyResponse depositPlayer(String playerName, String worldName, double amount) {
-        return depositPlayer(storage.getUser(playerName), amount);
+        User user = storage.getUser(playerName);
+        if (user == null) return new EconomyResponse(amount, 0, EconomyResponse.ResponseType.FAILURE, aio.getLocalization().playerNotFound);
+
+        return depositPlayer(user, amount);
     }
 
     @Override
     public EconomyResponse depositPlayer(OfflinePlayer offlinePlayer, String worldName, double amount) {
-        return depositPlayer(storage.getUser(offlinePlayer), amount);
+        User user = storage.getUser(offlinePlayer);
+        if (user == null) return new EconomyResponse(amount, 0, EconomyResponse.ResponseType.FAILURE, aio.getLocalization().playerNotFound);
+
+        return depositPlayer(user, amount);
     }
 
     private EconomyResponse notImplemented() {

@@ -1,7 +1,7 @@
 package it.multicoredev.aio.storage.config.modules;
 
 import com.google.gson.annotations.SerializedName;
-import it.multicoredev.aio.api.Module;
+import it.multicoredev.aio.api.models.Module;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +40,10 @@ public class EconomyModule extends Module {
     public Boolean logTransactions;
     @SerializedName("minimum_pay_amount")
     public Double minPayAmount;
+    @SerializedName("currency_singular")
+    public String currencySingular;
+    @SerializedName("currency_plural")
+    public String currencyPlural;
 
     public EconomyModule() {
         super("economy");
@@ -54,10 +58,17 @@ public class EconomyModule extends Module {
         if (minMoney == null) minMoney = 0d;
         if (logTransactions == null) logTransactions = true;
         if (minPayAmount == null) minPayAmount = 0.01;
+        if (currencySingular == null) currencySingular = "$";
+        if (currencyPlural == null) currencyPlural = "$";
     }
 
     @Override
     public boolean isValid() {
         return true;
+    }
+
+    public String getCurrency(double amount) {
+        if (amount == 1) return currencySingular;
+        else return currencyPlural;
     }
 }

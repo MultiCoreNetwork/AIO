@@ -1,7 +1,7 @@
 package it.multicoredev.aio.commands.teleport.home;
 
 import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.api.User;
+import it.multicoredev.aio.api.models.User;
 import it.multicoredev.aio.api.models.Home;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.mbcore.spigot.Chat;

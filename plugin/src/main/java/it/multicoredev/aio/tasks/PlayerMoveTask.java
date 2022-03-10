@@ -2,7 +2,7 @@ package it.multicoredev.aio.tasks;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.IStorage;
-import it.multicoredev.aio.api.User;
+import it.multicoredev.aio.api.models.User;
 import it.multicoredev.aio.api.tp.ITeleportManager;
 import it.multicoredev.aio.storage.config.Config;
 import it.multicoredev.aio.storage.config.Localization;

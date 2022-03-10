@@ -31,11 +31,6 @@ import java.util.stream.Collectors;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class Config extends JsonConfig {
-    private String help;
-    public Map<String, Boolean> modules;
-    @SerializedName("event_priorities")
-    public Map<String, String> eventPriorities;
-
     @SerializedName("storage")
     public StorageSection storageSection;
     @SerializedName("command_costs")
@@ -72,6 +67,9 @@ public class Config extends JsonConfig {
     @SerializedName("save_players_data")
     public Long savePlayersData;
 
+    @SerializedName("event_priorities")
+    public Map<String, String> eventPriorities;
+
     public Boolean debug;
 
     public Config() {
@@ -80,9 +78,25 @@ public class Config extends JsonConfig {
 
     @Override
     public void init() {
-        if (help == null) help = "https://github.com/MultiCoreNetwork/AIO/wiki"; //TODO
+        if (storageSection == null) storageSection = new StorageSection();
+        if (commandCosts == null) commandCosts = new CommandCostsSection();
+        if (commandCooldown == null) commandCooldown = new CommandCooldownSection();
+        if (helpBookSection == null) helpBookSection = new HelpBookSection();
+        if (nicknameSection == null) nicknameSection = new NicknameSection();
+        if (rtpSection == null) rtpSection = new RTPSection();
+        if (afkSection == null) afkSection = new AfkSection();
 
-        if (modules == null) modules = ModuleManager.DEF_MODULES.values().stream().collect(Collectors.toMap(s -> s, s -> true));
+        if (backTeleportDelay == null) backTeleportDelay = -1L;
+        if (defaultHomeLimit == null) defaultHomeLimit = 3;
+        if (homeTeleportDelay == null) homeTeleportDelay = -1L;
+        //TODO Fix unit
+        if (teleportRequestDelay == null) teleportRequestDelay = 300L;
+        if (warpTeleportDelay == null) warpTeleportDelay = -1L;
+        if (disablePlayerDeathMessages == null) disablePlayerDeathMessages = false;
+        if (disableGodOnJoin == null) disableGodOnJoin = false;
+        if (suicideBroadcast == null) suicideBroadcast = true;
+        if (clearPlayersCache == null) clearPlayersCache = 12000L;
+        if (savePlayersData == null) savePlayersData = 6000L;
 
         if (eventPriorities == null) eventPriorities = new HashMap<>();
         if (!eventPriorities.containsKey("PlayerPostTeleportEvent")) eventPriorities.put("PlayerPostTeleportEvent", "LOWEST");
@@ -107,26 +121,6 @@ public class Config extends JsonConfig {
         if (!eventPriorities.containsKey("PlayerQuitEvent")) eventPriorities.put("PlayerQuitEvent", "LOWEST");
         if (!eventPriorities.containsKey("PlayerRespawnEvent")) eventPriorities.put("PlayerRespawnEvent", "LOWEST");
         if (!eventPriorities.containsKey("PlayerTeleportEvent")) eventPriorities.put("PlayerTeleportEvent", "LOWEST");
-
-        if (storageSection == null) storageSection = new StorageSection();
-        if (commandCosts == null) commandCosts = new CommandCostsSection();
-        if (commandCooldown == null) commandCooldown = new CommandCooldownSection();
-        if (helpBookSection == null) helpBookSection = new HelpBookSection();
-        if (nicknameSection == null) nicknameSection = new NicknameSection();
-        if (rtpSection == null) rtpSection = new RTPSection();
-        if (afkSection == null) afkSection = new AfkSection();
-
-        if (backTeleportDelay == null) backTeleportDelay = -1L;
-        if (defaultHomeLimit == null) defaultHomeLimit = 3;
-        if (homeTeleportDelay == null) homeTeleportDelay = -1L;
-        //TODO Fix unit
-        if (teleportRequestDelay == null) teleportRequestDelay = 300L;
-        if (warpTeleportDelay == null) warpTeleportDelay = -1L;
-        if (disablePlayerDeathMessages == null) disablePlayerDeathMessages = false;
-        if (disableGodOnJoin == null) disableGodOnJoin = false;
-        if (suicideBroadcast == null) suicideBroadcast = true;
-        if (clearPlayersCache == null) clearPlayersCache = 12000L;
-        if (savePlayersData == null) savePlayersData = 6000L;
 
         if (debug == null) debug = false;
     }

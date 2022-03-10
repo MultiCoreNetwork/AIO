@@ -125,7 +125,7 @@ public class EconomyCommand extends PluginCommand {
                 }
             } else if (response.type.equals(EconomyResponse.ResponseType.FAILURE)) {
                 Chat.send(localization.commandException, sender);
-                Chat.warning(String.format("&eFailed to deposit %s%s to %s's account. Reason: %s", economy.format(amount), localization.getCurrency(amount), targetUuid, response.errorMessage));
+                Chat.warning(String.format("&eFailed to deposit %s to %s's account. Reason: %s", economy.formatWithCurrency(amount), targetUuid, response.errorMessage));
             }
         }
 
@@ -190,11 +190,10 @@ public class EconomyCommand extends PluginCommand {
                 }
             } else if (response.type.equals(EconomyResponse.ResponseType.FAILURE)) {
                 Chat.send(localization.commandException, sender);
-                Chat.warning(String.format("&eFailed to withdraw %s%s to %s's account. Reason: %s", economy.format(amount), localization.getCurrency(amount), targetUuid, response.errorMessage));
+                Chat.warning(String.format("&eFailed to withdraw %s to %s's account. Reason: %s", economy.formatWithCurrency(amount), targetUuid, response.errorMessage));
             }
         }
 
-        //TODO Add ability to set it to multiple players
         return true;
     }
 
@@ -247,10 +246,9 @@ public class EconomyCommand extends PluginCommand {
             }
         } else if (response.type.equals(EconomyResponse.ResponseType.FAILURE)) {
             Chat.send(localization.commandException, sender);
-            Chat.warning(String.format("&eFailed to set %s%s to %s's account. Reason: %s", economy.format(amount), localization.getCurrency(amount), targetUuid, response.errorMessage));
+            Chat.warning(String.format("&eFailed to set %s to %s's account. Reason: %s", economy.formatWithCurrency(amount), targetUuid, response.errorMessage));
         }
 
-        //TODO Add ability to set it to multiple players
         return true;
     }
 
@@ -288,10 +286,9 @@ public class EconomyCommand extends PluginCommand {
             }
         } else if (response.type.equals(EconomyResponse.ResponseType.FAILURE)) {
             Chat.send(localization.commandException, sender);
-            Chat.warning(String.format("&eFailed to set %s%s to %s's account. Reason: %s", economy.format(amount), localization.getCurrency(amount), targetUuid, response.errorMessage));
+            Chat.warning(String.format("&eFailed to set %s to %s's account. Reason: %s", economy.formatWithCurrency(amount), targetUuid, response.errorMessage));
         }
 
-        //TODO Add ability to set it to multiple players
         return true;
     }
 

@@ -1,8 +1,7 @@
-package it.multicoredev.aio.api;
+package it.multicoredev.aio.api.models;
 
 import com.google.gson.annotations.SerializedName;
 import it.multicoredev.aio.api.events.AfkToggleEvent;
-import it.multicoredev.aio.api.models.Home;
 import it.multicoredev.mclib.json.JsonConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

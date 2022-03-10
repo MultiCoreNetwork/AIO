@@ -3,14 +3,18 @@ package it.multicoredev.aio;
 import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
 import com.google.gson.GsonBuilder;
-import it.multicoredev.aio.api.Module;
-import it.multicoredev.aio.api.*;
+import it.multicoredev.aio.api.ICommandRegistry;
+import it.multicoredev.aio.api.IEconomy;
+import it.multicoredev.aio.api.IModuleManager;
+import it.multicoredev.aio.api.IStorage;
 import it.multicoredev.aio.api.events.AfkToggleEvent;
 import it.multicoredev.aio.api.events.PlayerPostTeleportEvent;
 import it.multicoredev.aio.api.events.PlayerTeleportCancelledEvent;
 import it.multicoredev.aio.api.events.PostCommandEvent;
 import it.multicoredev.aio.api.listeners.IListenerRegistry;
 import it.multicoredev.aio.api.models.CommandData;
+import it.multicoredev.aio.api.models.Module;
+import it.multicoredev.aio.api.models.User;
 import it.multicoredev.aio.api.tp.ITeleportManager;
 import it.multicoredev.aio.api.utils.IPlaceholdersUtils;
 import it.multicoredev.aio.commands.AIOCommand;
@@ -155,7 +159,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     //TODO ALL Chat.send must have placeholderutils.replace....
     //TODO Add the ability to log transactions inside AIOEconomy
     //TODO Use this everywhere !hasSubPerm(sender, "other") && !sender.equals(target)
-    //TODO Runlater command should send feedback when the comman is executed
+    //TODO Runlater command should send feedback when the command is executed
 
     @Override
     public void onEnable() {
@@ -893,9 +897,6 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     }
 
     private void logPluginSettings() {
-        Chat.info("&eAIO modules:");
-        config.modules.forEach((module, enabled) -> Chat.info("&b" + module + (enabled ? " &2enabled" : " &4disabled") + "&b."));
-
         Chat.info("&eAIO listeners:");
         config.eventPriorities.forEach((event, priority) -> Chat.info("&b" + event + " &e" + priority + "&b priority."));
     }

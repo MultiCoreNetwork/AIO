@@ -1,7 +1,7 @@
 package it.multicoredev.aio.listeners.player;
 
 import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.api.User;
+import it.multicoredev.aio.api.models.User;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

@@ -4,14 +4,13 @@ import com.google.common.base.Preconditions;
 import com.google.gson.JsonSyntaxException;
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.IModuleManager;
-import it.multicoredev.aio.api.Module;
+import it.multicoredev.aio.api.models.Module;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -168,7 +167,7 @@ public class ModuleManager implements IModuleManager {
 
         Module mod = getModule(module);
         if (mod == null) return false;
-        return aio.getConfiguration().modules.get(mod.getName());
+        return mod.isEnabled();
     }
 
     @Override
@@ -177,7 +176,7 @@ public class ModuleManager implements IModuleManager {
 
         Module mod = getModule(module);
         if (mod == null) return false;
-        return aio.getConfiguration().modules.get(mod.getName());
+        return mod.isEnabled();
     }
 
     @Override

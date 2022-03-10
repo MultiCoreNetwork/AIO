@@ -1,5 +1,6 @@
 package it.multicoredev.aio.api;
 
+import it.multicoredev.aio.api.models.User;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;

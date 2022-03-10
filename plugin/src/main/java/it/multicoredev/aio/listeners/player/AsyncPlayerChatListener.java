@@ -1,7 +1,7 @@
 package it.multicoredev.aio.listeners.player;
 
 import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.api.User;
+import it.multicoredev.aio.api.models.User;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
 import it.multicoredev.aio.storage.config.modules.ChatModule;
 import it.multicoredev.aio.storage.config.modules.PingModule;
@@ -65,9 +65,9 @@ public class AsyncPlayerChatListener extends PluginListenerExecutor<AsyncPlayerC
             return null;
         });
 
-        if (config.modules.get("chat")) chatModule(event);
+        if (aio.getModuleManager().isModuleEnabled(AIO.CHAT_MODULE)) chatModule(event);
 
-        if (config.modules.get("ping")) {
+        if (aio.getModuleManager().isModuleEnabled(AIO.PING_MODULE)) {
             if (!pingModule(event)) return;
         }
     }

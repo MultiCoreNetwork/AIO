@@ -2,7 +2,7 @@ package it.multicoredev.aio.utils.placeholders;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.IStorage;
-import it.multicoredev.aio.api.User;
+import it.multicoredev.aio.api.models.User;
 import it.multicoredev.aio.storage.config.Localization;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;

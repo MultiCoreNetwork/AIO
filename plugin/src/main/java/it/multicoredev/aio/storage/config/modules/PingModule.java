@@ -1,7 +1,7 @@
 package it.multicoredev.aio.storage.config.modules;
 
 import com.google.gson.annotations.SerializedName;
-import it.multicoredev.aio.api.Module;
+import it.multicoredev.aio.api.models.Module;
 
 import java.util.Arrays;
 import java.util.List;

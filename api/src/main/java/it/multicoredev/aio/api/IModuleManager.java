@@ -1,5 +1,6 @@
 package it.multicoredev.aio.api;
 
+import it.multicoredev.aio.api.models.Module;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

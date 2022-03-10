@@ -30,10 +30,6 @@ public class Localization extends JsonConfig {
     public String commandCooldown;
     @SerializedName("command_exception")
     public String commandException;
-    @SerializedName("currency_singular")
-    public String currencySingular;
-    @SerializedName("currency_plural")
-    public String currencyPlural;
     public String day;
     public String days;
     public String hour;
@@ -404,8 +400,6 @@ public class Localization extends JsonConfig {
         if (localization == null) localization = "us";
         if (commandCooldown == null) commandCooldown = "&cYou have to wait {TIME} to use this command again.";
         if (commandException == null) commandException = "&cThis command throw an exception! Check the console for more info.";
-        if (currencySingular == null) currencySingular = "$";
-        if (currencyPlural == null) currencyPlural = "$";
         if (day == null) day = "day";
         if (days == null) days = "days";
         if (hour == null) hour = "hour";
@@ -611,10 +605,5 @@ public class Localization extends JsonConfig {
         if (afkLeaveBroadcastOthers == null) afkLeaveBroadcastOthers = "&h{PLAYER} is no longer AFK.";
         if (afkPlaceholderReplacement == null) afkPlaceholderReplacement = "&7[AFK]&r";
         if (afkDisplayNamePrefix == null) afkDisplayNamePrefix = "&7[AFK] &r";
-    }
-
-    public String getCurrency(double amount) {
-        if (amount == 1) return currencySingular;
-        else return currencyPlural;
     }
 }

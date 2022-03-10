@@ -1,6 +1,6 @@
 package it.multicoredev.aio.storage.config.modules;
 
-import it.multicoredev.aio.api.Module;
+import it.multicoredev.aio.api.models.Module;
 import it.multicoredev.aio.models.CommandAliases;
 
 import java.util.ArrayList;

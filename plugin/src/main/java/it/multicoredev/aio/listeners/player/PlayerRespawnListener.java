@@ -37,7 +37,7 @@ public class PlayerRespawnListener extends PluginListenerExecutor<PlayerRespawnE
 
     @Override
     public void onEvent(@NotNull PlayerRespawnEvent event) {
-        if (config.modules.get("spawn")) {
+        if (aio.getModuleManager().isModuleEnabled(AIO.SPAWN_MODULE)) {
             if (!spawnModule(event)) return;
         }
     }

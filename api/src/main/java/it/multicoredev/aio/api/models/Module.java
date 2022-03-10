@@ -1,8 +1,9 @@
-package it.multicoredev.aio.api;
+package it.multicoredev.aio.api.models;
 
 import com.google.common.base.Preconditions;
 import com.google.gson.*;
 import com.google.gson.annotations.JsonAdapter;
+import it.multicoredev.aio.api.AIO;
 import it.multicoredev.mclib.json.JsonConfig;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,6 +32,7 @@ import java.lang.reflect.Type;
 @JsonAdapter(Module.Adapter.class)
 public abstract class Module extends JsonConfig {
     protected String name;
+    protected boolean enabled;
 
     /**
      * Create a new module.
@@ -42,6 +44,7 @@ public abstract class Module extends JsonConfig {
         Preconditions.checkArgument(!name.trim().isEmpty());
 
         this.name = name.trim().toLowerCase();
+        this.enabled = true;
     }
 
     /**
@@ -51,6 +54,26 @@ public abstract class Module extends JsonConfig {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Check if this module is enabled.
+     *
+     * @return true if this module is enabled, otherwise false.
+     */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * Enable or disable this module.
+     *
+     * @param enabled true to enable this module, otherwise false.
+     * @return this object.
+     */
+    public Module setEnabled(boolean enabled) {
+        this.enabled = enabled;
+        return this;
     }
 
     /**
