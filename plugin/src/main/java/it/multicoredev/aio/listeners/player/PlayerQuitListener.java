@@ -37,7 +37,7 @@ public class PlayerQuitListener extends PluginListenerExecutor<PlayerQuitEvent> 
 
     public PlayerQuitListener(Class<PlayerQuitEvent> eventClass, AIO aio) {
         super(eventClass, aio);
-        this.joinAndQuitModule = aio.getModuleManager().getModule(JoinQuitModule.class);
+        this.joinAndQuitModule = aio.getModuleManager().getModule(AIO.JOIN_QUIT_MODULE);
     }
 
     @Override

@@ -32,7 +32,7 @@ public class PlayerRespawnListener extends PluginListenerExecutor<PlayerRespawnE
 
     public PlayerRespawnListener(Class<PlayerRespawnEvent> eventClass, AIO aio) {
         super(eventClass, aio);
-        this.spawnModule = aio.getModuleManager().getModule(SpawnModule.class);
+        this.spawnModule = aio.getModuleManager().getModule(AIO.SPAWN_MODULE);
     }
 
     @Override

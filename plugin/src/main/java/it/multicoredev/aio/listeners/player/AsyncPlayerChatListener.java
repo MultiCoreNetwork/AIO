@@ -49,8 +49,8 @@ public class AsyncPlayerChatListener extends PluginListenerExecutor<AsyncPlayerC
 
     public AsyncPlayerChatListener(Class<AsyncPlayerChatEvent> eventClass, AIO aio) {
         super(eventClass, aio);
-        chatModule = aio.getModuleManager().getModule(ChatModule.class);
-        pingModule = aio.getModuleManager().getModule(PingModule.class);
+        chatModule = aio.getModuleManager().getModule(AIO.CHAT_MODULE);
+        pingModule = aio.getModuleManager().getModule(AIO.PING_MODULE);
     }
 
     @Override

@@ -41,7 +41,7 @@ public class SpawnCommand extends PluginCommand {
     public SpawnCommand(AIO aio) {
         super(aio, CMD);
 
-        spawnModule = aio.getModuleManager().getModule(SpawnModule.class);
+        spawnModule = aio.getModuleManager().getModule(AIO.SPAWN_MODULE);
     }
 
     @Override

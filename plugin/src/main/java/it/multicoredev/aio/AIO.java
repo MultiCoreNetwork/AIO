@@ -43,8 +43,7 @@ import it.multicoredev.aio.storage.config.Config;
 import it.multicoredev.aio.storage.config.Localization;
 import it.multicoredev.aio.storage.config.ModuleManager;
 import it.multicoredev.aio.storage.config.adapters.LocationAdapter;
-import it.multicoredev.aio.storage.config.modules.CommandAliasesModule;
-import it.multicoredev.aio.storage.config.modules.SpawnModule;
+import it.multicoredev.aio.storage.config.modules.*;
 import it.multicoredev.aio.storage.config.sections.StorageSection;
 import it.multicoredev.aio.storage.data.FileStorage;
 import it.multicoredev.aio.storage.data.KitStorage;
@@ -108,6 +107,13 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     public static boolean LUCKPERMS;
     public static boolean PAPI;
 
+    public static final Class<ChatModule> CHAT_MODULE = ChatModule.class;
+    public static final Class<CommandAliasesModule> COMMAND_ALIASES_MODULE = CommandAliasesModule.class;
+    public static final Class<EconomyModule> ECONOMY_MODULE = EconomyModule.class;
+    public static final Class<JoinQuitModule> JOIN_QUIT_MODULE = JoinQuitModule.class;
+    public static final Class<PingModule> PING_MODULE = PingModule.class;
+    public static final Class<SpawnModule> SPAWN_MODULE = SpawnModule.class;
+
     private final File root = getDataFolder();
     private final File modulesDir = new File(root, "modules");
     private final File helpbooksDir = new File(root, "helpbooks");
@@ -149,6 +155,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     //TODO ALL Chat.send must have placeholderutils.replace....
     //TODO Add the ability to log transactions inside AIOEconomy
     //TODO Use this everywhere !hasSubPerm(sender, "other") && !sender.equals(target)
+    //TODO Runlater command should send feedback when the comman is executed
 
     @Override
     public void onEnable() {
@@ -401,7 +408,12 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     }
 
     private void registerModules() {
-
+        moduleManager.registerModule(new ChatModule());
+        moduleManager.registerModule(new CommandAliasesModule());
+        moduleManager.registerModule(new EconomyModule());
+        moduleManager.registerModule(new JoinQuitModule());
+        moduleManager.registerModule(new PingModule());
+        moduleManager.registerModule(new SpawnModule());
     }
 
     private boolean initConfigs() {
@@ -554,84 +566,18 @@ public class AIO extends it.multicoredev.aio.api.AIO {
             }
         }
 
-        moduleManager.getModules().forEach(module -> {
+        for (Module module : moduleManager.getModules()) {
             if (moduleManager.moduleFileExists(module.getName())) {
-
+                if (!moduleManager.saveModule(module.getName())) return false;
             } else {
+                if (!moduleManager.loadModule(module.getName())) return false;
 
+                module = moduleManager.getModule(module.getName());
+                if (module != null && module.completeMissing()) {
+                    if (!moduleManager.saveModule(module.getName())) return false;
+                }
             }
-        });
-
-        /*for (Map.Entry<Class<? extends Module>, String> entry : ModuleManager.DEF_MODULES.entrySet()) {
-            String name = entry.getValue();
-            Class<? extends Module> clazz = entry.getKey();
-            File moduleFile = new File(modulesDir, name + ".json");
-
-            if (!moduleFile.exists() || !moduleFile.isFile()) {
-                Module module;
-
-                try {
-                    module = clazz.getDeclaredConstructor().newInstance();
-                    module.init();
-                } catch (Exception e) {
-                    Chat.severe("&4" + e.getMessage());
-                    if (debug) e.printStackTrace();
-                    return false;
-                }
-
-                try {
-                    gson.save(module, moduleFile);
-                } catch (IOException e) {
-                    Chat.severe("&4" + e.getMessage());
-                    if (debug) e.printStackTrace();
-                    return false;
-                }
-
-                if (config.modules.get(module.getName())) moduleManager.registerModule(module);
-            } else {
-                Module module;
-
-                try {
-                    module = gson.load(moduleFile, clazz);
-                    if (module == null) throw new NullPointerException("Module is null");
-                } catch (Exception e) {
-                    Chat.severe("&4" + e.getMessage());
-                    if (debug) e.printStackTrace();
-
-                    if (!backupFile(moduleFile)) return false;
-                    Chat.warning("&4Module " + name + " file is corrupted, creating new one");
-
-                    try {
-                        module = clazz.getDeclaredConstructor().newInstance();
-                        module.init();
-                    } catch (Exception e1) {
-                        Chat.severe("&4" + e1.getMessage());
-                        if (debug) e1.printStackTrace();
-                        return false;
-                    }
-
-                    try {
-                        gson.save(module, moduleFile);
-                    } catch (IOException e1) {
-                        Chat.severe("&4" + e1.getMessage());
-                        if (debug) e1.printStackTrace();
-                        return false;
-                    }
-                }
-
-                if (module.completeMissing()) {
-                    try {
-                        gson.save(module, moduleFile);
-                    } catch (Exception e) {
-                        Chat.severe("&4" + e.getMessage());
-                        if (debug) e.printStackTrace();
-                        return false;
-                    }
-                }
-
-                if (config.modules.get(module.getName())) moduleManager.registerModule(module);
-            }
-        }*/
+        }
 
         if (!helpbooksDir.exists() || !helpbooksDir.isDirectory()) {
             if (!helpbooksDir.mkdir()) {
@@ -881,10 +827,10 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         if (commands.isEnabled("rtp")) commandRegistry.registerCommand(new RTPCommand(this), this);
         if (commands.isEnabled("runlater")) commandRegistry.registerCommand(new RunLaterCommand(this), this);
         if (commands.isEnabled("sethome")) commandRegistry.registerCommand(new SetHomeCommand(this), this);
-        if (commands.isEnabled("setspawn") && moduleManager.isModuleEnabled(SpawnModule.class))
+        if (commands.isEnabled("setspawn") && moduleManager.isModuleEnabled(SPAWN_MODULE))
             commandRegistry.registerCommand(new SetSpawnCommand(this), this);
         if (commands.isEnabled("setwarp")) commandRegistry.registerCommand(new SetWarpCommand(this), this);
-        if (commands.isEnabled("spawn") && moduleManager.isModuleEnabled(SpawnModule.class))
+        if (commands.isEnabled("spawn") && moduleManager.isModuleEnabled(SPAWN_MODULE))
             commandRegistry.registerCommand(new SpawnCommand(this), this);
         if (commands.isEnabled("speed")) commandRegistry.registerCommand(new SpeedCommand(this), this);
         if (commands.isEnabled("suicide")) commandRegistry.registerCommand(new SuicideCommand(this), this);
@@ -901,8 +847,8 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         if (commands.isEnabled("warp")) commandRegistry.registerCommand(new WarpCommand(this), this);
         if (commands.isEnabled("warps")) commandRegistry.registerCommand(new WarpsCommand(this), this);
 
-        if (moduleManager.isModuleEnabled(CommandAliasesModule.class)) {
-            CommandAliasesModule aliasesModule = moduleManager.getModule(CommandAliasesModule.class);
+        if (moduleManager.isModuleEnabled(COMMAND_ALIASES_MODULE)) {
+            CommandAliasesModule aliasesModule = moduleManager.getModule(COMMAND_ALIASES_MODULE);
             if (aliasesModule == null) return;
 
             aliasesModule.aliases.forEach(alias -> {

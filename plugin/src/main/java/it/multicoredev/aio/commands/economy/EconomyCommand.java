@@ -45,7 +45,7 @@ public class EconomyCommand extends PluginCommand {
         super(aio, CMD);
 
         economy = aio.getEconomy();
-        economyModule = aio.getModuleManager().getModule(EconomyModule.class);
+        economyModule = aio.getModuleManager().getModule(AIO.ECONOMY_MODULE);
     }
 
     @Override

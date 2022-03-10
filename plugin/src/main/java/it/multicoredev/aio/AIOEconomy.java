@@ -42,7 +42,7 @@ public class AIOEconomy implements IEconomy {
     public AIOEconomy(AIO aio) {
         this.aio = aio;
         storage = aio.getStorage();
-        economyModule = aio.getModuleManager().getModule(EconomyModule.class);
+        economyModule = aio.getModuleManager().getModule(AIO.ECONOMY_MODULE);
 
         try {
             numberFormat = NumberFormat.getCurrencyInstance(Locale.forLanguageTag(aio.getLocalization().localization));
