@@ -1,9 +1,9 @@
-package it.multicoredev.aio.api.events;
+package it.multicoredev.aio.api.events.teleport;
 
+import com.google.common.base.Preconditions;
 import it.multicoredev.aio.api.tp.Teleport;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
@@ -28,21 +28,25 @@ import org.jetbrains.annotations.NotNull;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class PlayerTeleportRequestEvent extends Event implements Cancellable {
+public class PlayerTeleportCancelledEvent extends Event {
     private static final HandlerList HANDLERS = new HandlerList();
-    private boolean cancelled;
 
     private final Teleport teleport;
-    private String cancelReason;
-    private boolean notify;
+    private Teleport.CancelReason cancelReason;
+    private String cancelMessage;
 
     /**
-     * PlayerTeleportRequestEvent is called when a teleport request is called from the {@link it.multicoredev.aio.api.tp.ITeleportManager}.
+     * PlayerTeleportCancelledEvent is called when a teleport is cancelled.
      *
      * @param teleport the teleport instance.
      */
-    public PlayerTeleportRequestEvent(@NotNull Teleport teleport) {
+    public PlayerTeleportCancelledEvent(@NotNull Teleport teleport, @NotNull Teleport.CancelReason cancelReason, String cancelMessage) {
+        Preconditions.checkNotNull(teleport);
+        Preconditions.checkNotNull(cancelReason);
+
         this.teleport = teleport;
+        this.cancelReason = cancelReason;
+        this.cancelMessage = cancelMessage;
     }
 
     @Override
@@ -52,16 +56,6 @@ public class PlayerTeleportRequestEvent extends Event implements Cancellable {
 
     public static HandlerList getHandlerList() {
         return HANDLERS;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
     }
 
     /**
@@ -74,9 +68,9 @@ public class PlayerTeleportRequestEvent extends Event implements Cancellable {
     }
 
     /**
-     * Get the {@link Location} of the player when the teleport request is called.
+     * Get the {@link Location} of the player.
      *
-     * @return the location of the player when the teleport request is called.
+     * @return the location of the player.
      */
     public Location getFrom() {
         return teleport.getFrom();
@@ -92,15 +86,6 @@ public class PlayerTeleportRequestEvent extends Event implements Cancellable {
     }
 
     /**
-     * Set the destination of the player.
-     *
-     * @param to the destination of the player.
-     */
-    public void setTo(@NotNull Location to) {
-        teleport.setTo(to);
-    }
-
-    /**
      * Get the time to wait for the teleport.
      *
      * @return the time in ticks for the teleport.
@@ -110,47 +95,38 @@ public class PlayerTeleportRequestEvent extends Event implements Cancellable {
     }
 
     /**
-     * Set the time to wait for the teleport.
+     * Get the {@link Teleport.CancelReason} of the teleport.
      *
-     * @param timer the time in ticks for the teleport.
+     * @return the cancel reason of the teleport.
      */
-    public void setTimer(long timer) {
-        teleport.setTimer(timer);
-    }
-
-    /**
-     * Get the reason of the cancellation of the teleport.
-     *
-     * @return the reason of the cancellation of the teleport.
-     */
-    public String getCancelReason() {
+    public Teleport.CancelReason getCancelReason() {
         return cancelReason;
     }
 
     /**
-     * Set the reason of the cancellation of the teleport.
+     * Set the {@link Teleport.CancelReason} of the teleport.
      *
-     * @param cancelReason the reason of the cancellation of the teleport.
+     * @param cancelReason the cancel reason of the teleport.
      */
-    public void setCancelReason(String cancelReason) {
+    public void setCancelReason(Teleport.CancelReason cancelReason) {
         this.cancelReason = cancelReason;
     }
 
     /**
-     * Check if the player should be notified.
+     * Get the cancel message of the teleport.
      *
-     * @return true if the player should be notified.
+     * @return the cancel message of the teleport.
      */
-    public boolean shouldNotify() {
-        return notify;
+    public String getCancelMessage() {
+        return cancelMessage;
     }
 
     /**
-     * Set if the player should be notified.
+     * Set the cancel message of the teleport.
      *
-     * @param notify true if the player should be notified.
+     * @param cancelMessage the cancel message of the teleport.
      */
-    public void setNotify(boolean notify) {
-        this.notify = notify;
+    public void setCancelMessage(String cancelMessage) {
+        this.cancelMessage = cancelMessage;
     }
 }

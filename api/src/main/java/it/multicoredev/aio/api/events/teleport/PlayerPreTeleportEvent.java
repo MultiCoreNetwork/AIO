@@ -1,8 +1,9 @@
-package it.multicoredev.aio.api.events;
+package it.multicoredev.aio.api.events.teleport;
 
 import it.multicoredev.aio.api.tp.Teleport;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
@@ -27,17 +28,20 @@ import org.jetbrains.annotations.NotNull;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class PlayerPostTeleportEvent extends Event {
+public class PlayerPreTeleportEvent extends Event implements Cancellable {
     private static final HandlerList HANDLERS = new HandlerList();
+    private boolean cancelled;
 
     private final Teleport teleport;
+    private Teleport.CancelReason cancelReason;
+    private String cancelMessage;
 
     /**
-     * PlayerPostTeleportEvent is called after a player is teleported.
+     * PlayerPreTeleportEvent is called just before the player teleport.
      *
      * @param teleport the teleport instance.
      */
-    public PlayerPostTeleportEvent(@NotNull Teleport teleport) {
+    public PlayerPreTeleportEvent(@NotNull Teleport teleport) {
         this.teleport = teleport;
     }
 
@@ -50,6 +54,17 @@ public class PlayerPostTeleportEvent extends Event {
         return HANDLERS;
     }
 
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    @Override
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
+        if (cancelled && cancelReason == null) cancelReason = Teleport.CancelReason.OTHER;
+    }
+
     /**
      * Get the player to be teleported.
      *
@@ -60,9 +75,9 @@ public class PlayerPostTeleportEvent extends Event {
     }
 
     /**
-     * Get the {@link Location} of the player when the teleport request is called.
+     * Get the {@link Location} of the player.
      *
-     * @return the location of the player when the teleport request is called.
+     * @return the location of the player.
      */
     public Location getFrom() {
         return teleport.getFrom();
@@ -78,11 +93,74 @@ public class PlayerPostTeleportEvent extends Event {
     }
 
     /**
+     * Set the destination of the player.
+     *
+     * @param to the destination of the player.
+     */
+    public void setTo(@NotNull Location to) {
+        teleport.setTo(to);
+    }
+
+    /**
      * Get the time to wait for the teleport.
      *
      * @return the time in ticks for the teleport.
      */
     public long getTimer() {
         return teleport.getTimer();
+    }
+
+    /**
+     * Get the message to send to the player after the teleport.
+     *
+     * @return the message to send to the player.
+     */
+    public String getPostMessage() {
+        return teleport.getPostMessage();
+    }
+
+    /**
+     * Set the message to send to the player after the teleport.
+     *
+     * @param postMessage the message to send to the player.
+     */
+    public void setPostMessage(String postMessage) {
+        teleport.setPostMessage(postMessage);
+    }
+
+    /**
+     * Get the {@link Teleport.CancelReason} of the teleport.
+     *
+     * @return the cancel reason of the teleport.
+     */
+    public Teleport.CancelReason getCancelReason() {
+        return cancelReason;
+    }
+
+    /**
+     * Set the {@link Teleport.CancelReason} of the teleport.
+     *
+     * @param cancelReason the cancel reason of the teleport.
+     */
+    public void setCancelReason(Teleport.CancelReason cancelReason) {
+        this.cancelReason = cancelReason;
+    }
+
+    /**
+     * Get the cancel message of the teleport.
+     *
+     * @return the cancel message of the teleport.
+     */
+    public String getCancelMessage() {
+        return cancelMessage;
+    }
+
+    /**
+     * Set the cancel message of the teleport.
+     *
+     * @param cancelMessage the cancel message of the teleport.
+     */
+    public void setCancelMessage(String cancelMessage) {
+        this.cancelMessage = cancelMessage;
     }
 }

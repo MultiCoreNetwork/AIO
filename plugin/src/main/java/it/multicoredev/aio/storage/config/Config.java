@@ -33,8 +33,6 @@ import java.util.stream.Collectors;
 public class Config extends JsonConfig {
     @SerializedName("storage")
     public StorageSection storageSection;
-    @SerializedName("command_costs")
-    public CommandCostsSection commandCosts;
     @SerializedName("command_cooldown")
     public CommandCooldownSection commandCooldown;
     @SerializedName("help_book")
@@ -79,7 +77,6 @@ public class Config extends JsonConfig {
     @Override
     public void init() {
         if (storageSection == null) storageSection = new StorageSection();
-        if (commandCosts == null) commandCosts = new CommandCostsSection();
         if (commandCooldown == null) commandCooldown = new CommandCooldownSection();
         if (helpBookSection == null) helpBookSection = new HelpBookSection();
         if (nicknameSection == null) nicknameSection = new NicknameSection();

@@ -1,15 +1,8 @@
 package it.multicoredev.aio.api.tp;
 
 import com.google.common.base.Preconditions;
-import it.multicoredev.aio.api.AIO;
-import it.multicoredev.aio.api.events.PlayerPostTeleportEvent;
-import it.multicoredev.aio.api.events.PlayerPreTeleportEvent;
-import it.multicoredev.aio.api.events.PlayerTeleportCancelledEvent;
-import it.multicoredev.aio.api.events.PlayerTeleportRequestEvent;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -34,10 +27,30 @@ import org.jetbrains.annotations.NotNull;
  */
 public class Teleport {
     private final Player player;
-    private Location from;
     private Location to;
     private long timer;
-    private BukkitTask task;
+    private String pendingMessage;
+    private String postMessage;
+
+    /**
+     * Create a new Teleport object.
+     *
+     * @param player         the player to teleport.
+     * @param to             the destination of the player.
+     * @param timer          the time in ticks before the teleport.
+     * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
+     * @param postMessage    the message to send to the player after the teleport.
+     */
+    public Teleport(@NotNull Player player, @NotNull Location to, long timer, String pendingMessage, String postMessage) {
+        Preconditions.checkNotNull(player);
+        Preconditions.checkNotNull(to);
+
+        this.player = player;
+        this.to = to;
+        this.timer = timer;
+        this.pendingMessage = pendingMessage;
+        this.postMessage = postMessage;
+    }
 
     /**
      * Create a new Teleport object.
@@ -47,13 +60,31 @@ public class Teleport {
      * @param timer  the time in ticks before the teleport.
      */
     public Teleport(@NotNull Player player, @NotNull Location to, long timer) {
-        Preconditions.checkNotNull(player);
-        Preconditions.checkNotNull(to);
+        this(player, to, timer, null, null);
+    }
 
-        this.player = player;
-        this.from = player.getLocation();
-        this.to = to;
-        this.timer = timer;
+    /**
+     * Create a new Teleport object.
+     * Default timer is 0.
+     *
+     * @param player         the player to teleport.
+     * @param to             the destination of the player.
+     * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
+     * @param postMessage    the message to send to the player after the teleport.
+     */
+    public Teleport(@NotNull Player player, @NotNull Location to, String pendingMessage, String postMessage) {
+        this(player, to, 0, pendingMessage, postMessage);
+    }
+
+    /**
+     * Create a new Teleport object.
+     * Default timer is 0.
+     *
+     * @param player the player to teleport.
+     * @param to     the destination of the player.
+     */
+    public Teleport(@NotNull Player player, @NotNull Location to) {
+        this(player, to, 0, null, null);
     }
 
     /**
@@ -71,7 +102,7 @@ public class Teleport {
      * @return the starting location of the player.
      */
     public Location getFrom() {
-        return from;
+        return player.getLocation();
     }
 
     /**
@@ -95,77 +126,71 @@ public class Teleport {
     }
 
     /**
-     * Get the time to wait for the teleport.
+     * Get the time in seconds to wait for the teleport.
      *
-     * @return the time in ticks for the teleport.
+     * @return the time in seconds for the teleport.
      */
     public long getTimer() {
         return timer;
     }
 
     /**
-     * Set the time to wait for the teleport.
+     * Set the time in seconds to wait for the teleport.
      *
-     * @param timer the time in ticks for the teleport.
+     * @param timer the time in seconds for the teleport.
      */
     public void setTimer(long timer) {
         this.timer = timer;
     }
 
-    public void teleport() {
-        PlayerTeleportRequestEvent tpReqEvent = new PlayerTeleportRequestEvent(this);
-        Bukkit.getPluginManager().callEvent(tpReqEvent);
-
-        if (tpReqEvent.isCancelled()) {
-            cancel(tpReqEvent.getCancelReason(), tpReqEvent.shouldNotify());
-            return;
-        }
-
-        if (timer <= 0) {
-            teleportNow();
-        } else {
-            if (player.hasPermission("aio.teleport.instant")) {
-                teleportNow();
-            } else {
-                task = Bukkit.getScheduler().runTaskLater(AIO.getInstance(), this::teleportNow, timer);
-            }
-        }
+    /**
+     * Get the message to send to the player instantly if the timer is greater than 0.
+     *
+     * @return the message to send to the player.
+     */
+    public String getPendingMessage() {
+        return pendingMessage;
     }
 
     /**
-     * Cancel this task. DO NOT USE THIS METHOD DIRECTLY.
+     * Set the message to send to the player instantly if the timer is greater than 0.
      *
-     * @param reason Reason for the cancellation.
-     * @param notify Whether to notify the player.
+     * @param pendingMessage the message to send to the player.
+     * @return this object.
      */
-    public void cancel(String reason, boolean notify) {
-        if (task != null) {
-            if (!task.isCancelled()) task.cancel();
-            task = null;
-        }
-
-        PlayerTeleportCancelledEvent tpCancEvent = new PlayerTeleportCancelledEvent(this, reason, notify);
-        Bukkit.getPluginManager().callEvent(tpCancEvent);
+    public Teleport setPendingMessage(String pendingMessage) {
+        this.pendingMessage = pendingMessage;
+        return this;
     }
 
-    private void teleportNow() {
-        if (!player.isOnline()) {
-            cancel("Player is not online", false);
-            return;
-        }
+    /**
+     * Get the message to send to the player after the teleport.
+     *
+     * @return the message to send to the player.
+     */
+    public String getPostMessage() {
+        return postMessage;
+    }
 
-        from = player.getLocation();
+    /**
+     * Set the message to send to the player after the teleport.
+     *
+     * @param postMessage the message to send to the player.
+     * @return this object.
+     */
+    public Teleport setPostMessage(String postMessage) {
+        this.postMessage = postMessage;
+        return this;
+    }
 
-        PlayerPreTeleportEvent preTpEvent = new PlayerPreTeleportEvent(this);
-        Bukkit.getPluginManager().callEvent(preTpEvent);
-
-        if (preTpEvent.isCancelled()) {
-            cancel(preTpEvent.getCancelReason(), preTpEvent.shouldNotify());
-            return;
-        }
-
-        player.teleport(to);
-
-        Bukkit.getPluginManager().callEvent(new PlayerPostTeleportEvent(this));
+    /**
+     * Enumerator of the reasons for a teleport to be cancelled.
+     */
+    public enum CancelReason {
+        NOT_ONLINE,
+        MOVEMENT,
+        DAMAGE,
+        UNSAFE_DESTINATION,
+        OTHER
     }
 }

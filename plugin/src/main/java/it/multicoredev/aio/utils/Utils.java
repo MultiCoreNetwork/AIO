@@ -222,17 +222,6 @@ public class Utils {
         return !mat0.equals(Material.MAGMA_BLOCK) && !mat0.equals(Material.CACTUS);
     }
 
-    public static String getStringFromList(List<String> list) {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        for (int i = 0; i < list.size(); i++) {
-            stringBuilder.append(list.get(i));
-            if (i != list.size() - 1) stringBuilder.append(", ");
-        }
-
-        return stringBuilder.toString();
-    }
-
     public static boolean hasSpaceInInventory(Player player, ItemStack item) {
         Inventory inventory = Bukkit.createInventory(player, InventoryType.PLAYER);
         inventory.setContents(player.getInventory().getContents());

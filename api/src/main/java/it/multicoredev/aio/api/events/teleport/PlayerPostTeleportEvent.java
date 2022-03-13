@@ -1,4 +1,4 @@
-package it.multicoredev.aio.api.events;
+package it.multicoredev.aio.api.events.teleport;
 
 import it.multicoredev.aio.api.tp.Teleport;
 import org.bukkit.Location;
@@ -27,22 +27,18 @@ import org.jetbrains.annotations.NotNull;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class PlayerTeleportCancelledEvent extends Event {
+public class PlayerPostTeleportEvent extends Event {
     private static final HandlerList HANDLERS = new HandlerList();
 
     private final Teleport teleport;
-    private final String reason;
-    private final boolean notify;
 
     /**
-     * PlayerTeleportCancelledEvent is called when a teleport is cancelled.
+     * PlayerPostTeleportEvent is called after a player is teleported.
      *
      * @param teleport the teleport instance.
      */
-    public PlayerTeleportCancelledEvent(@NotNull Teleport teleport, String reason, boolean notify) {
+    public PlayerPostTeleportEvent(@NotNull Teleport teleport) {
         this.teleport = teleport;
-        this.reason = reason;
-        this.notify = notify;
     }
 
     @Override
@@ -64,9 +60,9 @@ public class PlayerTeleportCancelledEvent extends Event {
     }
 
     /**
-     * Get the {@link Location} of the player when the teleport request is called.
+     * Get the {@link Location} of the player.
      *
-     * @return the location of the player when the teleport request is called.
+     * @return the location of the player.
      */
     public Location getFrom() {
         return teleport.getFrom();
@@ -91,20 +87,20 @@ public class PlayerTeleportCancelledEvent extends Event {
     }
 
     /**
-     * Get the reason of the cancellation of the teleport.
+     * Get the message to send to the player after the teleport.
      *
-     * @return the reason of the cancellation of the teleport.
+     * @return the message to send to the player.
      */
-    public String getReason() {
-        return reason;
+    public String getPostMessage() {
+        return teleport.getPostMessage();
     }
 
     /**
-     * Check if the player should be notified.
+     * Set the message to send to the player after the teleport.
      *
-     * @return true if the player should be notified.
+     * @param postMessage the message to send to the player.
      */
-    public boolean shouldNotify() {
-        return notify;
+    public void setPostMessage(String postMessage) {
+        teleport.setPostMessage(postMessage);
     }
 }

@@ -3,9 +3,12 @@ package it.multicoredev.aio.listeners.aio;
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.events.PostCommandEvent;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
+import it.multicoredev.aio.storage.config.modules.EconomyModule;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 import static it.multicoredev.aio.AIO.VAULT;
 
@@ -30,30 +33,29 @@ import static it.multicoredev.aio.AIO.VAULT;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class PostCommandListener extends PluginListenerExecutor<PostCommandEvent> {
+    private final EconomyModule economyModule;
 
     public PostCommandListener(Class<PostCommandEvent> eventClass, AIO aio) {
         super(eventClass, aio);
+        this.economyModule = aio.getModuleManager().getModule(AIO.ECONOMY_MODULE);
     }
 
     @Override
     public void onEvent(@NotNull PostCommandEvent event) {
         CommandSender sender = event.getCommandSender();
-        boolean isPlayer = sender instanceof Player;
+        if (!(sender instanceof Player)) return;
+
         String cmd = event.getCommand();
 
-        if (isPlayer && config.commandCooldown.cooldownEnabled && event.isSuccess())
-            aio.addCommandCooldown((Player) sender, cmd);
+        if (config.commandCooldown.cooldownEnabled && event.isSuccess()) aio.addCommandCooldown((Player) sender, cmd);
 
-
-        if (config.commandCosts.costsEnabled && VAULT && isPlayer && config.commandCosts.hasCommandCost(cmd) && !sender.hasPermission("aio.bypass.costs")) {
+        if (economyModule.hasCommandCost(cmd, sender)) {
             Player player = (Player) sender;
-            double cost = Math.abs(config.commandCosts.getCommandCost(cmd));
+            double cost = economyModule.getCommandCost(cmd);
 
-            if (cmd.equalsIgnoreCase("tpa") || cmd.equalsIgnoreCase("tpahere")) {
-                cost = cost / 2;
-            }
+            if (cmd.equalsIgnoreCase("tpa") || cmd.equalsIgnoreCase("tpahere")) cost = cost / 2;
 
-            aio.getEconomy().withdrawPlayer(player, cost);
+            Objects.requireNonNull(aio.getEconomy()).withdrawPlayer(player, cost);
         }
     }
 }

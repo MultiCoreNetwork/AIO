@@ -1,10 +1,12 @@
 package it.multicoredev.aio.storage.config.modules;
 
 import com.google.gson.annotations.SerializedName;
+import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.models.Module;
+import org.bukkit.command.CommandSender;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Locale;
+import java.util.TreeMap;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -27,11 +29,12 @@ import java.util.Map;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class EconomyModule extends Module {
-    public Boolean enabled;
     @SerializedName("starting_balance")
     public Double startingBalance;
+    @SerializedName("command_costs_enabled")
+    public Boolean commandCostsEnabled;
     @SerializedName("command_costs")
-    public Map<String, Double> commandCosts;
+    public TreeMap<String, Double> commandCosts;
     @SerializedName("max_money")
     public Double maxMoney;
     @SerializedName("min_money")
@@ -51,9 +54,9 @@ public class EconomyModule extends Module {
 
     @Override
     public void init() {
-        if (enabled == null) enabled = true;
         if (startingBalance == null) startingBalance = 0d;
-        if (commandCosts == null) commandCosts = new HashMap<>();
+        if (commandCostsEnabled == null) commandCostsEnabled = false;
+        if (commandCosts == null) commandCosts = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         if (maxMoney == null) maxMoney = (double) Integer.MAX_VALUE;
         if (minMoney == null) minMoney = 0d;
         if (logTransactions == null) logTransactions = true;
@@ -70,5 +73,21 @@ public class EconomyModule extends Module {
     public String getCurrency(double amount) {
         if (amount == 1) return currencySingular;
         else return currencyPlural;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return super.isEnabled() && AIO.VAULT;
+    }
+
+    public boolean hasCommandCost(String cmd, CommandSender sender) {
+        if (!isEnabled()) return false;
+        if (!commandCostsEnabled) return false;
+        if (sender.hasPermission("aio.bypass.command_costs")) return false;
+        return commandCosts.containsKey(cmd); //TODO Test if it's case insensitive
+    }
+
+    public double getCommandCost(String cmd) {
+        return Math.abs(commandCosts.get(cmd));
     }
 }

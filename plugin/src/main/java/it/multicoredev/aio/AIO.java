@@ -8,8 +8,8 @@ import it.multicoredev.aio.api.IEconomy;
 import it.multicoredev.aio.api.IModuleManager;
 import it.multicoredev.aio.api.IStorage;
 import it.multicoredev.aio.api.events.AfkToggleEvent;
-import it.multicoredev.aio.api.events.PlayerPostTeleportEvent;
-import it.multicoredev.aio.api.events.PlayerTeleportCancelledEvent;
+import it.multicoredev.aio.api.events.teleport.PlayerPostTeleportEvent;
+import it.multicoredev.aio.api.events.teleport.PlayerTeleportCancelledEvent;
 import it.multicoredev.aio.api.events.PostCommandEvent;
 import it.multicoredev.aio.api.listeners.IListenerRegistry;
 import it.multicoredev.aio.api.models.CommandData;
@@ -160,6 +160,9 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     //TODO Add the ability to log transactions inside AIOEconomy
     //TODO Use this everywhere !hasSubPerm(sender, "other") && !sender.equals(target)
     //TODO Runlater command should send feedback when the command is executed
+    //TODO Require economy module enabled in checks
+    //TODO Add Objects.requireNonNull(...) where needed
+    //TODO Cancel pending teleports and requests when the player quits
 
     @Override
     public void onEnable() {
@@ -205,7 +208,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         }
 
         listenerRegistry = new ListenerRegistry();
-        tpManager = new TeleportManager();
+        tpManager = new TeleportManager(this);
 
         if (config.commandCooldown.cooldownEnabled) commandCooldown = new HashMap<>();
 
@@ -332,42 +335,6 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         }).start();
     }
 
-    public void addCommandCooldown(Player player, String command) {
-        if (!config.commandCooldown.hasCommandCooldown(command)) return;
-        if (player.hasPermission("aio.no-commands-cooldown")) return;
-
-        UUID uuid = player.getUniqueId();
-        if (commandCooldown.containsKey(uuid)) {
-            Map<String, Date> commands = commandCooldown.get(uuid);
-            commands.put(command, new Date());
-        } else {
-            Map<String, Date> commands = new HashMap<>();
-            commands.put(command, new Date());
-            commandCooldown.put(uuid, commands);
-        }
-    }
-
-    public int hasCommandCooldown(Player player, String command) {
-        if (!config.commandCooldown.cooldownEnabled) return -1;
-        UUID uuid = player.getUniqueId();
-
-        if (!commandCooldown.containsKey(uuid)) return -1;
-
-        Map<String, Date> commands = commandCooldown.get(uuid);
-        if (!commands.containsKey(command)) return -1;
-
-        Date date = commands.get(command);
-        int difference = (int) ((new Date().getTime() - date.getTime()) / 1000);
-        int cooldown = config.commandCooldown.getCommandCooldown(command);
-
-        if (difference > cooldown) {
-            commands.remove(command);
-            return -1;
-        }
-
-        return cooldown - difference;
-    }
-
     public Map<UUID, User> getUsersCache() {
         return usersCache;
     }
@@ -401,6 +368,40 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
     public void saveWarps() {
         saveAsync(warpStorage, warpsFile);
+    }
+
+    public void addCommandCooldown(Player player, String command) {
+        if (!config.commandCooldown.hasCommandCooldown(command)) return;
+        if (player.hasPermission("aio.no-commands-cooldown")) return;
+
+        UUID uuid = player.getUniqueId();
+        if (commandCooldown.containsKey(uuid)) {
+            Map<String, Date> commands = commandCooldown.get(uuid);
+            commands.put(command, new Date());
+        } else {
+            Map<String, Date> commands = new HashMap<>();
+            commands.put(command, new Date());
+            commandCooldown.put(uuid, commands);
+        }
+    }
+
+    public int hasCommandCooldown(Player player, String command) {
+        UUID uuid = player.getUniqueId();
+        if (!commandCooldown.containsKey(uuid)) return -1;
+
+        Map<String, Date> commands = commandCooldown.get(uuid);
+        if (!commands.containsKey(command)) return -1;
+
+        Date date = commands.get(command);
+        int difference = (int) ((new Date().getTime() - date.getTime()) / 1000);
+        int cooldown = config.commandCooldown.getCommandCooldown(command);
+
+        if (difference > cooldown) {
+            commands.remove(command);
+            return -1;
+        }
+
+        return cooldown - difference;
     }
 
     public void addDeferredCommand(CommandSender sender, String command, long delay) {

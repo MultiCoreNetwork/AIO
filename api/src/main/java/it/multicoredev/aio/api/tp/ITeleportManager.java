@@ -1,11 +1,11 @@
 package it.multicoredev.aio.api.tp;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -32,16 +32,56 @@ import java.util.Map;
 public interface ITeleportManager {
 
     /**
+     * Execute the given teleport.
+     *
+     * @param teleport the teleport to be executed.
+     */
+    void teleport(@NotNull Teleport teleport);
+
+    /**
      * Teleport a player to the give location after some time.
+     *
+     * @param player         the player to teleport.
+     * @param to             the destination of the player.
+     * @param timer          the time in seconds before the teleport.
+     * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
+     * @param postMessage    the message to send to the player after the teleport.
+     */
+    void teleport(@NotNull Player player, @NotNull Location to, long timer, String pendingMessage, String postMessage);
+
+    /**
+     * Teleport a player to the give location after some time.
+     *
+     * @param player      the player to teleport.
+     * @param to          the destination of the player.
+     * @param timer       the time in seconds before the teleport.
+     * @param postMessage the message to send to the player after the teleport.
+     */
+    void teleport(@NotNull Player player, @NotNull Location to, long timer, String postMessage);
+
+    /**
+     * Teleport a player to the give location after some time.
+     * Default value for the timer is 0.
      *
      * @param player the player to teleport.
      * @param to     the destination of the player.
-     * @param timer  the time in milliseconds before the teleport.
+     * @param timer  the time in seconds before the teleport.
      */
     void teleport(@NotNull Player player, @NotNull Location to, long timer);
 
     /**
      * Teleport a player to the give location.
+     * Default value for the timer is 0.
+     *
+     * @param player      the player to teleport.
+     * @param to          the destination of the player.
+     * @param postMessage the message to send to the player after the teleport.
+     */
+    void teleport(@NotNull Player player, @NotNull Location to, String postMessage);
+
+    /**
+     * Teleport a player to the give location.
+     * Default value for the timer is 0.
      *
      * @param player the player to teleport.
      * @param to     the destination of the player.
@@ -51,16 +91,54 @@ public interface ITeleportManager {
     /**
      * Teleport a player to a random location after some time.
      *
+     * @param player         the player to teleport.
+     * @param center         the center of the teleport area.
+     * @param minDistance    the minimum distance from the center.
+     * @param maxDistance    the maximum distance from the center.
+     * @param timer          the time in seconds before the teleport.
+     * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
+     * @param postMessage    the message to send to the player after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
      * @param player      the player to teleport.
      * @param center      the center of the teleport area.
      * @param minDistance the minimum distance from the center.
      * @param maxDistance the maximum distance from the center.
-     * @param timer       the time in milliseconds before the teleport.
+     * @param timer       the time in seconds before the teleport.
+     * @param postMessage the message to send to the player after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, long timer, String postMessage);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
+     * @param player      the player to teleport.
+     * @param center      the center of the teleport area.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param timer       the time in seconds before the teleport.
      */
     void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, long timer);
 
     /**
      * Teleport a player to a random location.
+     * Default value for the timer is 0.
+     *
+     * @param player      the player to teleport.
+     * @param center      the center of the teleport area.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param postMessage the message to send to the player after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, String postMessage);
+
+    /**
+     * Teleport a player to a random location.
+     * Default value for the timer is 0.
      *
      * @param player      the player to teleport.
      * @param center      the center of the teleport area.
@@ -72,18 +150,127 @@ public interface ITeleportManager {
     /**
      * Teleport a player to a random location after some time.
      *
+     * @param player         the player to teleport.
+     * @param world          the world.
+     * @param xCenter        the x coordinate of the center.
+     * @param zCenter        the z coordinate of the center.
+     * @param minDistance    the minimum distance from the center.
+     * @param maxDistance    the maximum distance from the center.
+     * @param timer          the time in seconds before the teleport.
+     * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
+     * @param postMessage    the message to send to the player after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
      * @param player      the player to teleport.
      * @param world       the world.
      * @param xCenter     the x coordinate of the center.
      * @param zCenter     the z coordinate of the center.
      * @param minDistance the minimum distance from the center.
      * @param maxDistance the maximum distance from the center.
-     * @param timer       the time in milliseconds before the teleport.
+     * @param timer       the time in seconds before the teleport.
+     * @param postMessage the message to send to the player after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String postMessage);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
+     * @param player      the player to teleport.
+     * @param world       the world.
+     * @param xCenter     the x coordinate of the center.
+     * @param zCenter     the z coordinate of the center.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param timer       the time in seconds before the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer);
+
+    /**
+     * Teleport a player to a random location.
+     *
+     * @param player      the player to teleport.
+     * @param world       the world.
+     * @param xCenter     the x coordinate of the center.
+     * @param zCenter     the z coordinate of the center.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param postMessage the message to send to the player after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, String postMessage);
+
+    /**
+     * Teleport a player to a random location.
+     *
+     * @param player      the player to teleport.
+     * @param world       the world.
+     * @param xCenter     the x coordinate of the center.
+     * @param zCenter     the z coordinate of the center.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
+     * @param player         the player to teleport.
+     * @param world          the world.
+     * @param xCenter        the x coordinate of the center.
+     * @param zCenter        the z coordinate of the center.
+     * @param minDistance    the minimum distance from the center.
+     * @param maxDistance    the maximum distance from the center.
+     * @param timer          the time in seconds before the teleport.
+     * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
+     * @param postMessage    the message to send to the player after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
+     * @param player      the player to teleport.
+     * @param world       the world.
+     * @param xCenter     the x coordinate of the center.
+     * @param zCenter     the z coordinate of the center.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param timer       the time in seconds before the teleport.
+     * @param postMessage the message to send to the player after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String postMessage);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
+     * @param player      the player to teleport.
+     * @param world       the world.
+     * @param xCenter     the x coordinate of the center.
+     * @param zCenter     the z coordinate of the center.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param timer       the time in seconds before the teleport.
      */
     void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer);
 
     /**
-     * Teleport a player to a random location after.
+     * Teleport a player to a random location.
+     *
+     * @param player      the player to teleport.
+     * @param world       the world.
+     * @param xCenter     the x coordinate of the center.
+     * @param zCenter     the z coordinate of the center.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param postMessage the message to send to the player after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, String postMessage);
+
+    /**
+     * Teleport a player to a random location.
      *
      * @param player      the player to teleport.
      * @param world       the world.
@@ -97,14 +284,53 @@ public interface ITeleportManager {
     /**
      * Teleport a player to a random location after some time.
      *
+     * @param player         the player to teleport.
+     * @param xCenter        the x coordinate of the center.
+     * @param zCenter        the z coordinate of the center.
+     * @param minDistance    the minimum distance from the center.
+     * @param maxDistance    the maximum distance from the center.
+     * @param timer          the time in seconds before the teleport.
+     * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
+     * @param postMessage    the message to send to the player after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
      * @param player      the player to teleport.
      * @param xCenter     the x coordinate of the center.
      * @param zCenter     the z coordinate of the center.
      * @param minDistance the minimum distance from the center.
      * @param maxDistance the maximum distance from the center.
-     * @param timer       the time in milliseconds before the teleport.
+     * @param timer       the time in seconds before the teleport.
+     * @param postMessage the message to send to the player after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String postMessage);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
+     * @param player      the player to teleport.
+     * @param xCenter     the x coordinate of the center.
+     * @param zCenter     the z coordinate of the center.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param timer       the time in seconds before the teleport.
      */
     void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, long timer);
+
+    /**
+     * Teleport a player to a random location.
+     *
+     * @param player      the player to teleport.
+     * @param xCenter     the x coordinate of the center.
+     * @param zCenter     the z coordinate of the center.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param postMessage the message to send to the player after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, String postMessage);
 
     /**
      * Teleport a player to a random location.
@@ -120,12 +346,45 @@ public interface ITeleportManager {
     /**
      * Teleport a player to a random location after some time.
      *
+     * @param player         the player to teleport.
+     * @param minDistance    the minimum distance from the center.
+     * @param maxDistance    the maximum distance from the center.
+     * @param timer          the time in seconds before the teleport.
+     * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
+     * @param postMessage    the message to send to the player after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
      * @param player      the player to teleport.
      * @param minDistance the minimum distance from the center.
      * @param maxDistance the maximum distance from the center.
-     * @param timer       the time in milliseconds before the teleport.
+     * @param timer       the time in seconds before the teleport.
+     * @param postMessage the message to send to the player after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, long timer, String postMessage);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
+     * @param player      the player to teleport.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param timer       the time in seconds before the teleport.
      */
     void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, long timer);
+
+    /**
+     * Teleport a player to a random location.
+     *
+     * @param player      the player to teleport.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param postMessage the message to send to the player after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, String postMessage);
 
     /**
      * Teleport a player to a random location.
@@ -141,9 +400,9 @@ public interface ITeleportManager {
      *
      * @param teleport the teleport to be cancelled.
      * @param reason   the reason of the cancellation.
-     * @param notify   if the player should be notified.
+     * @param message  the message to be sent to the player.
      */
-    void cancelTeleport(@NotNull Teleport teleport, String reason, boolean notify);
+    void cancelTeleport(@NotNull Teleport teleport, @NotNull Teleport.CancelReason reason, String message);
 
     /**
      * Cancel the teleport of a player.
@@ -151,22 +410,16 @@ public interface ITeleportManager {
      * @param teleport the teleport to be cancelled.
      * @param reason   the reason of the cancellation.
      */
-    void cancelTeleport(@NotNull Teleport teleport, String reason);
+    void cancelTeleport(@NotNull Teleport teleport, @NotNull Teleport.CancelReason reason);
 
     /**
      * Cancel the teleport of a player.
      *
-     * @param teleport the teleport to be cancelled.
-     * @param notify   if the player should be notified.
+     * @param player  the player whose teleport to be cancelled.
+     * @param reason  the reason of the cancellation.
+     * @param message the message to be sent to the player.
      */
-    void cancelTeleport(@NotNull Teleport teleport, boolean notify);
-
-    /**
-     * Cancel the teleport of a player.
-     *
-     * @param teleport the teleport to be cancelled.
-     */
-    void cancelTeleport(@NotNull Teleport teleport);
+    void cancelTeleport(@NotNull Player player, @NotNull Teleport.CancelReason reason, String message);
 
     /**
      * Cancel the teleport of a player.
@@ -174,22 +427,7 @@ public interface ITeleportManager {
      * @param player the player whose teleport to be cancelled.
      * @param reason the reason of the cancellation.
      */
-    void cancelTeleport(@NotNull Player player, String reason);
-
-    /**
-     * Cancel the teleport of a player.
-     * @param player the player whose teleport to be cancelled.
-     * @param reason the reason of the cancellation.
-     * @param notify if he has to be notified.
-     */
-    void cancelTeleport(@NotNull Player player, String reason, boolean notify);
-
-    /**
-     * Cancel the teleport of a player.
-     *
-     * @param player the player whose teleport to be cancelled.
-     */
-    void cancelTeleport(@NotNull Player player);
+    void cancelTeleport(@NotNull Player player, @NotNull Teleport.CancelReason reason);
 
     /**
      * Check if a player has a pending teleport.
@@ -215,144 +453,106 @@ public interface ITeleportManager {
     Map<Player, Teleport> getPendingTeleports();
 
     /**
-     * Request teleport for a player.
+     * Request a teleport to a player.
      *
-     * @param request the request to be made.
+     * @param request the request to be sent.
      */
     void requestTeleport(@NotNull TeleportRequest request);
 
     /**
-     * Request a teleport for a player.
+     * Request a teleport to a player.
      *
+     * @param requester        the player who request the teleport.
+     * @param target           the player who will receive the request.
+     * @param type             the type of the request.
+     * @param timeout          the timeout in seconds of the request.
+     * @param requesterMessage the message to send to the requester.
+     * @param targetMessage    the message to send to the target.
+     */
+    void requestTeleport(@NotNull Player requester, @NotNull Player target, @NotNull TeleportRequest.RequestType type, long timeout, String requesterMessage, String targetMessage);
+
+    /**
+     * Request a teleport to a player.
+     *
+     * @param requester the player who request the teleport.
+     * @param target    the player who will receive the request.
      * @param type      the type of the request.
-     * @param requester the requester.
-     * @param target    the target of the request.
+     * @param timeout   the timeout in seconds of the request.
      */
-    void requestTeleport(@NotNull TeleportRequestType type, @NotNull Player requester, @NotNull Player target);
+    void requestTeleport(@NotNull Player requester, @NotNull Player target, @NotNull TeleportRequest.RequestType type, long timeout);
+
+    /**
+     * Cancel a teleport request.
+     *
+     * @param request                the request to be cancelled.
+     * @param reason                 the reason of the cancellation.
+     * @param cancelMessageRequester the message to send to the requester.
+     * @param cancelMessageTarget    the message to send to the target.
+     */
+    void cancelTeleportRequest(@NotNull TeleportRequest request, @NotNull TeleportRequest.CancelReason reason, String cancelMessageRequester, String cancelMessageTarget);
 
     /**
      * Cancel a teleport request.
      *
      * @param request the request to be cancelled.
      * @param reason  the reason of the cancellation.
-     * @param notify  if the player should be notified.
      */
-    void cancelTeleportRequest(@NotNull TeleportRequest request, String reason, boolean notify);
+    void cancelTeleportRequest(@NotNull TeleportRequest request, @NotNull TeleportRequest.CancelReason reason);
 
     /**
      * Cancel a teleport request.
      *
-     * @param request the request to be cancelled.
-     * @param reason  the reason of the cancellation.
+     * @param requester              the player who request the teleport.
+     * @param reason                 the reason of the cancellation.
+     * @param cancelMessageRequester the message to send to the requester.
+     * @param cancelMessageTarget    the message to send to the target.
      */
-    void cancelTeleportRequest(@NotNull TeleportRequest request, String reason);
+    void cancelTeleportRequest(@NotNull Player requester, @NotNull TeleportRequest.CancelReason reason, String cancelMessageRequester, String cancelMessageTarget);
 
     /**
      * Cancel a teleport request.
      *
-     * @param request the request to be cancelled.
-     * @param notify  if the player should be notified.
-     */
-    void cancelTeleportRequest(@NotNull TeleportRequest request, boolean notify);
-
-    /**
-     * Cancel a teleport request.
-     *
-     * @param request the request to be cancelled.
-     */
-    void cancelTeleportRequest(@NotNull TeleportRequest request);
-
-    /**
-     * Cancel a teleport request.
-     *
-     * @param requester the requester.
-     * @param reason    the reason of the cancellation.
-     * @param notify    if the player should be notified.
-     */
-    void cancelTeleportRequest(@NotNull Player requester, String reason, boolean notify);
-
-    /**
-     * Cancel a teleport request.
-     *
-     * @param requester the requester.
+     * @param requester the player who request the teleport.
      * @param reason    the reason of the cancellation.
      */
-    void cancelTeleportRequest(@NotNull Player requester, String reason);
+    void cancelTeleportRequest(@NotNull Player requester, @NotNull TeleportRequest.CancelReason reason);
 
     /**
-     * Cancel a teleport request.
+     * Check if a player has a teleport request as a requester.
      *
-     * @param requester the requester.
-     * @param notify    if the player should be notified.
-     */
-    void cancelTeleportRequest(@NotNull Player requester, boolean notify);
-
-    /**
-     * Cancel a teleport request.
-     *
-     * @param requester the requester.
-     */
-    void cancelTeleportRequest(@NotNull Player requester);
-
-    /**
-     * Execute a teleport request.
-     *
-     * @param request the request
-     * @param accept  if the request must be accepted
-     */
-    void executeRequest(TeleportRequest request, boolean accept);
-
-    /**
-     * Get the teleport requests of a requester.
-     *
-     * @param requester the requester.
-     * @return the teleport requests of the requester.
+     * @param requester the player to check.
+     * @return true if the player has a teleport request as a requester, false otherwise.
      */
     boolean hasRequesterTeleportRequest(@NotNull Player requester);
 
     /**
-     * Get the teleport requests of a requester.
+     * Check if a player has a teleport request as a target.
      *
-     * @param target the target.
-     * @return the teleport requests of the target.
+     * @param target the player to check.
+     * @return true if the player has a teleport request as a target, false otherwise.
      */
     boolean hasTargetTeleportRequest(@NotNull Player target);
 
     /**
-     * Get the teleport requests of a requester.
+     * Get the teleport request of a player as a requester.
      *
-     * @param requester the requester.
-     * @return the teleport requests of the requester.
+     * @param requester the player to check.
+     * @return the teleport request of the player as a requester, null if the player has no teleport request as a requester.
      */
     @Nullable TeleportRequest getRequesterTeleportRequest(@NotNull Player requester);
 
     /**
-     * Get the teleport requests of a target.
+     * Get all the teleport requests of a player as a target.
      *
-     * @param target the target.
-     * @return the teleport requests of the target.
+     * @param target the player to check.
+     * @return the teleport requests of the player as a target, an empty collection if the player has no teleport requests.
      */
     List<TeleportRequest> getTargetTeleportRequests(@NotNull Player target);
 
     /**
-     * Get the teleport requests of a requester.
+     * Get a map of all the teleport requests.
      *
-     * @return the teleport requests of the requester.
+     * @return a map of all the teleport requests.
      */
-    Map<TeleportRequest, Date> getTeleportRequests();
-
-    /**
-     * Get the teleport requests of a requester.
-     *
-     * @param request the request.
-     * @return the teleport requests of the requester.
-     */
-    @Nullable Date getTeleportRequestTimestamp(@NotNull TeleportRequest request);
-
-    /**
-     * Get the names of the requesters of target
-     * @param target the target of requests
-     * @return the list of names of requesters
-     */
-    List<String> getRequesterNames(Player target);
+    Map<Player, TeleportRequest> getTeleportRequests();
 }

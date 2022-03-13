@@ -2,7 +2,7 @@ package it.multicoredev.aio.listeners.aio;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.TeleportManager;
-import it.multicoredev.aio.api.events.PlayerPostTeleportEvent;
+import it.multicoredev.aio.api.events.teleport.PlayerPostTeleportEvent;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
 import org.jetbrains.annotations.NotNull;
 

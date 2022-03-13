@@ -54,7 +54,7 @@ public class AIOEconomy implements IEconomy {
 
     @Override
     public boolean isEnabled() {
-        return AIO.VAULT && economyModule.enabled;
+        return economyModule.isEnabled();
     }
 
     @Override

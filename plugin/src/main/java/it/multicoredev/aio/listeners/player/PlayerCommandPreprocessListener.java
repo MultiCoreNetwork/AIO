@@ -4,13 +4,14 @@ import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.models.User;
 import it.multicoredev.aio.commands.player.AfkCommand;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
+import it.multicoredev.aio.storage.config.modules.EconomyModule;
+import it.multicoredev.aio.utils.Utils;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 import java.util.Locale;
-
-import static it.multicoredev.aio.AIO.VAULT;
+import java.util.Objects;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -35,14 +36,18 @@ import static it.multicoredev.aio.AIO.VAULT;
 public class PlayerCommandPreprocessListener extends PluginListenerExecutor<PlayerCommandPreprocessEvent> {
     private static final String AFK_CMD = AfkCommand.CMD;
     private static final String AFK_CMD_LONG = "aio:" + AfkCommand.CMD;
+    private final EconomyModule economyModule;
 
     public PlayerCommandPreprocessListener(Class<PlayerCommandPreprocessEvent> eventClass, AIO aio) {
         super(eventClass, aio);
+        this.economyModule = aio.getModuleManager().getModule(AIO.ECONOMY_MODULE);
     }
 
     @Override
     public void onEvent(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
+        String command = event.getMessage().substring(1).toLowerCase(Locale.ROOT);
+        String cmd = command.contains(" ") ? command.split(" ")[0] : command;
 
         // AFK
         User user = storage.getUser(player);
@@ -50,29 +55,27 @@ public class PlayerCommandPreprocessListener extends PluginListenerExecutor<Play
             user.setAfk(false);
         }
 
-        String completeCommand = event.getMessage().substring(1).toLowerCase(Locale.ROOT);
-        String command = completeCommand.contains(" ") ? completeCommand.split(" ")[0] : completeCommand;
-
-        if (config.commandCooldown.cooldownEnabled) {
-            int commandCooldown = aio.hasCommandCooldown(player, command);
+        if (config.commandCooldown.cooldownEnabled && config.commandCooldown.hasCommandCooldown(cmd)) {
+            int commandCooldown = aio.hasCommandCooldown(player, cmd);
             if (commandCooldown > 0) {
                 event.setCancelled(true);
-                Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(localization.commandCooldown, "{TIME}", commandCooldown), player);
-            }
-
-            if (config.commandCooldown.hasCommandCooldown(command) && !aio.getCommandRegistry().getCommandNames().contains(command)) {
-                aio.addCommandCooldown(player, command);
+                Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(localization.commandCooldown, "{TIME}", Utils.formatDelay(commandCooldown, localization)), player);
+                return;
             }
         }
 
-        if (config.commandCosts.costsEnabled && VAULT && !aio.getCommandRegistry().getCommandNames().contains(command) && config.commandCosts.hasCommandCost(command) && !player.hasPermission("aio.bypass.costs")) {
-            int cost = Math.abs(config.commandCosts.getCommandCost(command));
+        if (economyModule.hasCommandCost(cmd, player)) {
+            double cost = economyModule.getCommandCost(cmd);
 
-            if (aio.getEconomy().has(player, cost)) {
-                aio.getEconomy().withdrawPlayer(player, cost);
-            } else {
-                Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(localization.insufficientCmdMoney, "{MONEY}", aio.getEconomy().format(cost)), player);
+            if (!Objects.requireNonNull(aio.getEconomy()).has(player, cost)) {
+                Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(
+                        localization.insufficientCmdMoney,
+                        "{MONEY}",
+                        aio.getEconomy().format(cost)
+                ), player);
                 event.setCancelled(true);
+            } else {
+                if (!aio.getCommandRegistry().getCommandNames(aio).contains(cmd)) aio.getEconomy().withdrawPlayer(player, cost);
             }
         }
     }

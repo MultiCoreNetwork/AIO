@@ -7,6 +7,7 @@ import it.multicoredev.aio.api.models.CommandData;
 import it.multicoredev.aio.api.utils.IPlaceholdersUtils;
 import it.multicoredev.aio.storage.config.Config;
 import it.multicoredev.aio.storage.config.Localization;
+import it.multicoredev.aio.storage.config.modules.EconomyModule;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -15,8 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static it.multicoredev.aio.AIO.VAULT;
+import java.util.Objects;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -45,6 +45,7 @@ public abstract class PluginCommand extends BasePluginCommand {
     protected final IStorage storage;
     protected final CommandData commandData;
     protected final IPlaceholdersUtils pu;
+    private final EconomyModule economyModule;
 
     public PluginCommand(AIO aio, String name, CommandData commandData) {
         super(name, commandData);
@@ -54,6 +55,7 @@ public abstract class PluginCommand extends BasePluginCommand {
         this.storage = aio.getStorage();
         this.commandData = commandData;
         this.pu = aio.getPlaceholdersUtils();
+        this.economyModule = aio.getModuleManager().getModule(AIO.ECONOMY_MODULE);
     }
 
     public PluginCommand(AIO aio, String name) {
@@ -72,11 +74,11 @@ public abstract class PluginCommand extends BasePluginCommand {
             return false;
         }
 
-        if (config.commandCosts.costsEnabled && VAULT && isPlayer(sender) && config.commandCosts.hasCommandCost(getName()) && !sender.hasPermission("aio.bypass.costs")) {
+        if (economyModule.hasCommandCost(getName(), sender)) {
             Player player = (Player) sender;
-            int cost = Math.abs(config.commandCosts.getCommandCost(getName()));
+            double cost = economyModule.getCommandCost(getName());
 
-            if (!aio.getEconomy().has(player, cost)) {
+            if (!Objects.requireNonNull(aio.getEconomy()).has(player, cost)) {
                 Chat.send(pu.replacePlaceholders(
                         localization.insufficientCmdMoney,
                         "{MONEY}",

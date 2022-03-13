@@ -1,25 +1,23 @@
 package it.multicoredev.aio;
 
 import com.google.common.base.Preconditions;
-import it.multicoredev.aio.api.IEconomy;
+import it.multicoredev.aio.api.events.teleport.*;
 import it.multicoredev.aio.api.tp.ITeleportManager;
 import it.multicoredev.aio.api.tp.Teleport;
 import it.multicoredev.aio.api.tp.TeleportRequest;
-import it.multicoredev.aio.api.tp.TeleportRequestType;
-import it.multicoredev.aio.api.utils.IPlaceholdersUtils;
-import it.multicoredev.aio.storage.config.Config;
-import it.multicoredev.aio.storage.config.Localization;
+import it.multicoredev.aio.storage.config.modules.EconomyModule;
 import it.multicoredev.aio.utils.Utils;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-
-import static it.multicoredev.aio.AIO.VAULT;
+import java.util.stream.Collectors;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -42,143 +40,301 @@ import static it.multicoredev.aio.AIO.VAULT;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class TeleportManager implements ITeleportManager {
-    private final Map<Player, Teleport> pendingTeleports = new HashMap<>();
-    private final Map<TeleportRequest, Date> teleportRequests = new HashMap<>();
+    private final AIO aio;
+    private final EconomyModule economyModule;
+    private final Map<Player, Teleport> pendingTeleports = new LinkedHashMap<>();
+    private final Map<Player, TeleportRequest> teleportRequests = new LinkedHashMap<>();
+    private final Map<Teleport, BukkitTask> runningTeleports = new LinkedHashMap<>();
+
+    public TeleportManager(AIO aio) {
+        this.aio = aio;
+        this.economyModule = aio.getModuleManager().getModule(AIO.ECONOMY_MODULE);
+    }
+
+    private void teleportNow(@NotNull Teleport tp) {
+        pendingTeleports.remove(tp.getPlayer());
+
+        if (!tp.getPlayer().isOnline()) {
+            cancelTp(tp, Teleport.CancelReason.NOT_ONLINE, null);
+            return;
+        }
+
+        PlayerPreTeleportEvent preTpEvent = new PlayerPreTeleportEvent(tp);
+        Bukkit.getPluginManager().callEvent(preTpEvent);
+
+        if (preTpEvent.isCancelled()) {
+            cancelTp(tp, preTpEvent.getCancelReason(), preTpEvent.getCancelMessage());
+            return;
+        }
+
+        tp.getPlayer().teleport(tp.getTo());
+        runningTeleports.remove(tp);
+
+        PlayerPostTeleportEvent postTpEvent = new PlayerPostTeleportEvent(tp);
+        Bukkit.getPluginManager().callEvent(postTpEvent);
+
+        if (postTpEvent.getPostMessage() != null) {
+            Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(postTpEvent.getPostMessage()), tp.getPlayer());
+        }
+    }
+
+    private void cancelTp(@NotNull Teleport tp, Teleport.CancelReason reason, String cancelMessage) {
+        pendingTeleports.remove(tp.getPlayer());
+        runningTeleports.remove(tp);
+
+        if (runningTeleports.containsKey(tp)) {
+            BukkitTask task = runningTeleports.get(tp);
+            runningTeleports.remove(tp);
+
+            if (!task.isCancelled()) task.cancel();
+        }
+
+        PlayerTeleportCancelledEvent tpCancEvent = new PlayerTeleportCancelledEvent(tp, reason, cancelMessage);
+        Bukkit.getPluginManager().callEvent(tpCancEvent);
+
+        if (tpCancEvent.getCancelMessage() != null) {
+            Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(tpCancEvent.getCancelMessage()), tp.getPlayer());
+        }
+    }
+
+    private void cancelRequest(@NotNull TeleportRequest request, @NotNull TeleportRequest.CancelReason reason, String cancelMessageRequester, String cancelMessageTarget) {
+        teleportRequests.remove(request.getRequester());
+
+        PlayerTeleportRequestCancelledEvent tpReqCancEvent = new PlayerTeleportRequestCancelledEvent(request, reason, cancelMessageRequester, cancelMessageTarget);
+        Bukkit.getPluginManager().callEvent(tpReqCancEvent);
+
+        if (tpReqCancEvent.getCancelMessageRequester() != null) {
+            Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(tpReqCancEvent.getCancelMessageRequester()), request.getRequester());
+        }
+
+        if (tpReqCancEvent.getCancelMessageTarget() != null) {
+            Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(tpReqCancEvent.getCancelMessageTarget()), request.getTarget());
+        }
+    }
 
     @Override
-    public void teleport(@NotNull Player player, @NotNull Location to, long timer) {
+    public void teleport(@NotNull Teleport teleport) {
+        Preconditions.checkNotNull(teleport);
+
+        pendingTeleports.put(teleport.getPlayer(), teleport);
+
+        PlayerPendingTeleportEvent tpReqEvent = new PlayerPendingTeleportEvent(teleport);
+        Bukkit.getPluginManager().callEvent(tpReqEvent);
+
+        if (tpReqEvent.isCancelled()) {
+            cancelTp(teleport, tpReqEvent.getCancelReason(), tpReqEvent.getCancelMessage());
+            return;
+        }
+
+        if (tpReqEvent.getPendingMessage() != null && tpReqEvent.getTimer() > 0) {
+            Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(tpReqEvent.getPendingMessage()), teleport.getPlayer());
+        }
+
+        if (teleport.getTimer() <= 0) {
+            teleportNow(teleport);
+        } else {
+            if (teleport.getPlayer().hasPermission("aio.teleport.instant")) teleportNow(teleport);
+            else runningTeleports.put(teleport, Bukkit.getScheduler().runTaskLater(aio, () -> teleportNow(teleport), teleport.getTimer() * 20));
+        }
+    }
+
+    @Override
+    public void teleport(@NotNull Player player, @NotNull Location to, long timer, String pendingMessage, String postMessage) {
         Preconditions.checkNotNull(player);
         Preconditions.checkNotNull(to);
 
-        Teleport tp = new Teleport(player, to, timer);
-        pendingTeleports.put(player, tp);
-        tp.teleport();
+        Teleport tp = new Teleport(player, to, timer, pendingMessage, postMessage);
+        teleport(tp);
+    }
+
+    @Override
+    public void teleport(@NotNull Player player, @NotNull Location to, long timer, String postMessage) {
+        teleport(player, to, timer, null, postMessage);
+    }
+
+    @Override
+    public void teleport(@NotNull Player player, @NotNull Location to, long timer) {
+        teleport(player, to, timer, null, null);
+    }
+
+    @Override
+    public void teleport(@NotNull Player player, @NotNull Location to, String postMessage) {
+        teleport(player, to, 0, null, postMessage);
     }
 
     @Override
     public void teleport(@NotNull Player player, @NotNull Location to) {
-        Preconditions.checkNotNull(player);
-        Preconditions.checkNotNull(to);
-
-        teleport(player, to, 0);
+        teleport(player, to, 0, null, null);
     }
 
     @Override
-    public void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, long timer) {
+    public void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage) {
         Preconditions.checkNotNull(player);
         Preconditions.checkNotNull(center);
 
         Location to = Utils.getRandomLocation(center, minDistance, maxDistance);
         if (to == null) return;
 
-        Bukkit.getScheduler().callSyncMethod(AIO.getInstance(), () -> {
-            teleport(player, to, timer);
+        Bukkit.getScheduler().callSyncMethod(aio, () -> {
+            teleport(player, to, timer, pendingMessage, postMessage);
             return true;
         });
     }
 
     @Override
-    public void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance) {
-        Preconditions.checkNotNull(player);
-        Preconditions.checkNotNull(center);
+    public void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, long timer, String postMessage) {
+        randomTeleport(player, center, minDistance, maxDistance, timer, null, postMessage);
+    }
 
-        randomTeleport(player, center, minDistance, maxDistance, 0);
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, long timer) {
+        randomTeleport(player, center, minDistance, maxDistance, timer, null, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, String postMessage) {
+        randomTeleport(player, center, minDistance, maxDistance, 0, null, postMessage);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance) {
+        randomTeleport(player, center, minDistance, maxDistance, 0, null, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage) {
+        Preconditions.checkNotNull(player);
+        Preconditions.checkNotNull(world);
+
+        Location center = new Location(world, xCenter, 0, zCenter);
+        randomTeleport(player, center, minDistance, maxDistance, timer, pendingMessage, postMessage);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String postMessage) {
+        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, timer, null, postMessage);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer) {
+        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, timer, null, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, String postMessage) {
+        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, 0, null, postMessage);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance) {
+        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, 0, null, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage) {
+        randomTeleport(player, Objects.requireNonNull(Bukkit.getWorld(world)), xCenter, zCenter, minDistance, maxDistance, timer, pendingMessage, postMessage);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String postMessage) {
+        randomTeleport(player, Objects.requireNonNull(Bukkit.getWorld(world)), xCenter, zCenter, minDistance, maxDistance, timer, null, postMessage);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer) {
-        Preconditions.checkNotNull(player);
-        Preconditions.checkNotNull(world);
-        Preconditions.checkNotNull(Bukkit.getWorld(world));
+        randomTeleport(player, Objects.requireNonNull(Bukkit.getWorld(world)), xCenter, zCenter, minDistance, maxDistance, timer, null, null);
+    }
 
-        randomTeleport(player, new Location(Bukkit.getWorld(world), xCenter, 0, zCenter), minDistance, maxDistance, timer);
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, String postMessage) {
+        randomTeleport(player, Objects.requireNonNull(Bukkit.getWorld(world)), xCenter, zCenter, minDistance, maxDistance, 0, null, postMessage);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance) {
-        Preconditions.checkNotNull(player);
-        Preconditions.checkNotNull(world);
-        Preconditions.checkNotNull(Bukkit.getWorld(world));
+        randomTeleport(player, Objects.requireNonNull(Bukkit.getWorld(world)), xCenter, zCenter, minDistance, maxDistance, 0, null, null);
+    }
 
-        randomTeleport(player, new Location(Bukkit.getWorld(world), xCenter, 0, zCenter), minDistance, maxDistance);
+    @Override
+    public void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage) {
+        randomTeleport(player, player.getWorld(), xCenter, zCenter, minDistance, maxDistance, timer, pendingMessage, postMessage);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String postMessage) {
+        randomTeleport(player, player.getWorld(), xCenter, zCenter, minDistance, maxDistance, timer, null, postMessage);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, long timer) {
-        Preconditions.checkNotNull(player);
+        randomTeleport(player, player.getWorld(), xCenter, zCenter, minDistance, maxDistance, timer, null, null);
+    }
 
-        randomTeleport(player, new Location(player.getWorld(), xCenter, 0, zCenter), minDistance, maxDistance, timer);
+    @Override
+    public void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, String postMessage) {
+        randomTeleport(player, player.getWorld(), xCenter, zCenter, minDistance, maxDistance, 0, null, postMessage);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance) {
-        Preconditions.checkNotNull(player);
+        randomTeleport(player, player.getWorld(), xCenter, zCenter, minDistance, maxDistance, 0, null, null);
+    }
 
-        randomTeleport(player, new Location(player.getWorld(), xCenter, 0, zCenter), minDistance, maxDistance);
+    @Override
+    public void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage) {
+        randomTeleport(player, player.getLocation(), minDistance, maxDistance, timer, pendingMessage, postMessage);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, long timer, String postMessage) {
+        randomTeleport(player, player.getLocation(), minDistance, maxDistance, timer, null, postMessage);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, long timer) {
-        Preconditions.checkNotNull(player);
+        randomTeleport(player, player.getLocation(), minDistance, maxDistance, timer);
+    }
 
-        randomTeleport(player, player.getLocation(), minDistance, maxDistance);
+    @Override
+    public void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, String postMessage) {
+        randomTeleport(player, player.getLocation(), minDistance, maxDistance, 0, null, postMessage);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, int minDistance, int maxDistance) {
-        Preconditions.checkNotNull(player);
-
-        randomTeleport(player, player.getLocation(), minDistance, maxDistance);
+        randomTeleport(player, player.getLocation(), minDistance, maxDistance, 0);
     }
 
     @Override
-    public void cancelTeleport(@NotNull Teleport teleport, String reason, boolean notify) {
+    public void cancelTeleport(@NotNull Teleport teleport, @NotNull Teleport.CancelReason reason, String message) {
         Preconditions.checkNotNull(teleport);
+        Preconditions.checkNotNull(reason);
 
-        teleport.cancel(reason, notify);
+        cancelTp(teleport, reason, message);
     }
 
     @Override
-    public void cancelTeleport(@NotNull Teleport teleport, String reason) {
+    public void cancelTeleport(@NotNull Teleport teleport, @NotNull Teleport.CancelReason reason) {
         Preconditions.checkNotNull(teleport);
+        Preconditions.checkNotNull(reason);
 
-        teleport.cancel(reason, false);
+        cancelTp(teleport, reason, null);
     }
 
     @Override
-    public void cancelTeleport(@NotNull Teleport teleport, boolean notify) {
-        Preconditions.checkNotNull(teleport);
-
-        teleport.cancel(null, notify);
-    }
-
-    @Override
-    public void cancelTeleport(@NotNull Teleport teleport) {
-        Preconditions.checkNotNull(teleport);
-
-        teleport.cancel(null, false);
-    }
-
-    @Override
-    public void cancelTeleport(@NotNull Player player, String reason) {
+    public void cancelTeleport(@NotNull Player player, @NotNull Teleport.CancelReason reason, String message) {
         Preconditions.checkNotNull(player);
+        Preconditions.checkNotNull(reason);
 
-        if (hasPendingTeleport(player)) getPendingTeleport(player).cancel(reason, false);
+        if (hasPendingTeleport(player)) cancelTp(Objects.requireNonNull(getPendingTeleport(player)), reason, message);
     }
 
     @Override
-    public void cancelTeleport(@NotNull Player player, String reason, boolean notify) {
+    public void cancelTeleport(@NotNull Player player, @NotNull Teleport.CancelReason reason) {
         Preconditions.checkNotNull(player);
+        Preconditions.checkNotNull(reason);
 
-        if (hasPendingTeleport(player)) getPendingTeleport(player).cancel(reason, notify);
-    }
-
-    @Override
-    public void cancelTeleport(@NotNull Player player) {
-        Preconditions.checkNotNull(player);
-
-        Teleport tp = pendingTeleports.get(player);
-        tp.cancel(null, false);
+        cancelTeleport(player, reason, null);
     }
 
     @Override
@@ -200,106 +356,94 @@ public class TeleportManager implements ITeleportManager {
         return Collections.unmodifiableMap(pendingTeleports);
     }
 
-    public void removeTeleport(Player player) {
-        pendingTeleports.remove(player);
-    }
-
     @Override
     public void requestTeleport(@NotNull TeleportRequest request) {
         Preconditions.checkNotNull(request);
 
-        TeleportRequest previousRequest = getRequesterTeleportRequest(request.getRequester());
-        if (previousRequest != null) cancelTeleportRequest(previousRequest);
+        teleportRequests.put(request.getRequester(), request);
 
-        teleportRequests.put(request, new Date());
+        PlayerTeleportRequestEvent tpReqEvent = new PlayerTeleportRequestEvent(request);
+        Bukkit.getPluginManager().callEvent(tpReqEvent);
+
+        if (tpReqEvent.isCancelled()) {
+            cancelRequest(request, tpReqEvent.getCancelReason(), tpReqEvent.getCancelMessageRequester(), tpReqEvent.getCancelMessageTarget());
+            return;
+        }
+
+        if (request.getRequesterMessage() != null) {
+            Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(request.getRequesterMessage()), request.getRequester());
+        }
+        if (request.getTargetMessage() != null) {
+            Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(request.getTargetMessage()), request.getTarget());
+        }
     }
 
     @Override
-    public void requestTeleport(@NotNull TeleportRequestType type, @NotNull Player requester, @NotNull Player target) {
-        requestTeleport(new TeleportRequest(type, requester, target));
+    public void requestTeleport(@NotNull Player requester, @NotNull Player target, TeleportRequest.@NotNull RequestType type, long timeout, String requesterMessage, String targetMessage) {
+        requestTeleport(new TeleportRequest(requester, target, type, timeout, requesterMessage, targetMessage));
     }
 
     @Override
-    public void cancelTeleportRequest(@NotNull TeleportRequest request, String reason, boolean notify) {
+    public void requestTeleport(@NotNull Player requester, @NotNull Player target, TeleportRequest.@NotNull RequestType type, long timeout) {
+        requestTeleport(requester, target, type, timeout, null, null);
+    }
+
+    @Override
+    public void cancelTeleportRequest(@NotNull TeleportRequest request, TeleportRequest.@NotNull CancelReason reason, String cancelMessageRequester, String cancelMessageTarget) {
         Preconditions.checkNotNull(request);
+        Preconditions.checkNotNull(reason);
 
-        teleportRequests.remove(request);
+        cancelRequest(request, reason, cancelMessageRequester, cancelMessageTarget);
     }
 
     @Override
-    public void cancelTeleportRequest(@NotNull TeleportRequest request, String reason) {
-        Preconditions.checkNotNull(request);
-
-        teleportRequests.remove(request);
+    public void cancelTeleportRequest(@NotNull TeleportRequest request, TeleportRequest.@NotNull CancelReason reason) {
+        cancelRequest(request, reason, null, null);
     }
 
     @Override
-    public void cancelTeleportRequest(@NotNull TeleportRequest request, boolean notify) {
-        Preconditions.checkNotNull(request);
-
-        teleportRequests.remove(request);
-    }
-
-    @Override
-    public void cancelTeleportRequest(@NotNull TeleportRequest request) {
-        Preconditions.checkNotNull(request);
-
-        teleportRequests.remove(request);
-
-        Player target = request.getTarget();
-        if (target != null) {
-            AIO aio = (AIO) AIO.getInstance();
-            IPlaceholdersUtils pu = aio.getPlaceholdersUtils();
-            Chat.send(pu.replacePlaceholders(aio.getLocalization().tpRequestCanceledTarget, "{REQUESTER}", request.getRequester().getName()), target);
-        }
-    }
-
-    @Override
-    public void cancelTeleportRequest(@NotNull Player requester, String reason, boolean notify) {
+    public void cancelTeleportRequest(@NotNull Player requester, TeleportRequest.@NotNull CancelReason reason, String cancelMessageRequester, String cancelMessageTarget) {
         Preconditions.checkNotNull(requester);
+        Preconditions.checkNotNull(reason);
 
-        TeleportRequest request = getRequesterTeleportRequest(requester);
-        if (request != null) {
-            teleportRequests.remove(request);
-        }
+        if (hasRequesterTeleportRequest(requester))
+            cancelRequest(Objects.requireNonNull(getRequesterTeleportRequest(requester)), reason, cancelMessageRequester, cancelMessageTarget);
     }
 
     @Override
-    public void cancelTeleportRequest(@NotNull Player requester, String reason) {
-        Preconditions.checkNotNull(requester);
-
-        TeleportRequest request = getRequesterTeleportRequest(requester);
-        if (request != null) {
-            teleportRequests.remove(request);
-        }
+    public void cancelTeleportRequest(@NotNull Player requester, TeleportRequest.@NotNull CancelReason reason) {
+        cancelTeleportRequest(requester, reason, null, null);
     }
 
     @Override
-    public void cancelTeleportRequest(@NotNull Player requester, boolean notify) {
-        Preconditions.checkNotNull(requester);
-
-        TeleportRequest request = getRequesterTeleportRequest(requester);
-        if (request != null) {
-            teleportRequests.remove(request);
-        }
+    public boolean hasRequesterTeleportRequest(@NotNull Player requester) {
+        return teleportRequests.containsKey(requester);
     }
 
     @Override
-    public void cancelTeleportRequest(@NotNull Player requester) {
-        Preconditions.checkNotNull(requester);
-
-        TeleportRequest request = getRequesterTeleportRequest(requester);
-        if (request != null) {
-            teleportRequests.remove(request);
-        }
+    public boolean hasTargetTeleportRequest(@NotNull Player target) {
+        return teleportRequests.values().stream().anyMatch(r -> r.getTarget().equals(target));
     }
 
     @Override
+    public @Nullable TeleportRequest getRequesterTeleportRequest(@NotNull Player requester) {
+        return teleportRequests.get(requester);
+    }
+
+    @Override
+    public List<TeleportRequest> getTargetTeleportRequests(@NotNull Player target) {
+        return teleportRequests.values().stream().filter(r -> r.getTarget().equals(target)).collect(Collectors.toList());
+    }
+
+    @Override
+    public Map<Player, TeleportRequest> getTeleportRequests() {
+        return Collections.unmodifiableMap(teleportRequests);
+    }
+
+    /*@Override
     public void executeRequest(@NotNull TeleportRequest request, boolean accept) {
         teleportRequests.remove(request);
 
-        AIO aio = (AIO) AIO.getInstance();
-        Config config = aio.getConfiguration();
         Localization localization = aio.getLocalization();
         IPlaceholdersUtils pu = aio.getPlaceholdersUtils();
         IEconomy economy = aio.getEconomy();
@@ -308,11 +452,10 @@ public class TeleportManager implements ITeleportManager {
         Player target = request.getTarget();
 
         if (accept) {
-            //TODO Fix unit delay
             long delay = aio.getConfiguration().teleportRequestDelay;
             String seconds = String.valueOf(delay / 20);
             TeleportRequestType type = request.getType();
-            double cost = config.commandCosts.getCommandCost(type.name().toLowerCase(Locale.ROOT)) / 2f;
+            double cost = economyModconfig.commandCosts.getCommandCost(type.name().toLowerCase(Locale.ROOT)) / 2f;
 
             if (config.commandCosts.costsEnabled && VAULT && config.commandCosts.hasCommandCost(type.name().toLowerCase(Locale.ROOT)) && !requester.hasPermission("aio.bypass.costs")) {
                 if (!economy.has(requester, cost / 2)) {
@@ -337,67 +480,5 @@ public class TeleportManager implements ITeleportManager {
             Chat.send(localization.teleportRequestRejected, target);
             Chat.send(pu.replacePlaceholders(localization.targetRejectedRequest, new String[]{"{NAME}", "{DISPLAYNAME}"}, new Object[]{target.getName(), target.getDisplayName()}), requester);
         }
-    }
-
-    @Override
-    public boolean hasRequesterTeleportRequest(@NotNull Player requester) {
-        return getRequesterTeleportRequest(requester) != null;
-    }
-
-    @Override
-    public boolean hasTargetTeleportRequest(@NotNull Player target) {
-        return !getTargetTeleportRequests(target).isEmpty();
-    }
-
-    @Override
-    public @Nullable TeleportRequest getRequesterTeleportRequest(@NotNull Player requester) {
-        Preconditions.checkNotNull(requester);
-
-        for (TeleportRequest request : teleportRequests.keySet()) {
-            if (request.getRequester().equals(requester)) {
-                return request;
-            }
-        }
-
-        return null;
-    }
-
-    @Override
-    public List<TeleportRequest> getTargetTeleportRequests(@NotNull Player target) {
-        Preconditions.checkNotNull(target);
-
-        List<TeleportRequest> requests = new ArrayList<>();
-
-        for (TeleportRequest request : teleportRequests.keySet()) {
-            if (request.getTarget().equals(target)) {
-                requests.add(request);
-            }
-        }
-
-        return requests;
-    }
-
-    @Override
-    public Map<TeleportRequest, Date> getTeleportRequests() {
-        return Collections.unmodifiableMap(teleportRequests);
-    }
-
-    @Override
-    public @Nullable Date getTeleportRequestTimestamp(@NotNull TeleportRequest request) {
-        Preconditions.checkNotNull(request);
-
-        return teleportRequests.get(request);
-    }
-
-    @Override
-    public List<String> getRequesterNames(Player target) {
-        List<String> names = new ArrayList<>();
-        List<TeleportRequest> targetRequests = getTargetTeleportRequests(target);
-
-        for (TeleportRequest request : targetRequests) {
-            names.add(request.getRequester().getName());
-        }
-
-        return names;
-    }
+    }*/
 }
