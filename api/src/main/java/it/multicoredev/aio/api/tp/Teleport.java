@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class Teleport {
     private final Player player;
+    private Player target;
     private Location to;
     private long timer;
     private String pendingMessage;
@@ -88,6 +89,62 @@ public class Teleport {
     }
 
     /**
+     * Create a new Teleport object.
+     *
+     * @param player         the player to teleport.
+     * @param target         the target of the player.
+     * @param timer          the time in ticks before the teleport.
+     * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
+     * @param postMessage    the message to send to the player after the teleport.
+     */
+    public Teleport(@NotNull Player player, @NotNull Player target, long timer, String pendingMessage, String postMessage) {
+        Preconditions.checkNotNull(player);
+        Preconditions.checkNotNull(target);
+
+        this.player = player;
+        this.to = null;
+        this.target = target;
+        this.timer = timer;
+        this.pendingMessage = pendingMessage;
+        this.postMessage = postMessage;
+    }
+
+    /**
+     * Create a new Teleport object.
+     *
+     * @param player the player to teleport.
+     * @param target the target of the player.
+     * @param timer  the time in ticks before the teleport.
+     */
+    public Teleport(@NotNull Player player, @NotNull Player target, long timer) {
+        this(player, target, timer, null, null);
+    }
+
+    /**
+     * Create a new Teleport object.
+     * Default timer is 0.
+     *
+     * @param player         the player to teleport.
+     * @param target         the target of the player.
+     * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
+     * @param postMessage    the message to send to the player after the teleport.
+     */
+    public Teleport(@NotNull Player player, @NotNull Player target, String pendingMessage, String postMessage) {
+        this(player, target, 0, pendingMessage, postMessage);
+    }
+
+    /**
+     * Create a new Teleport object.
+     * Default timer is 0.
+     *
+     * @param player the player to teleport.
+     * @param target the target of the player.
+     */
+    public Teleport(@NotNull Player player, @NotNull Player target) {
+        this(player, target, 0, null, null);
+    }
+
+    /**
      * Get the teleported player.
      *
      * @return the teleported player.
@@ -111,7 +168,8 @@ public class Teleport {
      * @return the destination of the player.
      */
     public Location getTo() {
-        return to;
+        if (to != null) return to;
+        else return target.getLocation();
     }
 
     /**
@@ -123,6 +181,24 @@ public class Teleport {
         Preconditions.checkNotNull(to);
 
         this.to = to;
+    }
+
+    /**
+     * Get the target of the teleport.
+     *
+     * @return the target of the teleport.
+     */
+    public Player getTarget() {
+        return target;
+    }
+
+    /**
+     * Set the target of the teleport.
+     *
+     * @param target the target of the teleport.
+     */
+    public void setTarget(Player target) {
+        this.target = target;
     }
 
     /**
@@ -187,10 +263,6 @@ public class Teleport {
      * Enumerator of the reasons for a teleport to be cancelled.
      */
     public enum CancelReason {
-        NOT_ONLINE,
-        MOVEMENT,
-        DAMAGE,
-        UNSAFE_DESTINATION,
-        OTHER
+        NOT_ONLINE, MOVEMENT, DAMAGE, UNSAFE_DESTINATION, OTHER
     }
 }

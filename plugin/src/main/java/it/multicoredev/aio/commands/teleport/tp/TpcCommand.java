@@ -9,6 +9,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * Copyright © 2022 by Daniele Patella. All rights reserved.
  * This file is part of AIO.
@@ -21,18 +23,18 @@ import org.jetbrains.annotations.NotNull;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class TpacancelCommand extends PluginCommand {
-    private static final String CMD = "tpacancel";
+public class TpcCommand extends PluginCommand {
+    private static final String CMD = "tpc";
 
-    public TpacancelCommand(AIO aio) {
+    public TpcCommand(AIO aio) {
         super(aio, CMD);
     }
 
     @Override
     public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!isPlayer(sender)) {
-            Chat.send(localization.notPlayer, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.notPlayer), sender);
+            return false;
         }
 
         Player requester = (Player) sender;
@@ -40,18 +42,25 @@ public class TpacancelCommand extends PluginCommand {
         ITeleportManager teleportManager = aio.getTeleportManager();
 
         if (!teleportManager.hasRequesterTeleportRequest(requester)) {
-            Chat.send(localization.noSentTpRequest, requester);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.noTpRequest), requester);
+            return false;
         }
 
-        TeleportRequest request = aio.getTeleportManager().getRequesterTeleportRequest(requester);
-        if (request == null) {
-            Chat.send(localization.noSentTpRequest, requester);
-            return true;
-        }
+        Player target = Objects.requireNonNull(teleportManager.getRequesterTeleportRequest(requester)).getTarget();
 
-        teleportManager.cancelTeleportRequest(request);
-        Chat.send(localization.tpRequestCanceledRequester, requester);
+        teleportManager.cancelTeleportRequest(
+                requester,
+                TeleportRequest.CancelReason.CANCELLED,
+                pu.replacePlaceholders(
+                        localization.tpRequestCancelledRequester,
+                        new String[]{"{REQUESTER_NAME}", "{REQUESTER_DISPLAYNAME}", "{TARGET_NAME}", "{TARGET_DISPLAYNAME}"},
+                        new Object[]{requester.getName(), requester.getDisplayName(), target.getName(), target.getDisplayName()}),
+                pu.replacePlaceholders(
+                        localization.tpRequestCancelledTarget,
+                        new String[]{"{REQUESTER_NAME}", "{REQUESTER_DISPLAYNAME}", "{TARGET_NAME}", "{TARGET_DISPLAYNAME}"},
+                        new Object[]{requester.getName(), requester.getDisplayName(), target.getName(), target.getDisplayName()})
+        );
+
         return true;
     }
 }

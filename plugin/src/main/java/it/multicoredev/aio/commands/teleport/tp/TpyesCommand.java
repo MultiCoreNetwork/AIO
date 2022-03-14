@@ -6,13 +6,16 @@ import it.multicoredev.aio.api.tp.TeleportRequest;
 import it.multicoredev.aio.api.utils.IPlaceholdersUtils;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.mbcore.spigot.Chat;
+import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Copyright © 2022 by Daniele Patella. All rights reserved.
@@ -41,58 +44,52 @@ public class TpyesCommand extends PluginCommand {
         }
 
         Player target = (Player) sender;
-
-        if (args.length > 1) {
-            incorrectUsage(sender);
-            return false;
-        }
-
         ITeleportManager teleportManager = aio.getTeleportManager();
-        IPlaceholdersUtils pu = aio.getPlaceholdersUtils();
 
         if (!teleportManager.hasTargetTeleportRequest(target)) {
-            Chat.send(pu.replacePlaceholders(localization.noPendingTeleportRequest), target);
+            Chat.send(pu.replacePlaceholders(localization.noTpRequest), target);
             return false;
         }
 
         TeleportRequest request;
-        Player requester;
-
-        if (args.length == 0) {
-            List<TeleportRequest> targetList = teleportManager.getTargetTeleportRequests(target);
-            request = targetList.get(targetList.size() - 1);
-        } else {
-            requester = Bukkit.getPlayer(args[0]);
-
+        if (args.length > 0) {
+            Player requester = Bukkit.getPlayer(args[0]);
             if (requester == null) {
-                Chat.send(pu.replacePlaceholders(localization.playerNotFound), target);
+                Chat.send(pu.replacePlaceholders(localization.noTpRequestFound), target);
                 return false;
             }
 
-            if (requester.getUniqueId() == target.getUniqueId()) {
-                Chat.send(localization.noRequestFromYourSelf, sender);
-                return true;
-            }
-
-            TeleportRequest requesterRequest = teleportManager.getRequesterTeleportRequest(requester);
-
-            if (requesterRequest == null || requesterRequest.getTarget() != target) {
-                Chat.send(pu.replacePlaceholders(localization.teleportRequestNotFound), target);
+            request = teleportManager.getRequesterTeleportRequest(requester);
+            if (request == null || !request.getTarget().equals(target)) {
+                Chat.send(pu.replacePlaceholders(localization.noTpRequestFound), target);
                 return false;
             }
-
-            request = requesterRequest;
+        } else {
+            List<TeleportRequest> requests = teleportManager.getTargetTeleportRequests(target);
+            Collections.sort(requests);
+            request = requests.get(0);
         }
 
-        teleportManager.executeRequest(request, true);
+        if (request == null) {
+            Chat.send(pu.replacePlaceholders(localization.commandException), target);
+            Chat.warning("&6tpyes command returned a null request.");
+            return false;
+        }
+
+        teleportManager.acceptTeleportRequest(request);
         return true;
     }
 
     @Override
     public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
-        if (hasCommandPerm(sender) && args.length == 1) {
-            ITeleportManager teleportManager = aio.getTeleportManager();
-            return teleportManager.getRequesterNames((Player) sender);
+        if (isPlayer(sender) && hasCommandPerm(sender) && args.length == 1) {
+            return TabCompleterUtil.getCompletions(
+                    args[0],
+                    aio.getTeleportManager()
+                            .getTargetTeleportRequests((Player) sender)
+                            .stream()
+                            .map(r -> r.getRequester().getName())
+                            .collect(Collectors.toList()));
         }
 
         return new ArrayList<>();

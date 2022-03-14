@@ -18,7 +18,7 @@ import java.util.Date;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class TeleportRequest {
+public class TeleportRequest implements Comparable<TeleportRequest> {
     private final Player requester;
     private Player target;
     private final RequestType type;
@@ -170,17 +170,25 @@ public class TeleportRequest {
         return this.targetMessage;
     }
 
+    @Override
+    public int compareTo(@NotNull TeleportRequest request) {
+        return Long.compare(this.timestamp, request.timestamp);
+    }
+
     public enum RequestType {
         TPA,
         TPAHERE
     }
 
     public enum CancelReason {
-        REJECTED,
+        DENIED,
         EXPIRED,
+        CANCELLED,
+        REPLACED,
         MOVEMENT,
         DAMAGE,
         UNSAFE_DESTINATION,
+        INSUFFICIENT_MONEY,
         OTHER
     }
 }

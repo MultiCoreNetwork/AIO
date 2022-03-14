@@ -89,6 +89,56 @@ public interface ITeleportManager {
     void teleport(@NotNull Player player, @NotNull Location to);
 
     /**
+     * Teleport a player to the give location after some time.
+     *
+     * @param player         the player to teleport.
+     * @param target         the target of the player.
+     * @param timer          the time in seconds before the teleport.
+     * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
+     * @param postMessage    the message to send to the player after the teleport.
+     */
+    void teleport(@NotNull Player player, @NotNull Player target, long timer, String pendingMessage, String postMessage);
+
+    /**
+     * Teleport a player to the give location after some time.
+     *
+     * @param player      the player to teleport.
+     * @param target      the target of the player.
+     * @param timer       the time in seconds before the teleport.
+     * @param postMessage the message to send to the player after the teleport.
+     */
+    void teleport(@NotNull Player player, @NotNull Player target, long timer, String postMessage);
+
+    /**
+     * Teleport a player to the give location after some time.
+     * Default value for the timer is 0.
+     *
+     * @param player the player to teleport.
+     * @param target the target of the player.
+     * @param timer  the time in seconds before the teleport.
+     */
+    void teleport(@NotNull Player player, @NotNull Player target, long timer);
+
+    /**
+     * Teleport a player to the give location.
+     * Default value for the timer is 0.
+     *
+     * @param player      the player to teleport.
+     * @param target      the target of the player.
+     * @param postMessage the message to send to the player after the teleport.
+     */
+    void teleport(@NotNull Player player, @NotNull Player target, String postMessage);
+
+    /**
+     * Teleport a player to the give location.
+     * Default value for the timer is 0.
+     *
+     * @param player the player to teleport.
+     * @param target the target of the player.
+     */
+    void teleport(@NotNull Player player, @NotNull Player target);
+
+    /**
      * Teleport a player to a random location after some time.
      *
      * @param player         the player to teleport.
@@ -555,4 +605,18 @@ public interface ITeleportManager {
      * @return a map of all the teleport requests.
      */
     Map<Player, TeleportRequest> getTeleportRequests();
+
+    /**
+     * Accept the teleport request.
+     *
+     * @param request the teleport request to accept.
+     */
+    void acceptTeleportRequest(@NotNull TeleportRequest request);
+
+    /**
+     * Deny the teleport request.
+     *
+     * @param request the teleport request to deny.
+     */
+    void denyTeleportRequest(@NotNull TeleportRequest request);
 }

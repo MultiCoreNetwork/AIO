@@ -1,9 +1,7 @@
 package it.multicoredev.aio.commands.teleport.tp;
 
 import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.api.tp.ITeleportManager;
-import it.multicoredev.aio.api.tp.TeleportRequestType;
-import it.multicoredev.aio.api.utils.IPlaceholdersUtils;
+import it.multicoredev.aio.api.tp.TeleportRequest;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.mbcore.spigot.Chat;
 import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
@@ -37,41 +35,43 @@ public class TpahereCommand extends PluginCommand {
     @Override
     public boolean run(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!isPlayer(sender)) {
-            Chat.send(localization.notPlayer, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.notPlayer), sender);
+            return false;
         }
 
         Player requester = (Player) sender;
 
         if (args.length < 1) {
             incorrectUsage(sender);
-            return true;
+            return false;
         }
 
         Player target = Bukkit.getPlayer(args[0]);
-
         if (target == null) {
-            Chat.send(localization.playerNotFound, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
+            return false;
         }
 
         if (requester.getUniqueId() == target.getUniqueId()) {
-            Chat.send(localization.noTeleportRequestYourself, sender);
-            return true;
+            Chat.send(pu.replacePlaceholders(localization.tpToYourself), sender);
+            return false;
         }
 
-        ITeleportManager teleportManager = aio.getTeleportManager();
+        aio.getTeleportManager().requestTeleport(
+                requester,
+                target,
+                TeleportRequest.RequestType.TPAHERE,
+                config.teleportRequestTimeout,
+                pu.replacePlaceholders(
+                        localization.tpahereRequestRequester,
+                        new String[]{"{REQUESTER_NAME}", "{REQUESTER_DISPLAYNAME}", "{TARGET_NAME}", "{TARGET_DISPLAYNAME}"},
+                        new Object[]{requester.getName(), requester.getDisplayName(), target.getName(), target.getDisplayName()}),
+                pu.replacePlaceholders(
+                        localization.tpahereRequestTarget,
+                        new String[]{"{REQUESTER_NAME}", "{REQUESTER_DISPLAYNAME}", "{TARGET_NAME}", "{TARGET_DISPLAYNAME}"},
+                        new Object[]{requester.getName(), requester.getDisplayName(), target.getName(), target.getDisplayName()})
+        );
 
-        if (teleportManager.hasRequesterTeleportRequest(requester)) {
-            Chat.send(localization.anotherRequestInPending, requester);
-            return true;
-        }
-
-        teleportManager.requestTeleport(TeleportRequestType.TPAHERE, requester, target);
-
-        IPlaceholdersUtils placeholdersUtils = aio.getPlaceholdersUtils();
-        Chat.send(placeholdersUtils.replacePlaceholders(localization.tpahereRequestSent, "{TARGET}", target.getName()), sender);
-        Chat.send(placeholdersUtils.replacePlaceholders(localization.tpahereRequestTarget, "{REQUESTER}", requester.getName()), target);
         return true;
     }
 

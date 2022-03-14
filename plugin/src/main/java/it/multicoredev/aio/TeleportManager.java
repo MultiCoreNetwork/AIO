@@ -5,6 +5,8 @@ import it.multicoredev.aio.api.events.teleport.*;
 import it.multicoredev.aio.api.tp.ITeleportManager;
 import it.multicoredev.aio.api.tp.Teleport;
 import it.multicoredev.aio.api.tp.TeleportRequest;
+import it.multicoredev.aio.api.utils.IPlaceholdersUtils;
+import it.multicoredev.aio.storage.config.Localization;
 import it.multicoredev.aio.storage.config.modules.EconomyModule;
 import it.multicoredev.aio.utils.Utils;
 import it.multicoredev.mbcore.spigot.Chat;
@@ -41,6 +43,8 @@ import java.util.stream.Collectors;
  */
 public class TeleportManager implements ITeleportManager {
     private final AIO aio;
+    private final Localization localization;
+    private final IPlaceholdersUtils pu;
     private final EconomyModule economyModule;
     private final Map<Player, Teleport> pendingTeleports = new LinkedHashMap<>();
     private final Map<Player, TeleportRequest> teleportRequests = new LinkedHashMap<>();
@@ -48,6 +52,8 @@ public class TeleportManager implements ITeleportManager {
 
     public TeleportManager(AIO aio) {
         this.aio = aio;
+        this.localization = aio.getLocalization();
+        this.pu = aio.getPlaceholdersUtils();
         this.economyModule = aio.getModuleManager().getModule(AIO.ECONOMY_MODULE);
     }
 
@@ -73,8 +79,8 @@ public class TeleportManager implements ITeleportManager {
         PlayerPostTeleportEvent postTpEvent = new PlayerPostTeleportEvent(tp);
         Bukkit.getPluginManager().callEvent(postTpEvent);
 
-        if (postTpEvent.getPostMessage() != null) {
-            Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(postTpEvent.getPostMessage()), tp.getPlayer());
+        if (postTpEvent.getPostMessage() != null && tp.getPlayer().isOnline()) {
+            Chat.send(pu.replacePlaceholders(postTpEvent.getPostMessage()), tp.getPlayer());
         }
     }
 
@@ -92,8 +98,8 @@ public class TeleportManager implements ITeleportManager {
         PlayerTeleportCancelledEvent tpCancEvent = new PlayerTeleportCancelledEvent(tp, reason, cancelMessage);
         Bukkit.getPluginManager().callEvent(tpCancEvent);
 
-        if (tpCancEvent.getCancelMessage() != null) {
-            Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(tpCancEvent.getCancelMessage()), tp.getPlayer());
+        if (tpCancEvent.getCancelMessage() != null && tp.getPlayer().isOnline()) {
+            Chat.send(pu.replacePlaceholders(tpCancEvent.getCancelMessage()), tp.getPlayer());
         }
     }
 
@@ -103,12 +109,12 @@ public class TeleportManager implements ITeleportManager {
         PlayerTeleportRequestCancelledEvent tpReqCancEvent = new PlayerTeleportRequestCancelledEvent(request, reason, cancelMessageRequester, cancelMessageTarget);
         Bukkit.getPluginManager().callEvent(tpReqCancEvent);
 
-        if (tpReqCancEvent.getCancelMessageRequester() != null) {
-            Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(tpReqCancEvent.getCancelMessageRequester()), request.getRequester());
+        if (tpReqCancEvent.getCancelMessageRequester() != null && request.getRequester().isOnline()) {
+            Chat.send(pu.replacePlaceholders(tpReqCancEvent.getCancelMessageRequester()), request.getRequester());
         }
 
-        if (tpReqCancEvent.getCancelMessageTarget() != null) {
-            Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(tpReqCancEvent.getCancelMessageTarget()), request.getTarget());
+        if (tpReqCancEvent.getCancelMessageTarget() != null && request.getTarget().isOnline()) {
+            Chat.send(pu.replacePlaceholders(tpReqCancEvent.getCancelMessageTarget()), request.getTarget());
         }
     }
 
@@ -126,8 +132,8 @@ public class TeleportManager implements ITeleportManager {
             return;
         }
 
-        if (tpReqEvent.getPendingMessage() != null && tpReqEvent.getTimer() > 0) {
-            Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(tpReqEvent.getPendingMessage()), teleport.getPlayer());
+        if (tpReqEvent.getPendingMessage() != null && tpReqEvent.getTimer() > 0 && teleport.getPlayer().isOnline()) {
+            Chat.send(pu.replacePlaceholders(tpReqEvent.getPendingMessage()), teleport.getPlayer());
         }
 
         if (teleport.getTimer() <= 0) {
@@ -165,6 +171,31 @@ public class TeleportManager implements ITeleportManager {
     @Override
     public void teleport(@NotNull Player player, @NotNull Location to) {
         teleport(player, to, 0, null, null);
+    }
+
+    @Override
+    public void teleport(@NotNull Player player, @NotNull Player target, long timer, String pendingMessage, String postMessage) {
+        teleport(new Teleport(player, target, timer, pendingMessage, postMessage));
+    }
+
+    @Override
+    public void teleport(@NotNull Player player, @NotNull Player target, long timer, String postMessage) {
+        teleport(player, target, timer, null, postMessage);
+    }
+
+    @Override
+    public void teleport(@NotNull Player player, @NotNull Player target, long timer) {
+        teleport(player, target, timer, null, null);
+    }
+
+    @Override
+    public void teleport(@NotNull Player player, @NotNull Player target, String postMessage) {
+        teleport(player, target, 0, null, postMessage);
+    }
+
+    @Override
+    public void teleport(@NotNull Player player, @NotNull Player target) {
+        teleport(player, target, 0, null, null);
     }
 
     @Override
@@ -360,6 +391,8 @@ public class TeleportManager implements ITeleportManager {
     public void requestTeleport(@NotNull TeleportRequest request) {
         Preconditions.checkNotNull(request);
 
+        if (hasRequesterTeleportRequest(request.getRequester())) cancelTeleportRequest(request.getRequester(), TeleportRequest.CancelReason.REPLACED);
+
         teleportRequests.put(request.getRequester(), request);
 
         PlayerTeleportRequestEvent tpReqEvent = new PlayerTeleportRequestEvent(request);
@@ -371,10 +404,10 @@ public class TeleportManager implements ITeleportManager {
         }
 
         if (request.getRequesterMessage() != null) {
-            Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(request.getRequesterMessage()), request.getRequester());
+            Chat.send(pu.replacePlaceholders(request.getRequesterMessage()), request.getRequester());
         }
         if (request.getTargetMessage() != null) {
-            Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(request.getTargetMessage()), request.getTarget());
+            Chat.send(pu.replacePlaceholders(request.getTargetMessage()), request.getTarget());
         }
     }
 
@@ -440,45 +473,61 @@ public class TeleportManager implements ITeleportManager {
         return Collections.unmodifiableMap(teleportRequests);
     }
 
-    /*@Override
-    public void executeRequest(@NotNull TeleportRequest request, boolean accept) {
-        teleportRequests.remove(request);
+    @Override
+    public void acceptTeleportRequest(@NotNull TeleportRequest request) {
+        Preconditions.checkNotNull(request);
 
-        Localization localization = aio.getLocalization();
-        IPlaceholdersUtils pu = aio.getPlaceholdersUtils();
-        IEconomy economy = aio.getEconomy();
+        Chat.send(pu.replacePlaceholders(localization.tpyesRequester), request.getRequester());
 
         Player requester = request.getRequester();
         Player target = request.getTarget();
 
-        if (accept) {
-            long delay = aio.getConfiguration().teleportRequestDelay;
-            String seconds = String.valueOf(delay / 20);
-            TeleportRequestType type = request.getType();
-            double cost = economyModconfig.commandCosts.getCommandCost(type.name().toLowerCase(Locale.ROOT)) / 2f;
+        teleport(
+                requester,
+                target,
+                0, //TODO
+                pu.replacePlaceholders(localization.pendingTp, "{DELAY}", 0),
+                pu.replacePlaceholders(localization.postTp)
+        );
 
-            if (config.commandCosts.costsEnabled && VAULT && config.commandCosts.hasCommandCost(type.name().toLowerCase(Locale.ROOT)) && !requester.hasPermission("aio.bypass.costs")) {
-                if (!economy.has(requester, cost / 2)) {
-                    Chat.send(localization.insufficientCmdMoney, requester);
-                    return;
-                }
+        String cmd = request.getType() == TeleportRequest.RequestType.TPA ? "tpa" : "tpahere";
+        if (economyModule.hasCommandCost(cmd, requester)) {
+            double cost = economyModule.getCommandCost(cmd) / 2f;
 
-                economy.withdrawPlayer(requester, cost);
+            if (!Objects.requireNonNull(aio.getEconomy()).has(requester, cost)) {
+                cancelTeleportRequest(
+                        request,
+                        TeleportRequest.CancelReason.INSUFFICIENT_MONEY,
+                        pu.replacePlaceholders(localization.insufficientCmdMoney, "{MONEY}", aio.getEconomy().format(cost)),
+                        pu.replacePlaceholders(
+                                localization.tpRequestCancelledTarget,
+                                new String[]{"{REQUESTER_NAME}", "{REQUESTER_DISPLAYNAME}", "{TARGET_NAME}", "{TARGET_DISPLAYNAME}"},
+                                new Object[]{requester.getName(), requester.getDisplayName(), target.getName(), target.getDisplayName()})
+                );
+            } else {
+                if (!aio.getCommandRegistry().getCommandNames(aio).contains(cmd)) aio.getEconomy().withdrawPlayer(requester, cost);
             }
-
-            if (type == TeleportRequestType.TPA) {
-                Chat.send(pu.replacePlaceholders(localization.teleportRequestAccepted, new String[]{"{NAME}", "{DISPLAYNAME}", "{SECONDS}"}, new Object[]{target.getName(), target.getDisplayName(), seconds}), target);
-                Chat.send(pu.replacePlaceholders(localization.targetAcceptedRequest + " " + localization.stayStillFor, new String[]{"{NAME}", "{DISPLAYNAME}", "{SECONDS}"}, new Object[]{target.getName(), target.getDisplayName(), seconds}), requester);
-                teleport(requester, target.getLocation(), delay);
-            } else if (type == TeleportRequestType.TPAHERE) {
-                Chat.send(pu.replacePlaceholders(localization.teleportRequestAccepted + " " + localization.stayStillFor, new String[]{"{NAME}", "{DISPLAYNAME}", "{SECONDS}"}, new Object[]{target.getName(), target.getDisplayName(), seconds}), target);
-                Chat.send(pu.replacePlaceholders(localization.targetAcceptedRequest, new String[]{"{NAME}", "{DISPLAYNAME}", "{SECONDS}"}, new Object[]{target.getName(), target.getDisplayName(), seconds}), requester);
-                teleport(target, requester.getLocation(), delay);
-            }
-
-        } else {
-            Chat.send(localization.teleportRequestRejected, target);
-            Chat.send(pu.replacePlaceholders(localization.targetRejectedRequest, new String[]{"{NAME}", "{DISPLAYNAME}"}, new Object[]{target.getName(), target.getDisplayName()}), requester);
         }
-    }*/
+    }
+
+    @Override
+    public void denyTeleportRequest(@NotNull TeleportRequest request) {
+        Preconditions.checkNotNull(request);
+
+        Player requester = request.getRequester();
+        Player target = request.getTarget();
+
+        cancelTeleportRequest(
+                request,
+                TeleportRequest.CancelReason.DENIED,
+                pu.replacePlaceholders(
+                        localization.tpaRequestRequester,
+                        new String[]{"{REQUESTER_NAME}", "{REQUESTER_DISPLAYNAME}", "{TARGET_NAME}", "{TARGET_DISPLAYNAME}"},
+                        new Object[]{requester.getName(), requester.getDisplayName(), target.getName(), target.getDisplayName()}),
+                pu.replacePlaceholders(
+                        localization.tpaRequestTarget,
+                        new String[]{"{REQUESTER_NAME}", "{REQUESTER_DISPLAYNAME}", "{TARGET_NAME}", "{TARGET_DISPLAYNAME}"},
+                        new Object[]{requester.getName(), requester.getDisplayName(), target.getName(), target.getDisplayName()})
+        );
+    }
 }

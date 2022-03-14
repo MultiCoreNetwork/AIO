@@ -163,6 +163,8 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     //TODO Require economy module enabled in checks
     //TODO Add Objects.requireNonNull(...) where needed
     //TODO Cancel pending teleports and requests when the player quits
+    //TODO placeholderutils.replacePlaceholders does not have the player
+    //TODO Add vanilla tp command replacement (Priority low)
 
     @Override
     public void onEnable() {
@@ -843,7 +845,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         if (commands.isEnabled("sun")) commandRegistry.registerCommand(new SunCommand(this), this);
         if (commands.isEnabled("thunder")) commandRegistry.registerCommand(new ThunderCommand(this), this);
         if (commands.isEnabled("tpa")) commandRegistry.registerCommand(new TpaCommand(this), this);
-        if (commands.isEnabled("tpacancel")) commandRegistry.registerCommand(new TpacancelCommand(this), this);
+        if (commands.isEnabled("tpacancel")) commandRegistry.registerCommand(new TpcCommand(this), this);
         if (commands.isEnabled("tpahere")) commandRegistry.registerCommand(new TpahereCommand(this), this);
         if (commands.isEnabled("tpall")) commandRegistry.registerCommand(new TpallCommand(this), this);
         if (commands.isEnabled("tpyes")) commandRegistry.registerCommand(new TpyesCommand(this), this);

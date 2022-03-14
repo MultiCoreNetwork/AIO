@@ -87,4 +87,12 @@ public interface ICommandRegistry {
      * empty List if no command is registered by that plugin.
      */
     List<String> getCommandNames();
+
+    /**
+     * Get a list of aliases for a command.
+     *
+     * @param command the command to get the aliases.
+     * @return a list of aliases for the command.
+     */
+    List<String> getCommandAliases(@NotNull String command);
 }

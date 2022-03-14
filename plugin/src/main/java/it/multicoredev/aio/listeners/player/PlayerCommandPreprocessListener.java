@@ -67,6 +67,8 @@ public class PlayerCommandPreprocessListener extends PluginListenerExecutor<Play
         if (economyModule.hasCommandCost(cmd, player)) {
             double cost = economyModule.getCommandCost(cmd);
 
+            if (aio.getCommandRegistry().getCommandAliases("tpa").contains(cmd) || aio.getCommandRegistry().getCommandAliases("tpahere").contains(cmd)) cost = cost / 2f;
+
             if (!Objects.requireNonNull(aio.getEconomy()).has(player, cost)) {
                 Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(
                         localization.insufficientCmdMoney,

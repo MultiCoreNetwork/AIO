@@ -298,48 +298,44 @@ public class Localization extends JsonConfig {
     @SerializedName("time_set_night")
     public String timeSetNight;
 
-    @SerializedName(("another_request_in_pending"))
-    public String anotherRequestInPending;
-    @SerializedName("damage_on_teleport")
-    public String damageOnTeleport;
-    @SerializedName("no_pending_teleport_request")
-    public String noPendingTeleportRequest;
-    @SerializedName("no_teleport_request_yourself")
-    public String noTeleportRequestYourself;
-    @SerializedName("no_request_from_yourself")
-    public String noRequestFromYourSelf;
-    @SerializedName("requester_request_expired")
-    public String requesterRequestExpired;
-    @SerializedName("stay_still_for")
-    public String stayStillFor;
-    @SerializedName("target_accepted_request")
-    public String targetAcceptedRequest;
-    @SerializedName("target_rejected_request")
-    public String targetRejectedRequest;
-    @SerializedName("teleport_request_accepted")
-    public String teleportRequestAccepted;
-    @SerializedName("teleport_request_rejected")
-    public String teleportRequestRejected;
-    @SerializedName("teleport_request_not_found")
-    public String teleportRequestNotFound;
+    @SerializedName("no_tp_request")
+    public String noTpRequest;
+    @SerializedName("pending_tp")
+    public String pendingTp;
+    @SerializedName("post_tp")
+    public String postTp;
+    @SerializedName("tp_to_yourself")
+    public String tpToYourself;
+
+    @SerializedName("tpahere_request_requester")
+    public String tpahereRequestRequester;
+    @SerializedName("tpahere_request_target")
+    public String tpahereRequestTarget;
+    @SerializedName("tpa_request_requester")
+    public String tpaRequestRequester;
+    @SerializedName("tpa_request_target")
+    public String tpaRequestTarget;
+
+    @SerializedName("tp_request_cancelled_requester")
+    public String tpRequestCancelledRequester;
+    @SerializedName("tp_request_cancelled_target")
+    public String tpRequestCancelledTarget;
+
+    @SerializedName("no_tp_request_found")
+    public String noTpRequestFound;
+
+    @SerializedName("tpno_requester")
+    public String tpnoRequester;
+    @SerializedName("tpno_target")
+    public String tpnoTarget;
+
+    @SerializedName("tpyes_requester")
+    public String tpyesRequester;
+
     @SerializedName("tpall")
     public String tpall;
     @SerializedName("tpall_self")
     public String tpallSelf;
-    @SerializedName("tp_request_canceled")
-    public String tpRequestCanceledRequester;
-    @SerializedName("tpa_request_canceled")
-    public String tpRequestCanceledTarget;
-    @SerializedName("tpa_request_sent")
-    public String tpaRequestSent;
-    @SerializedName("tpa_request_target")
-    public String tpaRequestTarget;
-    @SerializedName("tpahere_request_sent")
-    public String tpahereRequestSent;
-    @SerializedName("tpahere_request_target")
-    public String tpahereRequestTarget;
-    @SerializedName("no_sent_tprequest")
-    public String noSentTpRequest;
 
     public String trash;
 
@@ -554,29 +550,27 @@ public class Localization extends JsonConfig {
         if (timeSetDay == null) timeSetDay = "&eTime set to day in world {WORLD}.";
         if (timeSetNight == null) timeSetNight = "&hTime set to night in world {WORLD}.";
 
-        if (anotherRequestInPending == null) anotherRequestInPending = "&cYou have another request in pending!";
-        if (damageOnTeleport == null) damageOnTeleport = "&cYou took damage! Teleport cancelled!";
-        if (tpall == null) tpall = "&hYou have been teleported!";
+        if (noTpRequest == null) noTpRequest = "&cYou don't have any teleport request.";
+        if (pendingTp == null) pendingTp = "&hYou will be teleported in {DELAY} seconds. Don't move!";
+        if (postTp == null) postTp = "&hYou have been teleported.";
+        if (tpToYourself == null) tpToYourself = "&cYou can't teleport to yourself.";
+
+        if (tpahereRequestRequester == null) tpahereRequestRequester = "&hYou sent a tpahere request to {TARGET_DISPLAYNAME}.";
+        if (tpahereRequestTarget == null) tpahereRequestTarget = "&hYou received a tpahere request from {REQUESTER_DISPLAYNAME}.\n&hType /tpyes to accept or /tpno to deny.";
+        if (tpaRequestRequester == null) tpaRequestRequester = "&hYou sent a tpa request to {TARGET_DISPLAYNAME}.";
+        if (tpaRequestTarget == null) tpaRequestTarget = "&hYou received a tpa request from {REQUESTER_DISPLAYNAME}.\n&hType /tpyes to accept or /tpno to deny.";
+
+        if (tpRequestCancelledRequester == null) tpRequestCancelledRequester = "&hYour teleport request to {TARGET_DISPLAYNAME} has been cancelled.";
+        if (tpRequestCancelledTarget == null) tpRequestCancelledTarget = "&h{REQUESTER_DISPLAYNAME}'s teleport request has been cancelled.";
+        if (noTpRequestFound == null) noTpRequestFound = "&cNo teleport request found from this player.";
+
+        if (tpnoRequester == null) tpnoRequester = "&hYour teleport request has been denied.";
+        if (tpnoTarget == null) tpnoTarget = "&hYou denied {TARGET_DISPLAYNAME}'s teleport request.";
+
+        if (tpyesRequester == null) tpyesRequester = "&hYour teleport request has been accepted.";
+
+        if (tpall == null) tpall = "&hYou have been teleported here by {DISPLAYNAME}!";
         if (tpallSelf == null) tpallSelf = "&hYou teleported everyone to you.";
-        if (tpRequestCanceledRequester == null) tpRequestCanceledRequester = "&6You have canceled the request.";
-        if (tpRequestCanceledTarget == null) tpRequestCanceledTarget = "&6{REQUESTER}'s teleport request has been cancelled.";
-        if (tpaRequestSent == null) tpaRequestSent = "&hYou sent a teleport request to {TARGET}. \n&e(/tpacancel for cancel)";
-        if (tpaRequestTarget == null) tpaRequestTarget = "&hYou received a teleport request to you from {REQUESTER}. \n&e(/tpyes - /tpno)";
-        if (tpahereRequestSent == null) tpahereRequestSent = "&hYou sent a teleport request to {TARGET}. \n&e(/tpacancel for cancel)";
-        if (tpahereRequestTarget == null) tpahereRequestTarget = "&hYou received a teleport request to {REQUESTER}. \n&e(/tpyes - /tpno)";
-        if (noSentTpRequest == null) noSentTpRequest = "&cYou don't have sent teleport requests!";
-
-        if (noPendingTeleportRequest == null) noPendingTeleportRequest = "&cYou haven't pending teleport requests.";
-        if (noTeleportRequestYourself == null) noTeleportRequestYourself = "&cYou can't send a teleport request to yourself.";
-        if (noRequestFromYourSelf == null) noRequestFromYourSelf = "&cYou can't have teleport requests from yourself.";
-
-        if (stayStillFor == null) stayStillFor = "&6Stay still for {SECONDS} seconds.";
-        if (targetAcceptedRequest == null) targetAcceptedRequest = "&6{DISPLAYNAME} has accepted the request!";
-        if (targetRejectedRequest == null) targetRejectedRequest = "&c{DISPLAYNAME} has rejected the request!";
-        if (teleportRequestAccepted == null) teleportRequestAccepted = "&6You have accepted the request!";
-        if (teleportRequestRejected == null) teleportRequestRejected = "&6You have rejected the request!";
-        if (teleportRequestNotFound == null) teleportRequestNotFound = "&cNo teleport requests found by this player.";
-        if (requesterRequestExpired == null) requesterRequestExpired = "&cLa richiesta";
 
         if (trash == null) trash = "Trash Can";
 
