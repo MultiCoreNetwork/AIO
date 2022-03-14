@@ -70,6 +70,7 @@ public class AIOCommand extends PluginCommand {
             aio.onDisable();
             aio.onEnable();
         }
+
         return true;
     }
 
