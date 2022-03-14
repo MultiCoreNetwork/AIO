@@ -33,10 +33,6 @@ import static it.multicoredev.aio.api.models.CommandData.UsagesBuilder;
 public class Commands extends JsonConfig {
     private Map<String, CommandData> commands;
 
-    public Commands() {
-        init();
-    }
-
     public CommandData getCommand(@NotNull String command) {
         Preconditions.checkNotNull(command);
 

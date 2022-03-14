@@ -387,10 +387,6 @@ public class Localization extends JsonConfig {
     @SerializedName("afk_name_prefix")
     public String afkDisplayNamePrefix;
 
-    public Localization() {
-        init();
-    }
-
     @Override
     public void init() {
         if (localization == null) localization = "us";

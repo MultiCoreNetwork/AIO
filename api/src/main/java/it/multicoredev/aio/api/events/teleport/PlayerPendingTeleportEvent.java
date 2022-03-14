@@ -108,7 +108,7 @@ public class PlayerPendingTeleportEvent extends Event implements Cancellable {
      * @return the time in ticks for the teleport.
      */
     public long getTimer() {
-        return teleport.getTimer();
+        return teleport.getDelay();
     }
 
     /**
@@ -117,7 +117,7 @@ public class PlayerPendingTeleportEvent extends Event implements Cancellable {
      * @param timer the time in ticks for the teleport.
      */
     public void setTimer(long timer) {
-        teleport.setTimer(timer);
+        teleport.setDelay(timer);
     }
 
     /**

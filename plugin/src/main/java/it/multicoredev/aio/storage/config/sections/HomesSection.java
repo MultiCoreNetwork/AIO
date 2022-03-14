@@ -2,12 +2,13 @@ package it.multicoredev.aio.storage.config.sections;
 
 import com.google.gson.annotations.SerializedName;
 import it.multicoredev.mclib.json.JsonConfig;
+import org.bukkit.World;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
+ * Copyright © 2022 by Lorenzo Magni
  * This file is part of AIO.
  * AIO is under "The 3-Clause BSD License", you can find a copy <a href="https://opensource.org/licenses/BSD-3-Clause">here</a>.
  * <p>
@@ -26,19 +27,24 @@ import java.util.List;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class HelpBookSection extends JsonConfig {
-    @SerializedName("default_book")
-    public String defBook;
-    @SerializedName("first_join_books")
-    public List<String> firstJoinBooks;
-
-    public HelpBookSection() {
-        init();
-    }
+public class HomesSection extends JsonConfig {
+    @SerializedName("homes_limit")
+    private Integer homesLimit;
+    @SerializedName("blacklisted_worlds")
+    public List<String> blacklistedWorlds;
 
     @Override
     public void init() {
-        if (defBook == null) defBook = "rules";
-        if (firstJoinBooks == null) firstJoinBooks = new ArrayList<>();
+        if (homesLimit == null) homesLimit = 5;
+        if (blacklistedWorlds == null) blacklistedWorlds = new ArrayList<>();
+    }
+
+    public Integer getHomesLimit() {
+        return Math.max(0, homesLimit);
+    }
+
+    public boolean isWorldBlacklisted(World world) {
+        if (world == null) return true;
+        return blacklistedWorlds.stream().anyMatch(world.getName()::equalsIgnoreCase);
     }
 }

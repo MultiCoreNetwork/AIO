@@ -3,8 +3,8 @@ package it.multicoredev.aio.storage.config.sections;
 import com.google.gson.annotations.SerializedName;
 import it.multicoredev.mclib.json.JsonConfig;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Copyright © 2021 - 2022 by Lorenzo Magni
@@ -27,15 +27,8 @@ import java.util.Locale;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class AfkSection extends JsonConfig {
-    public static final int AFK_SECONDS_COOLDOWN = 60;
-
-    public static final String BROADCAST_EVERYBODY = "everybody";
-    public static final String BROADCAST_WITH_PERM = "perm";
-    public static final String BROADCAST_NO = "no";
-
     @SerializedName("afk_cooldown")
-    public Integer afkSecondsCooldown;
-    public transient long afkMillisecondsCooldown;
+    private Integer afkCooldown;
 
     @SerializedName("afk_remove_on_movement")
     public Boolean afkRemoveOnMovement;
@@ -45,79 +38,40 @@ public class AfkSection extends JsonConfig {
     public Boolean afkRemoveOnMessage;
     @SerializedName("afk_remove_on_command")
     public Boolean afkRemoveOnCommand;
+    @SerializedName("afk_remove_on_damage")
+    public Boolean afkRemoveOnDamage;
 
     @SerializedName("afk_invulnerability")
     public Boolean afkInvulnerability;
-
     @SerializedName("show_in_display_name")
     public Boolean modifyDisplayName;
-
-    @SerializedName("broadcast")
-    public String broadcastType;
-    public transient boolean doNotBroadcast;
-    public transient boolean broadcastEverybody;
-
-    @SerializedName("broadcast_permission")
-    public String broadcastPermission;
-
-    @SerializedName("afk_enter_commands_console")
-    public List<String> afkEnterCommandsConsole;
-    @SerializedName("afk_enter_commands_player")
-    public List<String> afkEnterCommandsPlayer;
-    @SerializedName("afk_leave_commands_console")
-    public List<String> afkLeaveCommandsConsole;
-    @SerializedName("afk_leave_commands_player")
-    public List<String> afkLeaveCommandsPlayer;
-
-    public AfkSection() {
-        init();
-    }
+    @SerializedName("afk_remove_command_blacklist")
+    private List<String> afkRemoveCommandBlacklist;
 
     @Override
     public void init() {
-        if (afkSecondsCooldown == null) {
-            afkSecondsCooldown = AFK_SECONDS_COOLDOWN;
-        } else if (afkSecondsCooldown <= 0) {
-            afkSecondsCooldown = 1;
-        }
-
-        afkMillisecondsCooldown = afkSecondsCooldown * 1000L;
+        if (afkCooldown == null) afkCooldown = 60;
 
         if (afkRemoveOnMovement == null) afkRemoveOnMovement = true;
         if (afkRemoveOnInteract == null) afkRemoveOnInteract = true;
         if (afkRemoveOnMessage == null) afkRemoveOnMessage = true;
         if (afkRemoveOnCommand == null) afkRemoveOnCommand = true;
+        if (afkRemoveOnDamage == null) afkRemoveOnDamage = false;
 
-        if (afkInvulnerability == null) afkInvulnerability = true;
-
+        if (afkInvulnerability == null) afkInvulnerability = false;
         if (modifyDisplayName == null) modifyDisplayName = false;
+        if (afkRemoveCommandBlacklist == null) afkRemoveCommandBlacklist = new ArrayList<>();
+    }
 
-        if (broadcastType == null) {
-            broadcastType = BROADCAST_WITH_PERM; // Both doNotBroadcast and broadcastEverybody are already false
-        } else {
-            switch (broadcastType.toLowerCase(Locale.ROOT)) {
-                case BROADCAST_EVERYBODY:
-                    broadcastEverybody = true;
-                    break;
-                case BROADCAST_WITH_PERM:
-                    // Both doNotBroadcast and broadcastEverybody are already false
-                    break;
-                case BROADCAST_NO:
-                    doNotBroadcast = true;
-                    break;
-                default:
-                    broadcastType = BROADCAST_WITH_PERM;
-                    // Both doNotBroadcast and broadcastEverybody are already false
-                    break;
-            }
-        }
+    public boolean hasAfkCooldown() {
+        return afkCooldown > 0;
+    }
 
-        if (broadcastPermission == null || broadcastPermission.trim().isEmpty())
-            broadcastPermission = "aio.afk.broadcast";
+    public Integer getAfkCooldown() {
+        return afkCooldown;
+    }
 
-        if (afkEnterCommandsConsole == null) afkEnterCommandsConsole = List.of();
-        if (afkEnterCommandsPlayer == null) afkEnterCommandsPlayer = List.of();
-        if (afkLeaveCommandsConsole == null) afkLeaveCommandsConsole = List.of();
-        if (afkLeaveCommandsPlayer == null) afkLeaveCommandsPlayer = List.of();
+    public boolean isCommandBlacklisted(String cmd) {
+        return afkRemoveCommandBlacklist.stream().anyMatch(cmd::equalsIgnoreCase);
     }
 }

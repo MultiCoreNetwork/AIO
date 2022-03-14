@@ -52,7 +52,7 @@ public class TpahereCommand extends PluginCommand {
             return false;
         }
 
-        if (requester.getUniqueId() == target.getUniqueId()) {
+        if (requester.equals(target)) {
             Chat.send(pu.replacePlaceholders(localization.tpToYourself), sender);
             return false;
         }

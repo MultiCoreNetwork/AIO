@@ -2,12 +2,11 @@ package it.multicoredev.aio.storage.config;
 
 import com.google.gson.annotations.SerializedName;
 import it.multicoredev.aio.storage.config.sections.*;
+import it.multicoredev.mbcore.spigot.Chat;
 import it.multicoredev.mclib.json.JsonConfig;
 import org.bukkit.event.EventPriority;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -33,31 +32,25 @@ import java.util.stream.Collectors;
 public class Config extends JsonConfig {
     @SerializedName("storage")
     public StorageSection storageSection;
-    @SerializedName("command_cooldown")
-    public CommandCooldownSection commandCooldown;
-    @SerializedName("help_book")
-    public HelpBookSection helpBookSection;
-    @SerializedName("nickname")
-    public NicknameSection nicknameSection;
-    @SerializedName("rtp")
-    public RTPSection rtpSection;
+    @SerializedName("teleports")
+    public TeleportSection teleportSection;
     @SerializedName("afk")
     public AfkSection afkSection;
+    @SerializedName("command_cooldown")
+    public CommandCooldownSection commandCooldown;
 
-    //TODO Move teleport delays to their section
+    @SerializedName("nickname_min_length")
+    private Integer nicknameMinLength;
+    @SerializedName("nickname_max_length")
+    private Integer nicknameMaxLength;
+    @SerializedName("blacklisted_nicknames")
+    private List<String> blacklistedNicknames;
 
-    @SerializedName("back_teleport_delay")
-    public Long backTeleportDelay;
-    @SerializedName("default_home_limit")
-    public Integer defaultHomeLimit;
-    @SerializedName("home_teleport_delay")
-    public Long homeTeleportDelay;
-    @SerializedName("teleport_request_delay")
-    public Long teleportRequestDelay;
-    @SerializedName("warp_teleport_delay")
-    public Long warpTeleportDelay;
-    @SerializedName("teleport_request_timeout")
-    public Long teleportRequestTimeout;
+    @SerializedName("default_book")
+    public String defBook;
+    @SerializedName("first_join_books")
+    public List<String> firstJoinBooks;
+
     @SerializedName("disable_player_death_messages")
     public Boolean disablePlayerDeathMessages;
     @SerializedName("disable_god_on_join")
@@ -65,39 +58,50 @@ public class Config extends JsonConfig {
     @SerializedName("suicide_broadcast")
     public Boolean suicideBroadcast;
     @SerializedName("clear_players_cache")
-    public Long clearPlayersCache;
+    public Integer clearPlayersCache;
     @SerializedName("save_players_data")
-    public Long savePlayersData;
+    public Integer savePlayersData;
 
     @SerializedName("event_priorities")
-    public Map<String, String> eventPriorities;
+    private Map<String, String> eventPriorities;
 
     public Boolean debug;
 
-    public Config() {
-        init();
-    }
-
     @Override
     public void init() {
-        if (storageSection == null) storageSection = new StorageSection();
-        if (commandCooldown == null) commandCooldown = new CommandCooldownSection();
-        if (helpBookSection == null) helpBookSection = new HelpBookSection();
-        if (nicknameSection == null) nicknameSection = new NicknameSection();
-        if (rtpSection == null) rtpSection = new RTPSection();
-        if (afkSection == null) afkSection = new AfkSection();
+        if (storageSection == null) {
+            storageSection = new StorageSection();
+            storageSection.init();
+        }
+        if (teleportSection == null) {
+            teleportSection = new TeleportSection();
+            teleportSection.init();
+        }
+        if (afkSection == null) {
+            afkSection = new AfkSection();
+            afkSection.init();
+        }
+        if (commandCooldown == null) {
+            commandCooldown = new CommandCooldownSection();
+            commandCooldown.init();
+        }
 
-        if (backTeleportDelay == null) backTeleportDelay = -1L;
-        if (defaultHomeLimit == null) defaultHomeLimit = 3;
-        if (homeTeleportDelay == null) homeTeleportDelay = -1L;
-        if (teleportRequestDelay == null) teleportRequestDelay = 300L;
-        if (warpTeleportDelay == null) warpTeleportDelay = -1L;
-        if (teleportRequestTimeout == null) teleportRequestTimeout = 60L;
+        if (nicknameMinLength == null) nicknameMinLength = 4;
+        if (nicknameMaxLength == null) nicknameMaxLength = 32;
+        if (blacklistedNicknames == null) blacklistedNicknames = new ArrayList<>();
+
+        if (defBook == null) defBook = "rules";
+        if (firstJoinBooks == null) firstJoinBooks = new ArrayList<>();
+
+
+
+
+
         if (disablePlayerDeathMessages == null) disablePlayerDeathMessages = false;
         if (disableGodOnJoin == null) disableGodOnJoin = false;
         if (suicideBroadcast == null) suicideBroadcast = true;
-        if (clearPlayersCache == null) clearPlayersCache = 12000L;
-        if (savePlayersData == null) savePlayersData = 6000L;
+        if (clearPlayersCache == null) clearPlayersCache = 600;
+        if (savePlayersData == null) savePlayersData = 300;
 
         if (eventPriorities == null) eventPriorities = new HashMap<>();
         if (!eventPriorities.containsKey("PlayerPostTeleportEvent")) eventPriorities.put("PlayerPostTeleportEvent", "LOWEST");
@@ -124,6 +128,18 @@ public class Config extends JsonConfig {
         if (!eventPriorities.containsKey("PlayerTeleportEvent")) eventPriorities.put("PlayerTeleportEvent", "LOWEST");
 
         if (debug == null) debug = false;
+    }
+
+    public int getNicknameMinLength() {
+        return Math.max(1, nicknameMinLength);
+    }
+
+    public int getNicknameMaxLength() {
+        return Math.max(getNicknameMinLength(), nicknameMaxLength);
+    }
+
+    public boolean isNicknameBlacklisted(String nickname) {
+        return blacklistedNicknames.stream().anyMatch(Chat.getDiscolored(nickname)::equalsIgnoreCase);
     }
 
     public EventPriority getEventPriority(String event) {

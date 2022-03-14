@@ -29,7 +29,7 @@ public class Teleport {
     private final Player player;
     private Player target;
     private Location to;
-    private long timer;
+    private long delay;
     private String pendingMessage;
     private String postMessage;
 
@@ -38,17 +38,17 @@ public class Teleport {
      *
      * @param player         the player to teleport.
      * @param to             the destination of the player.
-     * @param timer          the time in ticks before the teleport.
+     * @param delay          the time in ticks before the teleport.
      * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
      * @param postMessage    the message to send to the player after the teleport.
      */
-    public Teleport(@NotNull Player player, @NotNull Location to, long timer, String pendingMessage, String postMessage) {
+    public Teleport(@NotNull Player player, @NotNull Location to, long delay, String pendingMessage, String postMessage) {
         Preconditions.checkNotNull(player);
         Preconditions.checkNotNull(to);
 
         this.player = player;
         this.to = to;
-        this.timer = timer;
+        this.delay = delay;
         this.pendingMessage = pendingMessage;
         this.postMessage = postMessage;
     }
@@ -58,10 +58,10 @@ public class Teleport {
      *
      * @param player the player to teleport.
      * @param to     the destination of the player.
-     * @param timer  the time in ticks before the teleport.
+     * @param delay  the time in ticks before the teleport.
      */
-    public Teleport(@NotNull Player player, @NotNull Location to, long timer) {
-        this(player, to, timer, null, null);
+    public Teleport(@NotNull Player player, @NotNull Location to, long delay) {
+        this(player, to, delay, null, null);
     }
 
     /**
@@ -93,18 +93,18 @@ public class Teleport {
      *
      * @param player         the player to teleport.
      * @param target         the target of the player.
-     * @param timer          the time in ticks before the teleport.
+     * @param delay          the time in ticks before the teleport.
      * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
      * @param postMessage    the message to send to the player after the teleport.
      */
-    public Teleport(@NotNull Player player, @NotNull Player target, long timer, String pendingMessage, String postMessage) {
+    public Teleport(@NotNull Player player, @NotNull Player target, long delay, String pendingMessage, String postMessage) {
         Preconditions.checkNotNull(player);
         Preconditions.checkNotNull(target);
 
         this.player = player;
         this.to = null;
         this.target = target;
-        this.timer = timer;
+        this.delay = delay;
         this.pendingMessage = pendingMessage;
         this.postMessage = postMessage;
     }
@@ -114,10 +114,10 @@ public class Teleport {
      *
      * @param player the player to teleport.
      * @param target the target of the player.
-     * @param timer  the time in ticks before the teleport.
+     * @param delay  the time in ticks before the teleport.
      */
-    public Teleport(@NotNull Player player, @NotNull Player target, long timer) {
-        this(player, target, timer, null, null);
+    public Teleport(@NotNull Player player, @NotNull Player target, long delay) {
+        this(player, target, delay, null, null);
     }
 
     /**
@@ -206,17 +206,17 @@ public class Teleport {
      *
      * @return the time in seconds for the teleport.
      */
-    public long getTimer() {
-        return timer;
+    public long getDelay() {
+        return delay;
     }
 
     /**
      * Set the time in seconds to wait for the teleport.
      *
-     * @param timer the time in seconds for the teleport.
+     * @param delay the time in seconds for the teleport.
      */
-    public void setTimer(long timer) {
-        this.timer = timer;
+    public void setDelay(long delay) {
+        this.delay = delay;
     }
 
     /**

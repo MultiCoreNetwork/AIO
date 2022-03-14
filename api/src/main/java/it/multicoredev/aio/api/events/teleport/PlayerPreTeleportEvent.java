@@ -107,7 +107,7 @@ public class PlayerPreTeleportEvent extends Event implements Cancellable {
      * @return the time in ticks for the teleport.
      */
     public long getTimer() {
-        return teleport.getTimer();
+        return teleport.getDelay();
     }
 
     /**

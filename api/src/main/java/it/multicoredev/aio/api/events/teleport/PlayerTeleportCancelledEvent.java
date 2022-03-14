@@ -91,7 +91,7 @@ public class PlayerTeleportCancelledEvent extends Event {
      * @return the time in ticks for the teleport.
      */
     public long getTimer() {
-        return teleport.getTimer();
+        return teleport.getDelay();
     }
 
     /**

@@ -31,6 +31,9 @@ public class StorageSection extends JsonConfig {
     @SerializedName("storage_type")
     public String storageType;
 
+    @SerializedName("mysql")
+    public MySQLSection mysql;
+
     public StorageSection() {
         init();
     }
@@ -38,5 +41,9 @@ public class StorageSection extends JsonConfig {
     @Override
     public void init() {
         if (storageType == null || (!storageType.equalsIgnoreCase(FILE) && !storageType.equalsIgnoreCase(MYSQL) && !storageType.equalsIgnoreCase(SQLITE))) storageType = FILE;
+        if (mysql == null && storageType.equalsIgnoreCase(MYSQL)) {
+            mysql = new MySQLSection();
+            mysql.init();
+        }
     }
 }

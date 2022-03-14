@@ -165,6 +165,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     //TODO Cancel pending teleports and requests when the player quits
     //TODO placeholderutils.replacePlaceholders does not have the player
     //TODO Add vanilla tp command replacement (Priority low)
+    //TODO Add validate method to configs
 
     @Override
     public void onEnable() {

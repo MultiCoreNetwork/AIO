@@ -30,11 +30,7 @@ public class CommandCooldownSection extends JsonConfig {
     @SerializedName("commands_cooldown_enabled")
     public Boolean cooldownEnabled;
     @SerializedName("commands_cooldown")
-    public Map<String, Integer> commandsCooldown;
-
-    public CommandCooldownSection() {
-        init();
-    }
+    private Map<String, Integer> commandsCooldown;
 
     @Override
     public void init() {

@@ -136,11 +136,11 @@ public class TeleportManager implements ITeleportManager {
             Chat.send(pu.replacePlaceholders(tpReqEvent.getPendingMessage()), teleport.getPlayer());
         }
 
-        if (teleport.getTimer() <= 0) {
+        if (teleport.getDelay() <= 0) {
             teleportNow(teleport);
         } else {
             if (teleport.getPlayer().hasPermission("aio.teleport.instant")) teleportNow(teleport);
-            else runningTeleports.put(teleport, Bukkit.getScheduler().runTaskLater(aio, () -> teleportNow(teleport), teleport.getTimer() * 20));
+            else runningTeleports.put(teleport, Bukkit.getScheduler().runTaskLater(aio, () -> teleportNow(teleport), teleport.getDelay() * 20));
         }
     }
 

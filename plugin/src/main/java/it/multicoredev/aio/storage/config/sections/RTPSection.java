@@ -28,20 +28,14 @@ import java.util.List;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class RTPSection extends JsonConfig {
-    @SerializedName("center_x")
-    public Double centerX;
-    @SerializedName("center_z")
-    public Double centerZ;
     @SerializedName("spread_distance")
     public Integer spreadDistance;
     @SerializedName("max_range")
     public Integer maxRange;
-    @SerializedName("rtp_teleport_delay")
-    public Integer rtpTeleportDelay;
-    @SerializedName("max_rtp")
-    public Integer maxRtp;
+    @SerializedName("rtps_limit")
+    public Integer rtpsLimit;
     @SerializedName("blacklisted_worlds")
-    public List<String> blacklistedWorlds;
+    private List<String> blacklistedWorlds;
 
     public RTPSection() {
         init();
@@ -49,22 +43,14 @@ public class RTPSection extends JsonConfig {
 
     @Override
     public void init() {
-        if (centerX == null) centerX = 0d;
-        if (centerZ == null) centerZ = 0d;
         if (spreadDistance == null) spreadDistance = 100;
         if (maxRange == null) maxRange = 10000;
-        if (rtpTeleportDelay == null) rtpTeleportDelay = -1;
-        if (maxRtp == null) maxRtp = -1;
+        if (rtpsLimit == null) rtpsLimit = -1;
         if (blacklistedWorlds == null) blacklistedWorlds = new ArrayList<>();
     }
 
     public boolean isWorldBlacklisted(World world) {
         if (world == null) return true;
-
-        for (String w : blacklistedWorlds) {
-            if (w.equalsIgnoreCase(world.getName())) return true;
-        }
-
-        return false;
+        return blacklistedWorlds.stream().anyMatch(world.getName()::equalsIgnoreCase);
     }
 }

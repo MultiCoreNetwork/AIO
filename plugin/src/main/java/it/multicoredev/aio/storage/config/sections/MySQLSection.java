@@ -1,14 +1,10 @@
 package it.multicoredev.aio.storage.config.sections;
 
 import com.google.gson.annotations.SerializedName;
-import it.multicoredev.mbcore.spigot.Chat;
 import it.multicoredev.mclib.json.JsonConfig;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
+ * Copyright © 2022 by Lorenzo Magni
  * This file is part of AIO.
  * AIO is under "The 3-Clause BSD License", you can find a copy <a href="https://opensource.org/licenses/BSD-3-Clause">here</a>.
  * <p>
@@ -27,28 +23,36 @@ import java.util.List;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class NicknameSection extends JsonConfig {
-    @SerializedName("nickname_blacklist")
-    public List<String> nicknameBlacklist;
-    @SerializedName("nickname_max_length")
-    public Integer nicknameMaxLength;
-
-    public NicknameSection() {
-        init();
-    }
+public class MySQLSection extends JsonConfig {
+    public String host;
+    public Integer port;
+    public String database;
+    public String username;
+    public String password;
+    public String prefix;
+    @SerializedName("use_pool")
+    public Boolean usePool;
+    @SerializedName("max_pool_size")
+    public Integer maxPoolSize;
+    @SerializedName("min_idle")
+    public Integer minIdle;
+    @SerializedName("max_lifetime")
+    public Integer maxLifeTime;
+    @SerializedName("idle_time")
+    public Integer idleTime;
 
     @Override
     public void init() {
-        if (nicknameBlacklist == null) nicknameBlacklist = new ArrayList<>();
-        if (nicknameMaxLength == null) nicknameMaxLength = 32;
-    }
-
-    public boolean isBlacklisted(String nickname) {
-        nickname = Chat.getDiscolored(nickname);
-        for (String nick : nicknameBlacklist) {
-            if (nick.equalsIgnoreCase(nickname)) return true;
-        }
-
-        return false;
+        if (host == null) host = "localhost";
+        if (port == null) port = 3306;
+        if (database == null) database = "database";
+        if (username == null) username = "username";
+        if (password == null) password = "password";
+        if (prefix == null) prefix = "bc_";
+        if (usePool == null) usePool = true;
+        if (maxPoolSize == null) maxPoolSize = 8;
+        if (minIdle == null) minIdle = 4;
+        if (maxLifeTime == null) maxLifeTime = 600000;
+        if (idleTime == null) idleTime = 100000;
     }
 }
