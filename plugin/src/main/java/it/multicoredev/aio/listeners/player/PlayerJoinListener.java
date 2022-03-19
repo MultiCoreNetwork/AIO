@@ -3,7 +3,7 @@ package it.multicoredev.aio.listeners.player;
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.models.User;
 import it.multicoredev.aio.listeners.PluginListenerExecutor;
-import it.multicoredev.aio.models.HelpBook;
+import it.multicoredev.aio.api.models.HelpBook;
 import it.multicoredev.aio.storage.config.modules.JoinQuitModule;
 import it.multicoredev.aio.storage.config.modules.SpawnModule;
 import it.multicoredev.aio.utils.Utils;
@@ -75,7 +75,7 @@ public class PlayerJoinListener extends PluginListenerExecutor<PlayerJoinEvent> 
             if (!config.helpBookSection.firstJoinBooks.isEmpty()) {
                 Inventory inventory = player.getInventory();
                 config.helpBookSection.firstJoinBooks.forEach(book -> {
-                    HelpBook hb = aio.getHelpbook(book);
+                    HelpBook hb = aio.getHelpBook(book);
                     if (hb == null) return;
                     inventory.addItem(hb.getBook());
                 });

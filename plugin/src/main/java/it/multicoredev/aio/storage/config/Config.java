@@ -7,7 +7,6 @@ import it.multicoredev.mclib.json.JsonConfig;
 import org.bukkit.event.EventPriority;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -36,8 +35,6 @@ public class Config extends JsonConfig {
     public TeleportSection teleportSection;
     @SerializedName("afk")
     public AfkSection afkSection;
-    @SerializedName("command_cooldown")
-    public CommandCooldownSection commandCooldown;
 
     @SerializedName("nickname_min_length")
     private Integer nicknameMinLength;
@@ -62,8 +59,11 @@ public class Config extends JsonConfig {
     @SerializedName("save_players_data")
     public Integer savePlayersData;
 
+    @SerializedName("command_cooldown")
+    public CommandCooldownSection cmdsCooldownSection;
+
     @SerializedName("event_priorities")
-    private Map<String, String> eventPriorities;
+    public Map<String, String> eventPriorities;
 
     public Boolean debug;
 
@@ -81,10 +81,6 @@ public class Config extends JsonConfig {
             afkSection = new AfkSection();
             afkSection.init();
         }
-        if (commandCooldown == null) {
-            commandCooldown = new CommandCooldownSection();
-            commandCooldown.init();
-        }
 
         if (nicknameMinLength == null) nicknameMinLength = 4;
         if (nicknameMaxLength == null) nicknameMaxLength = 32;
@@ -93,19 +89,18 @@ public class Config extends JsonConfig {
         if (defBook == null) defBook = "rules";
         if (firstJoinBooks == null) firstJoinBooks = new ArrayList<>();
 
-
-
-
-
         if (disablePlayerDeathMessages == null) disablePlayerDeathMessages = false;
         if (disableGodOnJoin == null) disableGodOnJoin = false;
-        if (suicideBroadcast == null) suicideBroadcast = true;
+        if (suicideBroadcast == null) suicideBroadcast = false;
         if (clearPlayersCache == null) clearPlayersCache = 600;
         if (savePlayersData == null) savePlayersData = 300;
 
+        if (cmdsCooldownSection == null) {
+            cmdsCooldownSection = new CommandCooldownSection();
+            cmdsCooldownSection.init();
+        }
+
         if (eventPriorities == null) eventPriorities = new HashMap<>();
-        if (!eventPriorities.containsKey("PlayerPostTeleportEvent")) eventPriorities.put("PlayerPostTeleportEvent", "LOWEST");
-        if (!eventPriorities.containsKey("PlayerTeleportCancelledEvent")) eventPriorities.put("PlayerTeleportCancelledEvent", "NORMAL");
         if (!eventPriorities.containsKey("PostCommandEvent")) eventPriorities.put("PostCommandEvent", "HIGH");
         if (!eventPriorities.containsKey("AfkToggleEvent")) eventPriorities.put("AfkToggleEvent", "LOWEST");
 

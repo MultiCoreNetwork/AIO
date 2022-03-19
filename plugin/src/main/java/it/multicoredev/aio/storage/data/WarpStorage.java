@@ -2,16 +2,20 @@ package it.multicoredev.aio.storage.data;
 
 import com.google.common.base.Preconditions;
 import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.api.IWarpStorage;
+import it.multicoredev.aio.api.IWarps;
 import it.multicoredev.aio.api.models.Warp;
-import it.multicoredev.mbcore.spigot.Chat;
 import it.multicoredev.mclib.json.JsonConfig;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Copyright © 2021 - 2022 by Lorenzo Magni
@@ -33,12 +37,8 @@ import java.util.List;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class WarpStorage extends JsonConfig implements IWarpStorage {
+public class WarpStorage extends JsonConfig implements IWarps {
     private List<Warp> warps;
-
-    public WarpStorage() {
-        init();
-    }
 
     @Override
     public void init() {
@@ -46,72 +46,58 @@ public class WarpStorage extends JsonConfig implements IWarpStorage {
     }
 
     @Override
-    public void saveWarps() {
-        AIO aio = (AIO) AIO.getInstance();
-
-        try {
-            aio.saveWarps();
-        } catch (Exception e) {
-            Chat.severe(e.getMessage());
-            if (AIO.debug) e.printStackTrace();
-        }
+    public List<Warp> getWarps() {
+        return Collections.unmodifiableList(warps);
     }
 
     @Override
-    public boolean existsWarp(String warpName) {
-        for (Warp warp : warps) {
-            if (warp.getName().equalsIgnoreCase(warpName)) return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public Warp getWarp(String warpName) {
-        for (Warp warp : warps) {
-            if (warp.getName().equalsIgnoreCase(warpName)) return warp;
-        }
-
-        return null;
-    }
-
-    @Override
-    public List<String> getWarpNames(CommandSender sender) {
-        List<String> warpList = new ArrayList<>();
-
-        if (warps.isEmpty()) return warpList;
-
-        for (Warp warp : warps) {
-            if (sender.hasPermission("aio.warp." + warp.getName())) warpList.add(warp.getName());
-        }
-
-        if (!(sender instanceof Player)) return warpList;
-
-        Player player = (Player) sender;
-
-        if (!player.hasPermission("aio.warp.local.bypass")) {
-            warpList.removeIf(warp -> !player.getLocation().getWorld().getName().equals(warp));
-        }
-
-        return warpList;
-    }
-
-    @Override
-    public boolean createWarp(String name, Location location, boolean global) {
-        Preconditions.checkNotNull(location);
+    public @Nullable Warp getWarp(@NotNull String name) {
         Preconditions.checkNotNull(name);
 
-        if (existsWarp(name)) return false;
-        warps.add(new Warp(location, name, global));
+        return warps.stream().filter(warp -> warp.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+    }
+
+    @Override
+    public boolean warpExists(@NotNull String name) {
+        Preconditions.checkNotNull(name);
+
+        return warps.stream().anyMatch(warp -> warp.getName().equalsIgnoreCase(name));
+    }
+
+    @Override
+    public synchronized boolean addWarp(@NotNull Warp warp) {
+        Preconditions.checkNotNull(warp);
+
+        if (warpExists(warp.getName())) return false;
+
+        warps.add(warp);
+        ((AIO) AIO.getInstance()).saveWarps();
         return true;
     }
 
     @Override
-    public boolean deleteWarp(String name) {
-        Preconditions.checkNotNull(name);
+    public synchronized void deleteWarp(@NotNull Warp warp) {
+        Preconditions.checkNotNull(warp);
 
-        if (!existsWarp(name)) return false;
-        warps.removeIf(warp -> warp.getName().equalsIgnoreCase(name));
-        return true;
+        warps.remove(warp);
+        ((AIO) AIO.getInstance()).saveWarps();
+    }
+
+    public List<String> getWarpsNameByPerm(CommandSender sender) {
+        if (!(sender instanceof Player)) return warps.stream().map(Warp::getName).collect(Collectors.toList());
+
+        List<Warp> filteredWarps = warps.stream()
+                .filter(warp -> sender.hasPermission("aio.warp." + warp.getName()) || sender.hasPermission("aio.warp.*"))
+                .collect(Collectors.toList());
+
+        if (sender.hasPermission("aio.warp.local-bypass")) return filteredWarps.stream().map(Warp::getName).collect(Collectors.toList());
+
+        Location location = ((Player) sender).getLocation();
+        if (location.getWorld() == null) return filteredWarps.stream().map(Warp::getName).collect(Collectors.toList());
+
+        return filteredWarps.stream()
+                .filter(warp -> Objects.equals(warp.getLocation().getWorld(), location.getWorld()))
+                .map(Warp::getName)
+                .collect(Collectors.toList());
     }
 }

@@ -1,4 +1,7 @@
-package it.multicoredev.aio.models;
+package it.multicoredev.aio.api.models;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Copyright © 2022 by Daniele Patella. All rights reserved.
@@ -12,26 +15,24 @@ package it.multicoredev.aio.models;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class ItemObject {
-    private final String material;
-    private final int amount;
-    private final String nbt;
+public class Kit {
+    private final String name;
+    private final List<ItemObject> items;
 
-    public ItemObject(String material, int amount, String nbt) {
-        this.material = material;
-        this.amount = amount;
-        this.nbt = nbt;
+    public Kit(String name) {
+        this.name = name;
+        this.items = new ArrayList<>();
     }
 
-    public String getMaterial() {
-        return material;
+    public String getName() {
+        return name;
     }
 
-    public int getAmount() {
-        return amount;
+    public List<ItemObject> getItems() {
+        return items;
     }
 
-    public String getNbtString() {
-        return nbt;
+    public void addItem(ItemObject itemObject) {
+        items.add(itemObject);
     }
 }

@@ -2,7 +2,7 @@ package it.multicoredev.aio.commands.utilities;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.commands.PluginCommand;
-import it.multicoredev.aio.models.HelpBook;
+import it.multicoredev.aio.api.models.HelpBook;
 import it.multicoredev.mbcore.spigot.Chat;
 import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
 import org.bukkit.Bukkit;
@@ -69,7 +69,7 @@ public class HelpBookCommand extends PluginCommand {
             target = (Player) sender;
         }
 
-        HelpBook hb = aio.getHelpbook(id);
+        HelpBook hb = aio.getHelpBook(id);
 
         if (target == null) {
             Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
@@ -113,7 +113,7 @@ public class HelpBookCommand extends PluginCommand {
         if (!hasCommandPerm(sender)) return new ArrayList<>();
 
         if (args.length == 1) {
-            return TabCompleterUtil.getCompletions(args[0], aio.getHelpbooks()
+            return TabCompleterUtil.getCompletions(args[0], aio.getHelpBooks()
                     .stream()
                     .filter(book -> book.permission == null || hasSubPerm(sender, book.id.toLowerCase(Locale.ROOT)))
                     .map(book -> book.id)

@@ -3,13 +3,8 @@ package it.multicoredev.aio;
 import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
 import com.google.gson.GsonBuilder;
-import it.multicoredev.aio.api.ICommandRegistry;
-import it.multicoredev.aio.api.IEconomy;
-import it.multicoredev.aio.api.IModuleManager;
-import it.multicoredev.aio.api.IStorage;
+import it.multicoredev.aio.api.*;
 import it.multicoredev.aio.api.events.AfkToggleEvent;
-import it.multicoredev.aio.api.events.teleport.PlayerPostTeleportEvent;
-import it.multicoredev.aio.api.events.teleport.PlayerTeleportCancelledEvent;
 import it.multicoredev.aio.api.events.PostCommandEvent;
 import it.multicoredev.aio.api.listeners.IListenerRegistry;
 import it.multicoredev.aio.api.models.CommandData;
@@ -36,12 +31,10 @@ import it.multicoredev.aio.commands.teleport.warp.WarpsCommand;
 import it.multicoredev.aio.commands.utilities.*;
 import it.multicoredev.aio.commands.utilities.time_and_weather.*;
 import it.multicoredev.aio.listeners.aio.AfkListener;
-import it.multicoredev.aio.listeners.aio.PlayerPostTeleportListener;
-import it.multicoredev.aio.listeners.aio.PlayerTeleportCancelledListener;
 import it.multicoredev.aio.listeners.aio.PostCommandListener;
 import it.multicoredev.aio.listeners.entity.EntityDamageListener;
 import it.multicoredev.aio.listeners.player.*;
-import it.multicoredev.aio.models.HelpBook;
+import it.multicoredev.aio.api.models.HelpBook;
 import it.multicoredev.aio.storage.config.Commands;
 import it.multicoredev.aio.storage.config.Config;
 import it.multicoredev.aio.storage.config.Localization;
@@ -213,7 +206,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         listenerRegistry = new ListenerRegistry();
         tpManager = new TeleportManager(this);
 
-        if (config.commandCooldown.cooldownEnabled) commandCooldown = new HashMap<>();
+        if (config.cmdsCooldownSection.cooldownEnabled) commandCooldown = new HashMap<>();
 
         initDependencies();
 
@@ -274,14 +267,6 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         return tpManager;
     }
 
-    public KitStorage getKitStorage() {
-        return kitStorage;
-    }
-
-    public WarpStorage getWarpStorage() {
-        return warpStorage;
-    }
-
     @Override
     public IStorage getStorage() {
         return storage;
@@ -291,6 +276,38 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     @Nullable
     public IEconomy getEconomy() {
         return economy;
+    }
+
+    @Override
+    public IKits getKits() {
+        return kitStorage;
+    }
+
+    @Override
+    public IWarps getWarps() {
+        return warpStorage;
+    }
+
+    @Override
+    public List<HelpBook> getHelpBooks() {
+        return Collections.unmodifiableList(helpbooks);
+    }
+
+    @Override
+    @Nullable
+    public HelpBook getHelpBook(String id) {
+        for (HelpBook hb : helpbooks) {
+            if (Objects.equals(hb.id, id)) return hb;
+        }
+
+        return null;
+    }
+
+    @Override
+    public boolean addHelpBook(HelpBook helpBook) {
+        if (getHelpBook(helpBook.id) != null) return false;
+        helpbooks.add(helpBook);
+        return true;
     }
 
     @Override
@@ -304,19 +321,6 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
     public Config getConfiguration() {
         return config;
-    }
-
-    public List<HelpBook> getHelpbooks() {
-        return Collections.unmodifiableList(helpbooks);
-    }
-
-    @Nullable
-    public HelpBook getHelpbook(String id) {
-        for (HelpBook hb : helpbooks) {
-            if (Objects.equals(hb.id, id)) return hb;
-        }
-
-        return null;
     }
 
     public Localization getLocalization() {
@@ -369,12 +373,16 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         saveAsync(usermap, usermapFile);
     }
 
+    public void saveKits() {
+        saveAsync(kitStorage, kitsFile);
+    }
+
     public void saveWarps() {
         saveAsync(warpStorage, warpsFile);
     }
 
     public void addCommandCooldown(Player player, String command) {
-        if (!config.commandCooldown.hasCommandCooldown(command)) return;
+        if (!config.cmdsCooldownSection.hasCommandCooldown(command)) return;
         if (player.hasPermission("aio.no-commands-cooldown")) return;
 
         UUID uuid = player.getUniqueId();
@@ -397,7 +405,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
         Date date = commands.get(command);
         int difference = (int) ((new Date().getTime() - date.getTime()) / 1000);
-        int cooldown = config.commandCooldown.getCommandCooldown(command);
+        int cooldown = config.cmdsCooldownSection.getCommandCooldown(command);
 
         if (difference > cooldown) {
             commands.remove(command);
@@ -785,8 +793,6 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     }
 
     private void registerListeners() {
-        listenerRegistry.registerListener(new PlayerPostTeleportListener(PlayerPostTeleportEvent.class, this), config.getEventPriority("PlayerPostTeleportEvent"), this);
-        listenerRegistry.registerListener(new PlayerTeleportCancelledListener(PlayerTeleportCancelledEvent.class, this), config.getEventPriority("PlayerTeleportCancelledEvent"), this);
         listenerRegistry.registerListener(new PostCommandListener(PostCommandEvent.class, this), config.getEventPriority("PostCommandEvent"), this);
         listenerRegistry.registerListener(new AfkListener(AfkToggleEvent.class, this), config.getEventPriority("AfkToggleEvent"), this);
 
@@ -812,7 +818,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
         if (commands.isEnabled("delhome")) commandRegistry.registerCommand(new DelHomeCommand(this), this);
         if (commands.isEnabled("delwarp")) commandRegistry.registerCommand(new DelWarpCommand(this), this);
         if (commands.isEnabled("disenchant")) commandRegistry.registerCommand(new DisenchantCommand(this), this);
-        if (commands.isEnabled("economy") && VAULT) commandRegistry.registerCommand(new EconomyCommand(this), this);
+        if (commands.isEnabled("economy") && moduleManager.isModuleEnabled(ECONOMY_MODULE)) commandRegistry.registerCommand(new EconomyCommand(this), this);
         if (commands.isEnabled("enchant")) commandRegistry.registerCommand(new EnchantCommand(this), this);
         if (commands.isEnabled("entitylist")) commandRegistry.registerCommand(new EntitylistCommand(this), this);
         if (commands.isEnabled("feed")) commandRegistry.registerCommand(new FeedCommand(this), this);

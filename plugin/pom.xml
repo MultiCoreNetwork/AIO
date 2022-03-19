@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <version>1.0.0</version>
 
@@ -13,8 +15,8 @@
     <packaging>jar</packaging>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -43,11 +45,25 @@
         </developer>
     </developers>
 
+    <repositories>
+        <repository>
+            <id>codemc-repo</id>
+            <url>https://repo.codemc.org/repository/maven-public/</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>it.multicoredev.aio.api</groupId>
             <artifactId>AIO-api</artifactId>
             <version>${parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.tr7zw</groupId>
+            <artifactId>item-nbt-api</artifactId>
+            <version>2.9.2</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
@@ -100,11 +116,15 @@
                             <relocations>
                                 <relocation>
                                     <pattern>it.multicoredev.mclib</pattern>
-                                    <shadedPattern>it.multicoredev.aio.libs</shadedPattern>
+                                    <shadedPattern>it.multicoredev.aio.libs.mclib</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>it.multicoredev.mbcore</pattern>
-                                    <shadedPattern>it.multicoredev.aio.libs</shadedPattern>
+                                    <shadedPattern>it.multicoredev.aio.libs.mbcore</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>de.tr7zw.changeme.nbtapi</pattern>
+                                    <shadedPattern>it.multicoredev.aio.libs.nbtapi</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>

@@ -1,14 +1,16 @@
-package it.multicoredev.aio.api;
+package it.multicoredev.aio.storage.data;
 
-import it.multicoredev.aio.api.models.Warp;
-import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
+import it.multicoredev.aio.api.IStorage;
+import it.multicoredev.aio.api.models.User;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.UUID;
 
 /**
- * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
+ * Copyright © 2022 by Lorenzo Magni
  * This file is part of AIO.
  * AIO is under "The 3-Clause BSD License", you can find a copy <a href="https://opensource.org/licenses/BSD-3-Clause">here</a>.
  * <p>
@@ -27,52 +29,69 @@ import java.util.List;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public interface IWarpStorage {
+public class MySQLStorage implements IStorage {
+    @Override
+    public boolean userExists(@NotNull OfflinePlayer player) {
+        return false;
+    }
 
-    /**
-     * Save warp changes in storage.
-     */
-    void saveWarps();
+    @Override
+    public boolean userExists(@NotNull Player player) {
+        return false;
+    }
 
-    /**
-     * Check if a warp with a certain name exists.
-     *
-     * @param warpName the warp name to check
-     * @return true if the warp exists, otherwise false
-     */
-    boolean existsWarp(String warpName);
+    @Override
+    public boolean userExists(@NotNull UUID uuid) {
+        return false;
+    }
 
-    /**
-     * Get a {@link Warp} from the storage.
-     *
-     * @param warpName the warp name to get
-     * @return the warp or null if the warp does not exists or in case of error
-     */
-    Warp getWarp(String warpName);
+    @Override
+    public boolean userExists(@NotNull String name) {
+        return false;
+    }
 
-    /**
-     * Get all the warp names from the storage.
-     *
-     * @param sender
-     * @return
-     */
-    List<String> getWarpNames(CommandSender sender);
+    @Override
+    public @Nullable User getUser(@NotNull OfflinePlayer player) {
+        return null;
+    }
 
-    /**
-     * Create a new warp.
-     *
-     * @param name the name
-     * @param location the location
-     * @param global if the warp will be accessible in all worlds
-     * @return true if this operation is successful, otherwise false.
-     */
-    boolean createWarp(String name, Location location, boolean global);
+    @Override
+    public @Nullable User getUser(@NotNull Player player) {
+        return null;
+    }
 
-    /**
-     * Delete a warp.
-     *
-     * @param name the name of the warp to delete
-     * @return true if this operation is successful, otherwise false
-     */
-    boolean deleteWarp(String name);
+    @Override
+    public @Nullable User getUser(@NotNull UUID uuid) {
+        return null;
+    }
+
+    @Override
+    public @Nullable User getUser(@NotNull String name) {
+        return null;
+    }
+
+    @Override
+    public @Nullable User searchUser(@NotNull String name) {
+        return null;
+    }
+
+    @Override
+    public void updateUserAsync(@NotNull User user) {
+
+    }
+
+    @Override
+    public boolean updateUser(@NotNull User user) {
+        return false;
+    }
+
+    @Override
+    public void registerUserAsync(@NotNull User user) {
+
+    }
+
+    @Override
+    public boolean registerUser(@NotNull User user) {
+        return false;
+    }
 }

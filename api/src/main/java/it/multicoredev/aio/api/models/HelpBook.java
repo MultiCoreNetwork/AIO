@@ -1,17 +1,16 @@
-package it.multicoredev.aio.listeners.aio;
+package it.multicoredev.aio.api.models;
 
-import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.api.events.PostCommandEvent;
-import it.multicoredev.aio.listeners.PluginListenerExecutor;
-import it.multicoredev.aio.storage.config.modules.EconomyModule;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import it.multicoredev.mbcore.spigot.Chat;
+import it.multicoredev.mclib.json.JsonConfig;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Copyright © 2022 by Lorenzo Magni
+ * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
  * This file is part of AIO.
  * AIO is under "The 3-Clause BSD License", you can find a copy <a href="https://opensource.org/licenses/BSD-3-Clause">here</a>.
  * <p>
@@ -30,30 +29,50 @@ import java.util.Objects;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class PostCommandListener extends PluginListenerExecutor<PostCommandEvent> {
-    private final EconomyModule economyModule;
+public class HelpBook extends JsonConfig {
+    public String id;
+    public Boolean permission;
+    public String name;
+    public String author;
+    public List<Page> pages;
 
-    public PostCommandListener(Class<PostCommandEvent> eventClass, AIO aio) {
-        super(eventClass, aio);
-        this.economyModule = aio.getModuleManager().getModule(AIO.ECONOMY_MODULE);
+    public HelpBook() {
+        init();
     }
 
     @Override
-    public void onEvent(@NotNull PostCommandEvent event) {
-        CommandSender sender = event.getCommandSender();
-        if (!(sender instanceof Player)) return;
+    public void init() {
+        if (permission == null) permission = false;
+        if (name == null) name = "HelpBook";
+        if (author == null) author = "AIO";
+        if (pages == null) pages = new ArrayList<>();
+    }
 
-        String cmd = event.getCommand();
+    public ItemStack getBook() {
+        ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+        BookMeta meta = (BookMeta) book.getItemMeta();
 
-        if (config.cmdsCooldownSection.cooldownEnabled && event.isSuccess()) aio.addCommandCooldown((Player) sender, cmd);
+        if (meta != null) {
+            meta.setTitle(Chat.getTranslated(name));
+            meta.setAuthor(Chat.getTranslated(author));
+            pages.forEach(page -> meta.addPage(page.lines));
 
-        if (economyModule.hasCommandCost(cmd, sender)) {
-            Player player = (Player) sender;
-            double cost = economyModule.getCommandCost(cmd);
+            book.setItemMeta(meta);
+        }
 
-            if (cmd.equalsIgnoreCase("tpa") || cmd.equalsIgnoreCase("tpahere")) cost = cost / 2;
+        return book;
+    }
 
-            Objects.requireNonNull(aio.getEconomy()).withdrawPlayer(player, cost);
+    public static class Page extends JsonConfig {
+        public String[] lines;
+
+        public Page() {
+            init();
+        }
+
+        @Override
+        public void init() {
+            if (lines == null) lines = new String[0];
         }
     }
 }

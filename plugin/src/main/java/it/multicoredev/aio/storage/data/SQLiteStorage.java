@@ -1,13 +1,16 @@
-package it.multicoredev.aio.listeners.aio;
+package it.multicoredev.aio.storage.data;
 
-import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.TeleportManager;
-import it.multicoredev.aio.api.events.teleport.PlayerPostTeleportEvent;
-import it.multicoredev.aio.listeners.PluginListenerExecutor;
+import it.multicoredev.aio.api.IStorage;
+import it.multicoredev.aio.api.models.User;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.UUID;
 
 /**
- * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
+ * Copyright © 2022 by Lorenzo Magni
  * This file is part of AIO.
  * AIO is under "The 3-Clause BSD License", you can find a copy <a href="https://opensource.org/licenses/BSD-3-Clause">here</a>.
  * <p>
@@ -26,14 +29,69 @@ import org.jetbrains.annotations.NotNull;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class PlayerPostTeleportListener extends PluginListenerExecutor<PlayerPostTeleportEvent> {
-
-    public PlayerPostTeleportListener(Class<PlayerPostTeleportEvent> eventClass, AIO aio) {
-        super(eventClass, aio);
+public class SQLiteStorage implements IStorage {
+    @Override
+    public boolean userExists(@NotNull OfflinePlayer player) {
+        return false;
     }
 
     @Override
-    public void onEvent(@NotNull PlayerPostTeleportEvent event) {
-        ((TeleportManager) aio.getTeleportManager()).removeTeleport(event.getPlayer());
+    public boolean userExists(@NotNull Player player) {
+        return false;
+    }
+
+    @Override
+    public boolean userExists(@NotNull UUID uuid) {
+        return false;
+    }
+
+    @Override
+    public boolean userExists(@NotNull String name) {
+        return false;
+    }
+
+    @Override
+    public @Nullable User getUser(@NotNull OfflinePlayer player) {
+        return null;
+    }
+
+    @Override
+    public @Nullable User getUser(@NotNull Player player) {
+        return null;
+    }
+
+    @Override
+    public @Nullable User getUser(@NotNull UUID uuid) {
+        return null;
+    }
+
+    @Override
+    public @Nullable User getUser(@NotNull String name) {
+        return null;
+    }
+
+    @Override
+    public @Nullable User searchUser(@NotNull String name) {
+        return null;
+    }
+
+    @Override
+    public void updateUserAsync(@NotNull User user) {
+
+    }
+
+    @Override
+    public boolean updateUser(@NotNull User user) {
+        return false;
+    }
+
+    @Override
+    public void registerUserAsync(@NotNull User user) {
+
+    }
+
+    @Override
+    public boolean registerUser(@NotNull User user) {
+        return false;
     }
 }

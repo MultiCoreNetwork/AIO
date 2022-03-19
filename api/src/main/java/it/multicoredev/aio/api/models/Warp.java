@@ -25,12 +25,16 @@ import org.bukkit.Location;
 public class Warp {
     public final String name;
     public final Location location;
-    public final boolean global;
+    public Boolean global;
 
     public Warp(Location location, String name, boolean global) {
         this.name = name;
         this.location = location;
         this.global = global;
+    }
+
+    public Warp(Location location, String name) {
+        this(location, name, true);
     }
 
     public String getName() {
@@ -42,6 +46,6 @@ public class Warp {
     }
 
     public boolean isGlobal() {
-        return global;
+        return global != null ? global : true;
     }
 }

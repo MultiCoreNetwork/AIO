@@ -55,7 +55,7 @@ public class PlayerCommandPreprocessListener extends PluginListenerExecutor<Play
             user.setAfk(false);
         }
 
-        if (config.commandCooldown.cooldownEnabled && config.commandCooldown.hasCommandCooldown(cmd)) {
+        if (config.cmdsCooldownSection.cooldownEnabled && config.cmdsCooldownSection.hasCommandCooldown(cmd)) {
             int commandCooldown = aio.hasCommandCooldown(player, cmd);
             if (commandCooldown > 0) {
                 event.setCancelled(true);

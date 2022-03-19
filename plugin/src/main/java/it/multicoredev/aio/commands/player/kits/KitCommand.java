@@ -2,8 +2,8 @@ package it.multicoredev.aio.commands.player.kits;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.commands.PluginCommand;
-import it.multicoredev.aio.models.ItemObject;
-import it.multicoredev.aio.models.Kit;
+import it.multicoredev.aio.api.models.ItemObject;
+import it.multicoredev.aio.api.models.Kit;
 import it.multicoredev.mbcore.spigot.Chat;
 import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
 import org.bukkit.Bukkit;
@@ -79,7 +79,7 @@ public class KitCommand extends PluginCommand {
             return false;
         }
 
-        Kit kit = aio.getKitStorage().getKitByName(id);
+        Kit kit = aio.getKitStorage().getKit(id);
 
         if (kit == null) {
             Chat.send(pu.replacePlaceholders(localization.kitNotFound), sender);

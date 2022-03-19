@@ -68,7 +68,6 @@ public class User extends JsonConfig {
         this.uuid = player.getUniqueId();
         this.name = player.getName();
         this.nickname = player.getDisplayName();
-        init();
     }
 
     @Override

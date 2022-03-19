@@ -1,14 +1,13 @@
-package it.multicoredev.aio.listeners.aio;
+package it.multicoredev.aio.api;
 
-import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.TeleportManager;
-import it.multicoredev.aio.api.events.teleport.PlayerTeleportCancelledEvent;
-import it.multicoredev.aio.listeners.PluginListenerExecutor;
-import it.multicoredev.mbcore.spigot.Chat;
+import it.multicoredev.aio.api.models.Kit;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 /**
- * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
+ * Copyright © 2022 by Lorenzo Magni
  * This file is part of AIO.
  * AIO is under "The 3-Clause BSD License", you can find a copy <a href="https://opensource.org/licenses/BSD-3-Clause">here</a>.
  * <p>
@@ -27,18 +26,37 @@ import org.jetbrains.annotations.NotNull;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class PlayerTeleportCancelledListener extends PluginListenerExecutor<PlayerTeleportCancelledEvent> {
+public interface IKits {
 
-    public PlayerTeleportCancelledListener(Class<PlayerTeleportCancelledEvent> eventClass, AIO aio) {
-        super(eventClass, aio);
-    }
+    /**
+     * Get a list of all the kits.
+     *
+     * @return all the kits.
+     */
+    List<Kit> getKits();
 
-    @Override
-    public void onEvent(@NotNull PlayerTeleportCancelledEvent event) {
-        ((TeleportManager) aio.getTeleportManager()).removeTeleport(event.getPlayer());
+    /**
+     * Get a {@link Kit} by its name.
+     *
+     * @param name The name of the kit.
+     * @return the kit or null if there's no kit with that name.
+     */
+    @Nullable
+    Kit getKit(@NotNull String name);
 
-        if (event.shouldNotify() && event.getPlayer().isOnline()) {
-            Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(localization.teleportCancelled, "{REASON}", event.getReason()), event.getPlayer());
-        }
-    }
+    /**
+     * Check if a kit with the given name exists.
+     *
+     * @param name The name of the kit.
+     * @return true if the kit exists, false otherwise.
+     */
+    boolean kitExists(@NotNull String name);
+
+    /**
+     * Add a new kit.
+     *
+     * @param kit The kit to add.
+     * @return true if the kit was added, false if there's already a kit with this name.
+     */
+    boolean addKit(@NotNull Kit kit);
 }

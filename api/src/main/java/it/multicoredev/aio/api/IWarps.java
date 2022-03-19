@@ -1,12 +1,11 @@
-package it.multicoredev.aio.models;
+package it.multicoredev.aio.api;
 
-import it.multicoredev.mbcore.spigot.Chat;
-import it.multicoredev.mclib.json.JsonConfig;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
+import it.multicoredev.aio.api.models.Warp;
+import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,50 +28,44 @@ import java.util.List;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class HelpBook extends JsonConfig {
-    public String id;
-    public Boolean permission;
-    public String name;
-    public String author;
-    public List<Page> pages;
+public interface IWarps {
 
-    public HelpBook() {
-        init();
-    }
+    /**
+     * Get a list of all the warps.
+     *
+     * @return all the warps.
+     */
+    List<Warp> getWarps();
 
-    @Override
-    public void init() {
-        if (permission == null) permission = false;
-        if (name == null) name = "HelpBook";
-        if (author == null) author = "AIO";
-        if (pages == null) pages = new ArrayList<>();
-    }
+    /**
+     * Get a {@link Warp} by name.
+     *
+     * @param name the name of the warp.
+     * @return the warp.
+     */
+    @Nullable
+    Warp getWarp(@NotNull String name);
 
-    public ItemStack getBook() {
-        ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
-        BookMeta meta = (BookMeta) book.getItemMeta();
+    /**
+     * Check if a warp with the given name exists.
+     *
+     * @param name the name of the warp.
+     * @return true if the warp exists, otherwise false.
+     */
+    boolean warpExists(@NotNull String name);
 
-        if (meta != null) {
-            meta.setTitle(Chat.getTranslated(name));
-            meta.setAuthor(Chat.getTranslated(author));
-            pages.forEach(page -> meta.addPage(page.lines));
+    /**
+     * Add a new warp.
+     *
+     * @param warp The warp to add.
+     * @return true if the warp was added, false if there's already a warp with this name.
+     */
+    boolean addWarp(@NotNull Warp warp);
 
-            book.setItemMeta(meta);
-        }
-
-        return book;
-    }
-
-    public static class Page extends JsonConfig {
-        public String[] lines;
-
-        public Page() {
-            init();
-        }
-
-        @Override
-        public void init() {
-            if (lines == null) lines = new String[0];
-        }
-    }
+    /**
+     * Delete a warp.
+     *
+     * @param warp The warp to delete.
+     */
+    void deleteWarp(@NotNull Warp warp);
 }

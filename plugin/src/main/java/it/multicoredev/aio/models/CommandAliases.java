@@ -38,10 +38,6 @@ public class CommandAliases extends JsonConfig {
     @SerializedName("add_completions")
     public Boolean addCompletions;
 
-    public CommandAliases() {
-        init();
-    }
-
     @Override
     public void init() {
         if (aliases == null) aliases = new ArrayList<>();

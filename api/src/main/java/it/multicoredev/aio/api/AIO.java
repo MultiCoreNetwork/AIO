@@ -1,10 +1,13 @@
 package it.multicoredev.aio.api;
 
 import it.multicoredev.aio.api.listeners.IListenerRegistry;
+import it.multicoredev.aio.api.models.HelpBook;
 import it.multicoredev.aio.api.tp.ITeleportManager;
 import it.multicoredev.aio.api.utils.IPlaceholdersUtils;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -78,7 +81,46 @@ public abstract class AIO extends JavaPlugin {
      *
      * @return the instance of the {@link IEconomy} or null if module is disabled or Vault is missing.
      */
-    @Nullable public abstract IEconomy getEconomy();
+    @Nullable
+    public abstract IEconomy getEconomy();
+
+    /**
+     * Get an instance of the {@link IKits} interface.
+     *
+     * @return the instance of the {@link IKits}.
+     */
+    public abstract IKits getKits();
+
+    /**
+     * Get an instance of the {@link IWarps} interface.
+     *
+     * @return the instance of the {@link IWarps}.
+     */
+    public abstract IWarps getWarps();
+
+    /**
+     * Get a list of all the {@link HelpBook}s.
+     *
+     * @return a list of all the HelpBooks.
+     */
+    public abstract List<HelpBook> getHelpBooks();
+
+    /**
+     * Get an HelpBook by its id.
+     *
+     * @param id the id of the HelpBook.
+     * @return the HelpBook or null if not found.
+     */
+    @Nullable
+    public abstract HelpBook getHelpBook(String id);
+
+    /**
+     * Add a new {@link HelpBook} to the list of available ones.
+     *
+     * @param helpBook the HelpBook to add.
+     * @return true if the HelpBook was added, false otherwise.
+     */
+    public abstract boolean addHelpBook(HelpBook helpBook);
 
     /**
      * Get an instance of the {@link IPlaceholdersUtils} interface.
