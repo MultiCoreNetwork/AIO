@@ -1,9 +1,11 @@
 package it.multicoredev.aio.api.tp;
 
 import com.google.common.base.Preconditions;
+import it.multicoredev.aio.api.utils.ITeleportCallback;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -32,6 +34,29 @@ public class Teleport {
     private long delay;
     private String pendingMessage;
     private String postMessage;
+    private ITeleportCallback callback;
+
+    /**
+     * Create a new Teleport object.
+     *
+     * @param player         the player to teleport.
+     * @param to             the destination of the player.
+     * @param delay          the time in ticks before the teleport.
+     * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
+     * @param postMessage    the message to send to the player after the teleport.
+     * @param callback       the callback to call after the teleport.
+     */
+    public Teleport(@NotNull Player player, @NotNull Location to, long delay, String pendingMessage, String postMessage, ITeleportCallback callback) {
+        Preconditions.checkNotNull(player);
+        Preconditions.checkNotNull(to);
+
+        this.player = player;
+        this.to = to;
+        this.delay = delay;
+        this.pendingMessage = pendingMessage;
+        this.postMessage = postMessage;
+        this.callback = callback;
+    }
 
     /**
      * Create a new Teleport object.
@@ -43,14 +68,19 @@ public class Teleport {
      * @param postMessage    the message to send to the player after the teleport.
      */
     public Teleport(@NotNull Player player, @NotNull Location to, long delay, String pendingMessage, String postMessage) {
-        Preconditions.checkNotNull(player);
-        Preconditions.checkNotNull(to);
+        this(player, to, delay, pendingMessage, postMessage, null);
+    }
 
-        this.player = player;
-        this.to = to;
-        this.delay = delay;
-        this.pendingMessage = pendingMessage;
-        this.postMessage = postMessage;
+    /**
+     * Create a new Teleport object.
+     *
+     * @param player   the player to teleport.
+     * @param to       the destination of the player.
+     * @param delay    the time in ticks before the teleport.
+     * @param callback the callback to call after the teleport.
+     */
+    public Teleport(@NotNull Player player, @NotNull Location to, long delay, ITeleportCallback callback) {
+        this(player, to, delay, null, null, callback);
     }
 
     /**
@@ -61,7 +91,21 @@ public class Teleport {
      * @param delay  the time in ticks before the teleport.
      */
     public Teleport(@NotNull Player player, @NotNull Location to, long delay) {
-        this(player, to, delay, null, null);
+        this(player, to, delay, null, null, null);
+    }
+
+    /**
+     * Create a new Teleport object.
+     * Default timer is 0.
+     *
+     * @param player         the player to teleport.
+     * @param to             the destination of the player.
+     * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
+     * @param postMessage    the message to send to the player after the teleport.
+     * @param callback       the callback to call after the teleport.
+     */
+    public Teleport(@NotNull Player player, @NotNull Location to, String pendingMessage, String postMessage, ITeleportCallback callback) {
+        this(player, to, 0, pendingMessage, postMessage, callback);
     }
 
     /**
@@ -74,7 +118,19 @@ public class Teleport {
      * @param postMessage    the message to send to the player after the teleport.
      */
     public Teleport(@NotNull Player player, @NotNull Location to, String pendingMessage, String postMessage) {
-        this(player, to, 0, pendingMessage, postMessage);
+        this(player, to, 0, pendingMessage, postMessage, null);
+    }
+
+    /**
+     * Create a new Teleport object.
+     * Default timer is 0.
+     *
+     * @param player   the player to teleport.
+     * @param to       the destination of the player.
+     * @param callback the callback to call after the teleport.
+     */
+    public Teleport(@NotNull Player player, @NotNull Location to, ITeleportCallback callback) {
+        this(player, to, 0, null, null, callback);
     }
 
     /**
@@ -85,7 +141,30 @@ public class Teleport {
      * @param to     the destination of the player.
      */
     public Teleport(@NotNull Player player, @NotNull Location to) {
-        this(player, to, 0, null, null);
+        this(player, to, 0, null, null, null);
+    }
+
+    /**
+     * Create a new Teleport object.
+     *
+     * @param player         the player to teleport.
+     * @param target         the target of the player.
+     * @param delay          the time in ticks before the teleport.
+     * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
+     * @param postMessage    the message to send to the player after the teleport.
+     * @param callback       the callback to call after the teleport.
+     */
+    public Teleport(@NotNull Player player, @NotNull Player target, long delay, String pendingMessage, String postMessage, ITeleportCallback callback) {
+        Preconditions.checkNotNull(player);
+        Preconditions.checkNotNull(target);
+
+        this.player = player;
+        this.to = null;
+        this.target = target;
+        this.delay = delay;
+        this.pendingMessage = pendingMessage;
+        this.postMessage = postMessage;
+        this.callback = callback;
     }
 
     /**
@@ -98,15 +177,19 @@ public class Teleport {
      * @param postMessage    the message to send to the player after the teleport.
      */
     public Teleport(@NotNull Player player, @NotNull Player target, long delay, String pendingMessage, String postMessage) {
-        Preconditions.checkNotNull(player);
-        Preconditions.checkNotNull(target);
+        this(player, target, delay, pendingMessage, postMessage, null);
+    }
 
-        this.player = player;
-        this.to = null;
-        this.target = target;
-        this.delay = delay;
-        this.pendingMessage = pendingMessage;
-        this.postMessage = postMessage;
+    /**
+     * Create a new Teleport object.
+     *
+     * @param player the player to teleport.
+     * @param target the target of the player.
+     * @param delay  the time in ticks before the teleport.
+     * @param callback the callback to call after the teleport.
+     */
+    public Teleport(@NotNull Player player, @NotNull Player target, long delay, ITeleportCallback callback) {
+        this(player, target, delay, null, null, callback);
     }
 
     /**
@@ -117,7 +200,21 @@ public class Teleport {
      * @param delay  the time in ticks before the teleport.
      */
     public Teleport(@NotNull Player player, @NotNull Player target, long delay) {
-        this(player, target, delay, null, null);
+        this(player, target, delay, null, null, null);
+    }
+
+    /**
+     * Create a new Teleport object.
+     * Default timer is 0.
+     *
+     * @param player         the player to teleport.
+     * @param target         the target of the player.
+     * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
+     * @param postMessage    the message to send to the player after the teleport.
+     * @param callback       the callback to call after the teleport.
+     */
+    public Teleport(@NotNull Player player, @NotNull Player target, String pendingMessage, String postMessage, ITeleportCallback callback) {
+        this(player, target, 0, pendingMessage, postMessage, callback);
     }
 
     /**
@@ -130,7 +227,19 @@ public class Teleport {
      * @param postMessage    the message to send to the player after the teleport.
      */
     public Teleport(@NotNull Player player, @NotNull Player target, String pendingMessage, String postMessage) {
-        this(player, target, 0, pendingMessage, postMessage);
+        this(player, target, 0, pendingMessage, postMessage, null);
+    }
+
+    /**
+     * Create a new Teleport object.
+     * Default timer is 0.
+     *
+     * @param player the player to teleport.
+     * @param target the target of the player.
+     * @param callback the callback to call after the teleport.
+     */
+    public Teleport(@NotNull Player player, @NotNull Player target, ITeleportCallback callback) {
+        this(player, target, 0, null, null, callback);
     }
 
     /**
@@ -141,7 +250,7 @@ public class Teleport {
      * @param target the target of the player.
      */
     public Teleport(@NotNull Player player, @NotNull Player target) {
-        this(player, target, 0, null, null);
+        this(player, target, 0, null, null, null);
     }
 
     /**
@@ -256,6 +365,27 @@ public class Teleport {
      */
     public Teleport setPostMessage(String postMessage) {
         this.postMessage = postMessage;
+        return this;
+    }
+
+    /**
+     * Get the callback to call after the teleport.
+     *
+     * @return the callback to call after the teleport.
+     */
+    @Nullable
+    public ITeleportCallback getCallback() {
+        return callback;
+    }
+
+    /**
+     * Set the callback to call after the teleport.
+     *
+     * @param callback the callback to call after the teleport.
+     * @return this object.
+     */
+    public Teleport setCallback(ITeleportCallback callback) {
+        this.callback = callback;
         return this;
     }
 

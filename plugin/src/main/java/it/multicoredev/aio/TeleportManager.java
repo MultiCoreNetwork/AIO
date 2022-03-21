@@ -6,6 +6,7 @@ import it.multicoredev.aio.api.tp.ITeleportManager;
 import it.multicoredev.aio.api.tp.Teleport;
 import it.multicoredev.aio.api.tp.TeleportRequest;
 import it.multicoredev.aio.api.utils.IPlaceholdersUtils;
+import it.multicoredev.aio.api.utils.ITeleportCallback;
 import it.multicoredev.aio.storage.config.Localization;
 import it.multicoredev.aio.storage.config.modules.EconomyModule;
 import it.multicoredev.aio.utils.Utils;
@@ -80,8 +81,14 @@ public class TeleportManager implements ITeleportManager {
         Bukkit.getPluginManager().callEvent(postTpEvent);
 
         if (postTpEvent.getPostMessage() != null && tp.getPlayer().isOnline()) {
-            Chat.send(pu.replacePlaceholders(postTpEvent.getPostMessage()), tp.getPlayer());
+            Chat.send(pu.replacePlaceholders(
+                    postTpEvent.getPostMessage(),
+                    new String[]{"{NAME}", "{DISPLAYNAME}", "{DELAY}"},
+                    new Object[]{tp.getPlayer().getName(), tp.getPlayer().getDisplayName(), tp.getDelay()}
+            ), tp.getPlayer());
         }
+
+        if (tp.getCallback() != null) tp.getCallback().call(tp, true, null);
     }
 
     private void cancelTp(@NotNull Teleport tp, Teleport.CancelReason reason, String cancelMessage) {
@@ -101,6 +108,8 @@ public class TeleportManager implements ITeleportManager {
         if (tpCancEvent.getCancelMessage() != null && tp.getPlayer().isOnline()) {
             Chat.send(pu.replacePlaceholders(tpCancEvent.getCancelMessage()), tp.getPlayer());
         }
+
+        if (tp.getCallback() != null) tp.getCallback().call(tp, false, reason);
     }
 
     private void cancelRequest(@NotNull TeleportRequest request, @NotNull TeleportRequest.CancelReason reason, String cancelMessageRequester, String cancelMessageTarget) {
@@ -119,7 +128,7 @@ public class TeleportManager implements ITeleportManager {
     }
 
     @Override
-    public void teleport(@NotNull Teleport teleport) {
+    public void teleport(@NotNull Teleport teleport, ITeleportCallback callback) {
         Preconditions.checkNotNull(teleport);
 
         pendingTeleports.put(teleport.getPlayer(), teleport);
@@ -133,73 +142,136 @@ public class TeleportManager implements ITeleportManager {
         }
 
         if (tpReqEvent.getPendingMessage() != null && tpReqEvent.getTimer() > 0 && teleport.getPlayer().isOnline()) {
-            Chat.send(pu.replacePlaceholders(tpReqEvent.getPendingMessage()), teleport.getPlayer());
+            Chat.send(pu.replacePlaceholders(
+                    tpReqEvent.getPendingMessage(),
+                    new String[]{"{NAME}", "{DISPLAYNAME}", "{DELAY}"},
+                    new Object[]{teleport.getPlayer().getName(), teleport.getPlayer().getDisplayName(), tpReqEvent.getTimer()}
+            ), teleport.getPlayer());
         }
 
         if (teleport.getDelay() <= 0) {
-            teleportNow(teleport);
+            teleportNow(teleport.setCallback(callback));
         } else {
-            if (teleport.getPlayer().hasPermission("aio.teleport.instant")) teleportNow(teleport);
-            else runningTeleports.put(teleport, Bukkit.getScheduler().runTaskLater(aio, () -> teleportNow(teleport), teleport.getDelay() * 20));
+            if (teleport.getPlayer().hasPermission("aio.teleport.instant")) teleportNow(teleport.setCallback(callback));
+            else
+                runningTeleports.put(teleport, Bukkit.getScheduler().runTaskLater(aio, () -> teleportNow(teleport.setCallback(callback)), teleport.getDelay() * 20));
         }
     }
 
     @Override
-    public void teleport(@NotNull Player player, @NotNull Location to, long timer, String pendingMessage, String postMessage) {
+    public void teleport(@NotNull Teleport teleport) {
+        teleport(teleport, null);
+    }
+
+    @Override
+    public void teleport(@NotNull Player player, @NotNull Location to, long timer, String pendingMessage, String postMessage, ITeleportCallback callback) {
         Preconditions.checkNotNull(player);
         Preconditions.checkNotNull(to);
 
         Teleport tp = new Teleport(player, to, timer, pendingMessage, postMessage);
-        teleport(tp);
+        teleport(tp, callback);
+    }
+
+    @Override
+    public void teleport(@NotNull Player player, @NotNull Location to, long timer, String pendingMessage, String postMessage) {
+        teleport(player, to, timer, pendingMessage, postMessage, null);
+    }
+
+    @Override
+    public void teleport(@NotNull Player player, @NotNull Location to, long timer, String postMessage, ITeleportCallback callback) {
+        teleport(player, to, timer, null, postMessage, null);
     }
 
     @Override
     public void teleport(@NotNull Player player, @NotNull Location to, long timer, String postMessage) {
-        teleport(player, to, timer, null, postMessage);
+        teleport(player, to, timer, null, postMessage, null);
+    }
+
+    @Override
+    public void teleport(@NotNull Player player, @NotNull Location to, long timer, ITeleportCallback callback) {
+        teleport(player, to, timer, null, null, callback);
     }
 
     @Override
     public void teleport(@NotNull Player player, @NotNull Location to, long timer) {
-        teleport(player, to, timer, null, null);
+        teleport(player, to, timer, null, null, null);
+    }
+
+    @Override
+    public void teleport(@NotNull Player player, @NotNull Location to, String postMessage, ITeleportCallback callback) {
+        teleport(player, to, 0, null, postMessage, callback);
     }
 
     @Override
     public void teleport(@NotNull Player player, @NotNull Location to, String postMessage) {
-        teleport(player, to, 0, null, postMessage);
+        teleport(player, to, 0, null, postMessage, null);
+    }
+
+    @Override
+    public void teleport(@NotNull Player player, @NotNull Location to, ITeleportCallback callback) {
+        teleport(player, to, 0, null, null, callback);
     }
 
     @Override
     public void teleport(@NotNull Player player, @NotNull Location to) {
-        teleport(player, to, 0, null, null);
+        teleport(player, to, 0, null, null, null);
+    }
+
+    @Override
+    public void teleport(@NotNull Player player, @NotNull Player target, long timer, String pendingMessage, String postMessage, ITeleportCallback callback) {
+        Preconditions.checkNotNull(target);
+        Preconditions.checkNotNull(target.getLocation());
+
+        teleport(player, target.getLocation(), timer, pendingMessage, postMessage, callback);
     }
 
     @Override
     public void teleport(@NotNull Player player, @NotNull Player target, long timer, String pendingMessage, String postMessage) {
-        teleport(new Teleport(player, target, timer, pendingMessage, postMessage));
+        teleport(player, target, timer, pendingMessage, postMessage, null);
+    }
+
+    @Override
+    public void teleport(@NotNull Player player, @NotNull Player target, long timer, String postMessage, ITeleportCallback callback) {
+        teleport(player, target, timer, null, postMessage, callback);
     }
 
     @Override
     public void teleport(@NotNull Player player, @NotNull Player target, long timer, String postMessage) {
-        teleport(player, target, timer, null, postMessage);
+        teleport(player, target, timer, null, postMessage, null);
+    }
+
+    @Override
+    public void teleport(@NotNull Player player, @NotNull Player target, long timer, ITeleportCallback callback) {
+        teleport(player, target, timer, null, null, callback);
     }
 
     @Override
     public void teleport(@NotNull Player player, @NotNull Player target, long timer) {
-        teleport(player, target, timer, null, null);
+        teleport(player, target, timer, null, null, null);
+    }
+
+    @Override
+    public void teleport(@NotNull Player player, @NotNull Player target, String postMessage, ITeleportCallback callback) {
+        teleport(player, target, 0, null, postMessage, callback);
     }
 
     @Override
     public void teleport(@NotNull Player player, @NotNull Player target, String postMessage) {
-        teleport(player, target, 0, null, postMessage);
+        teleport(player, target, 0, null, postMessage, null);
+    }
+
+    @Override
+    public void teleport(@NotNull Player player, @NotNull Player target, ITeleportCallback callback) {
+        teleport(player, target, 0, null, null, callback);
     }
 
     @Override
     public void teleport(@NotNull Player player, @NotNull Player target) {
-        teleport(player, target, 0, null, null);
+        teleport(player, target, 0, null, null, null);
     }
 
     @Override
-    public void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage) {
+    public void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage, ITeleportCallback callback) {
         Preconditions.checkNotNull(player);
         Preconditions.checkNotNull(center);
 
@@ -207,133 +279,265 @@ public class TeleportManager implements ITeleportManager {
         if (to == null) return;
 
         Bukkit.getScheduler().callSyncMethod(aio, () -> {
-            teleport(player, to, timer, pendingMessage, postMessage);
+            teleport(player, to, timer, pendingMessage, postMessage, callback);
             return true;
         });
     }
 
     @Override
+    public void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage) {
+        randomTeleport(player, center, minDistance, maxDistance, timer, pendingMessage, postMessage, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, long timer, String postMessage, ITeleportCallback callback) {
+        randomTeleport(player, center, minDistance, maxDistance, timer, null, postMessage, callback);
+    }
+
+    @Override
     public void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, long timer, String postMessage) {
-        randomTeleport(player, center, minDistance, maxDistance, timer, null, postMessage);
+        randomTeleport(player, center, minDistance, maxDistance, timer, null, postMessage, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, long timer, ITeleportCallback callback) {
+        randomTeleport(player, center, minDistance, maxDistance, timer, null, null, callback);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, long timer) {
-        randomTeleport(player, center, minDistance, maxDistance, timer, null, null);
+        randomTeleport(player, center, minDistance, maxDistance, timer, null, null, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, String postMessage, ITeleportCallback callback) {
+        randomTeleport(player, center, minDistance, maxDistance, 0, null, postMessage, callback);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, String postMessage) {
-        randomTeleport(player, center, minDistance, maxDistance, 0, null, postMessage);
+        randomTeleport(player, center, minDistance, maxDistance, 0, null, postMessage, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, ITeleportCallback callback) {
+        randomTeleport(player, center, minDistance, maxDistance, 0, null, null, callback);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance) {
-        randomTeleport(player, center, minDistance, maxDistance, 0, null, null);
+        randomTeleport(player, center, minDistance, maxDistance, 0, null, null, null);
     }
 
     @Override
-    public void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage) {
+    public void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage, ITeleportCallback callback) {
         Preconditions.checkNotNull(player);
         Preconditions.checkNotNull(world);
 
         Location center = new Location(world, xCenter, 0, zCenter);
-        randomTeleport(player, center, minDistance, maxDistance, timer, pendingMessage, postMessage);
+        randomTeleport(player, center, minDistance, maxDistance, timer, pendingMessage, postMessage, callback);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage) {
+        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, timer, pendingMessage, postMessage, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String postMessage, ITeleportCallback callback) {
+        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, timer, null, postMessage, callback);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String postMessage) {
-        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, timer, null, postMessage);
+        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, timer, null, postMessage, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, ITeleportCallback callback) {
+        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, timer, null, null, callback);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer) {
-        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, timer, null, null);
+        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, timer, null, null, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, String postMessage, ITeleportCallback callback) {
+        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, 0, null, postMessage, callback);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, String postMessage) {
-        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, 0, null, postMessage);
+        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, 0, null, postMessage, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, ITeleportCallback callback) {
+        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, 0, null, null, callback);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance) {
-        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, 0, null, null);
+        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, 0, null, null, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage, ITeleportCallback callback) {
+        Preconditions.checkNotNull(world);
+        Preconditions.checkNotNull(Bukkit.getWorld(world));
+
+        randomTeleport(player, Objects.requireNonNull(Bukkit.getWorld(world)), xCenter, zCenter, minDistance, maxDistance, timer, pendingMessage, postMessage, callback);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage) {
-        randomTeleport(player, Objects.requireNonNull(Bukkit.getWorld(world)), xCenter, zCenter, minDistance, maxDistance, timer, pendingMessage, postMessage);
+        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, timer, pendingMessage, postMessage, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String postMessage, ITeleportCallback callback) {
+        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, timer, null, postMessage, callback);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String postMessage) {
-        randomTeleport(player, Objects.requireNonNull(Bukkit.getWorld(world)), xCenter, zCenter, minDistance, maxDistance, timer, null, postMessage);
+        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, timer, null, postMessage, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, ITeleportCallback callback) {
+        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, timer, null, null, callback);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer) {
-        randomTeleport(player, Objects.requireNonNull(Bukkit.getWorld(world)), xCenter, zCenter, minDistance, maxDistance, timer, null, null);
+        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, timer, null, null, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, String postMessage, ITeleportCallback callback) {
+        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, 0, null, postMessage, callback);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, String postMessage) {
-        randomTeleport(player, Objects.requireNonNull(Bukkit.getWorld(world)), xCenter, zCenter, minDistance, maxDistance, 0, null, postMessage);
+        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, 0, null, postMessage, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, ITeleportCallback callback) {
+        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, 0, null, null, callback);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance) {
-        randomTeleport(player, Objects.requireNonNull(Bukkit.getWorld(world)), xCenter, zCenter, minDistance, maxDistance, 0, null, null);
+        randomTeleport(player, world, xCenter, zCenter, minDistance, maxDistance, 0, null, null, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage, ITeleportCallback callback) {
+        Preconditions.checkNotNull(player);
+
+        randomTeleport(player, player.getWorld(), xCenter, zCenter, minDistance, maxDistance, timer, pendingMessage, postMessage, callback);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage) {
-        randomTeleport(player, player.getWorld(), xCenter, zCenter, minDistance, maxDistance, timer, pendingMessage, postMessage);
+        randomTeleport(player, xCenter, zCenter, minDistance, maxDistance, timer, pendingMessage, postMessage, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String postMessage, ITeleportCallback callback) {
+        randomTeleport(player, xCenter, zCenter, minDistance, maxDistance, timer, null, postMessage, callback);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String postMessage) {
-        randomTeleport(player, player.getWorld(), xCenter, zCenter, minDistance, maxDistance, timer, null, postMessage);
+        randomTeleport(player, xCenter, zCenter, minDistance, maxDistance, timer, null, postMessage, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, ITeleportCallback callback) {
+        randomTeleport(player, xCenter, zCenter, minDistance, maxDistance, timer, null, null, callback);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, long timer) {
-        randomTeleport(player, player.getWorld(), xCenter, zCenter, minDistance, maxDistance, timer, null, null);
+        randomTeleport(player, xCenter, zCenter, minDistance, maxDistance, timer, null, null, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, String postMessage, ITeleportCallback callback) {
+        randomTeleport(player, xCenter, zCenter, minDistance, maxDistance, 0, null, postMessage, callback);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, String postMessage) {
-        randomTeleport(player, player.getWorld(), xCenter, zCenter, minDistance, maxDistance, 0, null, postMessage);
+        randomTeleport(player, xCenter, zCenter, minDistance, maxDistance, 0, null, postMessage, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, ITeleportCallback callback) {
+        randomTeleport(player, xCenter, zCenter, minDistance, maxDistance, 0, null, null, callback);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance) {
-        randomTeleport(player, player.getWorld(), xCenter, zCenter, minDistance, maxDistance, 0, null, null);
+        randomTeleport(player, xCenter, zCenter, minDistance, maxDistance, 0, null, null, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage, ITeleportCallback callback) {
+        Preconditions.checkNotNull(player);
+
+        randomTeleport(player, player.getLocation(), minDistance, maxDistance, timer, pendingMessage, postMessage, callback);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage) {
-        randomTeleport(player, player.getLocation(), minDistance, maxDistance, timer, pendingMessage, postMessage);
+        randomTeleport(player, minDistance, maxDistance, timer, pendingMessage, postMessage, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, long timer, String postMessage, ITeleportCallback callback) {
+        randomTeleport(player, minDistance, maxDistance, timer, null, postMessage, callback);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, long timer, String postMessage) {
-        randomTeleport(player, player.getLocation(), minDistance, maxDistance, timer, null, postMessage);
+        randomTeleport(player, minDistance, maxDistance, timer, null, postMessage, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, long timer, ITeleportCallback callback) {
+        randomTeleport(player, minDistance, maxDistance, timer, null, null, callback);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, long timer) {
-        randomTeleport(player, player.getLocation(), minDistance, maxDistance, timer);
+        randomTeleport(player, minDistance, maxDistance, timer, null, null, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, String postMessage, ITeleportCallback callback) {
+        randomTeleport(player, minDistance, maxDistance, 0, null, postMessage, callback);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, String postMessage) {
-        randomTeleport(player, player.getLocation(), minDistance, maxDistance, 0, null, postMessage);
+        randomTeleport(player, minDistance, maxDistance, 0, null, postMessage, null);
+    }
+
+    @Override
+    public void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, ITeleportCallback callback) {
+        randomTeleport(player, minDistance, maxDistance, 0, null, null, callback);
     }
 
     @Override
     public void randomTeleport(@NotNull Player player, int minDistance, int maxDistance) {
-        randomTeleport(player, player.getLocation(), minDistance, maxDistance, 0);
+        randomTeleport(player, minDistance, maxDistance, 0, null, null, null);
     }
 
     @Override

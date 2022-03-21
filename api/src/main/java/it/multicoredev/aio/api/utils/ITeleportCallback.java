@@ -1,15 +1,10 @@
-package it.multicoredev.aio.listeners.player;
+package it.multicoredev.aio.api.utils;
 
-import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.api.models.User;
-import it.multicoredev.aio.listeners.PluginListenerExecutor;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import it.multicoredev.aio.api.tp.Teleport;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
+ * Copyright © 2022 by Lorenzo Magni
  * This file is part of AIO.
  * AIO is under "The 3-Clause BSD License", you can find a copy <a href="https://opensource.org/licenses/BSD-3-Clause">here</a>.
  * <p>
@@ -28,29 +23,14 @@ import org.jetbrains.annotations.NotNull;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class PlayerTeleportListener extends PluginListenerExecutor<PlayerTeleportEvent> {
+public interface ITeleportCallback {
 
-    public PlayerTeleportListener(Class<PlayerTeleportEvent> eventClass, AIO aio) {
-        super(eventClass, aio);
-    }
-
-    @Override
-    public void onEvent(@NotNull PlayerTeleportEvent event) {
-        Location from = event.getFrom();
-        Player player = event.getPlayer();
-
-        if (event.getCause().equals(PlayerTeleportEvent.TeleportCause.ENDER_PEARL) ||
-                event.getCause().equals(PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) ||
-                event.getCause().equals(PlayerTeleportEvent.TeleportCause.END_PORTAL) ||
-                event.getCause().equals(PlayerTeleportEvent.TeleportCause.SPECTATE) ||
-                event.getCause().equals(PlayerTeleportEvent.TeleportCause.END_GATEWAY) ||
-                event.getCause().equals(PlayerTeleportEvent.TeleportCause.CHORUS_FRUIT))
-            return;
-
-        User user = aio.getStorage().getUser(player.getUniqueId());
-        if (user != null) {
-            user.setLastLocation(from);
-            aio.getStorage().updateUserAsync(user);
-        }
-    }
+    /**
+     * Method called when the teleport is completed.
+     *
+     * @param teleport     The teleport that was completed.
+     * @param success      True if the teleport was successful, false otherwise.
+     * @param cancelReason The reason why the teleport was cancelled. (Null if the teleport was not cancelled)
+     */
+    void call(@NotNull Teleport teleport, boolean success, Teleport.CancelReason cancelReason);
 }

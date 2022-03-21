@@ -1,14 +1,15 @@
-package it.multicoredev.aio.models;
+package it.multicoredev.aio.utils;
 
-import com.google.gson.annotations.SerializedName;
-import it.multicoredev.mclib.json.JsonConfig;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import it.multicoredev.aio.AIO;
+import it.multicoredev.aio.api.tp.Teleport;
+import it.multicoredev.aio.api.utils.ITeleportCallback;
+import it.multicoredev.mbcore.spigot.Chat;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
+ * Copyright © 2022 by Lorenzo Magni
  * This file is part of AIO.
  * AIO is under "The 3-Clause BSD License", you can find a copy <a href="https://opensource.org/licenses/BSD-3-Clause">here</a>.
  * <p>
@@ -27,22 +28,25 @@ import java.util.Map;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class CommandAliases extends JsonConfig {
-    public List<String> aliases;
-    public String command;
-    public String permission;
-    public String description;
-    public Map<String, List<String>> usages;
-    @SerializedName("allow_args")
-    public Boolean allowArgs;
-    @SerializedName("add_completions")
-    public Boolean addCompletions;
+public class TeleportMessageCallback implements ITeleportCallback {
+    private final AIO aio;
+    private final CommandSender sender;
+    private final String message;
+
+    public TeleportMessageCallback(AIO aio, CommandSender sender, String message) {
+        this.aio = aio;
+        this.sender = sender;
+        this.message = message;
+    }
 
     @Override
-    public void init() {
-        if (aliases == null) aliases = new ArrayList<>();
-        if (command == null) command = "";
-        if (allowArgs == null) allowArgs = false;
-        if (addCompletions == null) addCompletions = true;
+    public void call(@NotNull Teleport teleport, boolean success, Teleport.CancelReason cancelReason) {
+        if ((sender instanceof Player) && !((Player) sender).isOnline()) return;
+
+        Chat.send(aio.getPlaceholdersUtils().replacePlaceholders(
+                message,
+                new String[]{"{NAME}", "{DISPLAYNAME}"},
+                new Object[]{teleport.getPlayer().getName(), teleport.getPlayer().getDisplayName()}
+        ), sender);
     }
 }

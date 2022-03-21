@@ -5,6 +5,7 @@ import it.multicoredev.aio.api.models.User;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -65,12 +66,13 @@ public class RTPCommand extends PluginCommand {
             return false;
         }
 
-        if (config.rtpSection.isWorldBlacklisted(target.getWorld())) {
+        World world = target.getWorld();
+        if (config.teleportSection.rtpSection.isWorldBlacklisted(world)) {
             Chat.send(pu.replacePlaceholders(localization.rtpBlacklistedWorld), sender);
             return false;
         }
 
-        if (config.rtpSection.maxRtp > 0) {
+        if (config.teleportSection.rtpSection.rtpsLimit > 0) {
             if (!hasSubPerm(sender, "bypass-limits")) {
                 User user = storage.getUser(((Player) sender).getUniqueId());
                 if (user == null) {
@@ -78,7 +80,7 @@ public class RTPCommand extends PluginCommand {
                     return false;
                 }
 
-                if (user.getRTP() > config.rtpSection.maxRtp) {
+                if (user.getRTP() > config.teleportSection.rtpSection.rtpsLimit) {
                     Chat.send(pu.replacePlaceholders(localization.maxRtpExceeded), sender);
                     return false;
                 }
@@ -87,11 +89,11 @@ public class RTPCommand extends PluginCommand {
 
         Bukkit.getScheduler().runTaskAsynchronously(aio, () -> aio.getTeleportManager().randomTeleport(
                 target,
-                config.rtpSection.centerX,
-                config.rtpSection.centerZ,
-                config.rtpSection.spreadDistance,
-                config.rtpSection.maxRange,
-                config.rtpSection.rtpTeleportDelay
+                world.getSpawnLocation().getBlockX(),
+                world.getSpawnLocation().getBlockZ(),
+                config.teleportSection.rtpSection.spreadDistance,
+                config.teleportSection.rtpSection.maxRange,
+                config.teleportSection.getRtpDelay()
         ));
 
         if (target.equals(sender)) {

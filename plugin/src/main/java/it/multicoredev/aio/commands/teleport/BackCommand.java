@@ -2,7 +2,10 @@ package it.multicoredev.aio.commands.teleport;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.models.User;
+import it.multicoredev.aio.api.tp.Teleport;
+import it.multicoredev.aio.api.utils.ITeleportCallback;
 import it.multicoredev.aio.commands.PluginCommand;
+import it.multicoredev.aio.utils.TeleportMessageCallback;
 import it.multicoredev.mbcore.spigot.Chat;
 import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
 import org.bukkit.Bukkit;
@@ -75,7 +78,25 @@ public class BackCommand extends PluginCommand {
             return false;
         }
 
-        aio.getTeleportManager().teleport(target, user.getLastLocation()); //TODO Add delay
+        boolean senderIsTarget = sender.equals(target);
+
+        aio.getTeleportManager().teleport(
+                target,
+                user.getLastLocation(),
+                !senderIsTarget && sender.hasPermission("aio.teleport.instant") ? 0 : config.teleportSection.getBackDelay(),
+                localization.pendingBackTeleportSelf,
+                localization.backTeleportSelf,
+                !senderIsTarget ? new TeleportMessageCallback(aio, sender, localization.backTeleport) : null
+        );
+
+        if (!senderIsTarget) {
+            Chat.send(pu.replacePlaceholders(
+                    localization.pendingBackTeleport,
+                    new String[]{"{NAME}", "{DISPLAYNAME}", "{DELAY}"},
+                    new Object[]{target.getName(), target.getDisplayName(), config.teleportSection.getBackDelay()}
+            ), sender);
+        }
+
         return true;
     }
 

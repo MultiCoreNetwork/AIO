@@ -78,12 +78,17 @@ public class Localization extends JsonConfig {
     public String year;
     public String years;
 
+    // Back command
     @SerializedName("back_teleport")
     public String backTeleport;
     @SerializedName("back_teleport_self")
     public String backTeleportSelf;
     @SerializedName("location_not_available")
     public String locationNotAvailable;
+    @SerializedName("pending_back_teleport")
+    public String pendingBackTeleport;
+    @SerializedName("pending_back_teleport_self")
+    public String pendingBackTeleportSelf;
 
     @SerializedName("chat_cleaned")
     public String chatCleaned;
@@ -423,9 +428,12 @@ public class Localization extends JsonConfig {
         if (year == null) year = "year";
         if (years == null) years = "years";
 
+        // Back command
         if (backTeleport == null) backTeleport = "&h{DISPLAYNAME} has been teleported to the last location.";
         if (backTeleportSelf == null) backTeleportSelf = "&hYou have been teleported to your last location.";
-        if (locationNotAvailable == null) locationNotAvailable = "&cLocation not available.";
+        if (locationNotAvailable == null) locationNotAvailable = "&cYou don't have a previous location.";
+        if (pendingBackTeleport == null) pendingBackTeleport = "&h{DISPLAYNAME} will be teleported in {DELAY} seconds. Don't move!";
+        if (pendingBackTeleportSelf == null) pendingBackTeleportSelf = "&hYou will be teleported in {DELAY} seconds. Don't move!";
 
         if (chatCleaned == null) chatCleaned = "&hChat cleaned by the staff.";
 

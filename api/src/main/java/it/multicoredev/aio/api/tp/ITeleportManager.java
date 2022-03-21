@@ -1,5 +1,6 @@
 package it.multicoredev.aio.api.tp;
 
+import it.multicoredev.aio.api.utils.ITeleportCallback;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -35,8 +36,28 @@ public interface ITeleportManager {
      * Execute the given teleport.
      *
      * @param teleport the teleport to be executed.
+     * @param callback the callback to be executed after the teleport.
+     */
+    void teleport(@NotNull Teleport teleport, ITeleportCallback callback);
+
+    /**
+     * Execute the given teleport.
+     *
+     * @param teleport the teleport to be executed.
      */
     void teleport(@NotNull Teleport teleport);
+
+    /**
+     * Teleport a player to the give location after some time.
+     *
+     * @param player         the player to teleport.
+     * @param to             the destination of the player.
+     * @param timer          the time in seconds before the teleport.
+     * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
+     * @param postMessage    the message to send to the player after the teleport.
+     * @param callback       the callback to be executed after the teleport.
+     */
+    void teleport(@NotNull Player player, @NotNull Location to, long timer, String pendingMessage, String postMessage, ITeleportCallback callback);
 
     /**
      * Teleport a player to the give location after some time.
@@ -56,8 +77,30 @@ public interface ITeleportManager {
      * @param to          the destination of the player.
      * @param timer       the time in seconds before the teleport.
      * @param postMessage the message to send to the player after the teleport.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void teleport(@NotNull Player player, @NotNull Location to, long timer, String postMessage, ITeleportCallback callback);
+
+    /**
+     * Teleport a player to the give location after some time.
+     *
+     * @param player      the player to teleport.
+     * @param to          the destination of the player.
+     * @param timer       the time in seconds before the teleport.
+     * @param postMessage the message to send to the player after the teleport.
      */
     void teleport(@NotNull Player player, @NotNull Location to, long timer, String postMessage);
+
+    /**
+     * Teleport a player to the give location after some time.
+     * Default value for the timer is 0.
+     *
+     * @param player   the player to teleport.
+     * @param to       the destination of the player.
+     * @param timer    the time in seconds before the teleport.
+     * @param callback the callback to be executed after the teleport.
+     */
+    void teleport(@NotNull Player player, @NotNull Location to, long timer, ITeleportCallback callback);
 
     /**
      * Teleport a player to the give location after some time.
@@ -76,8 +119,29 @@ public interface ITeleportManager {
      * @param player      the player to teleport.
      * @param to          the destination of the player.
      * @param postMessage the message to send to the player after the teleport.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void teleport(@NotNull Player player, @NotNull Location to, String postMessage, ITeleportCallback callback);
+
+    /**
+     * Teleport a player to the give location.
+     * Default value for the timer is 0.
+     *
+     * @param player      the player to teleport.
+     * @param to          the destination of the player.
+     * @param postMessage the message to send to the player after the teleport.
      */
     void teleport(@NotNull Player player, @NotNull Location to, String postMessage);
+
+    /**
+     * Teleport a player to the give location.
+     * Default value for the timer is 0.
+     *
+     * @param player   the player to teleport.
+     * @param to       the destination of the player.
+     * @param callback the callback to be executed after the teleport.
+     */
+    void teleport(@NotNull Player player, @NotNull Location to, ITeleportCallback callback);
 
     /**
      * Teleport a player to the give location.
@@ -87,6 +151,18 @@ public interface ITeleportManager {
      * @param to     the destination of the player.
      */
     void teleport(@NotNull Player player, @NotNull Location to);
+
+    /**
+     * Teleport a player to the give location after some time.
+     *
+     * @param player         the player to teleport.
+     * @param target         the target of the player.
+     * @param timer          the time in seconds before the teleport.
+     * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
+     * @param postMessage    the message to send to the player after the teleport.
+     * @param callback       the callback to be executed after the teleport.
+     */
+    void teleport(@NotNull Player player, @NotNull Player target, long timer, String pendingMessage, String postMessage, ITeleportCallback callback);
 
     /**
      * Teleport a player to the give location after some time.
@@ -106,8 +182,30 @@ public interface ITeleportManager {
      * @param target      the target of the player.
      * @param timer       the time in seconds before the teleport.
      * @param postMessage the message to send to the player after the teleport.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void teleport(@NotNull Player player, @NotNull Player target, long timer, String postMessage, ITeleportCallback callback);
+
+    /**
+     * Teleport a player to the give location after some time.
+     *
+     * @param player      the player to teleport.
+     * @param target      the target of the player.
+     * @param timer       the time in seconds before the teleport.
+     * @param postMessage the message to send to the player after the teleport.
      */
     void teleport(@NotNull Player player, @NotNull Player target, long timer, String postMessage);
+
+    /**
+     * Teleport a player to the give location after some time.
+     * Default value for the timer is 0.
+     *
+     * @param player   the player to teleport.
+     * @param target   the target of the player.
+     * @param timer    the time in seconds before the teleport.
+     * @param callback the callback to be executed after the teleport.
+     */
+    void teleport(@NotNull Player player, @NotNull Player target, long timer, ITeleportCallback callback);
 
     /**
      * Teleport a player to the give location after some time.
@@ -126,8 +224,29 @@ public interface ITeleportManager {
      * @param player      the player to teleport.
      * @param target      the target of the player.
      * @param postMessage the message to send to the player after the teleport.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void teleport(@NotNull Player player, @NotNull Player target, String postMessage, ITeleportCallback callback);
+
+    /**
+     * Teleport a player to the give location.
+     * Default value for the timer is 0.
+     *
+     * @param player      the player to teleport.
+     * @param target      the target of the player.
+     * @param postMessage the message to send to the player after the teleport.
      */
     void teleport(@NotNull Player player, @NotNull Player target, String postMessage);
+
+    /**
+     * Teleport a player to the give location.
+     * Default value for the timer is 0.
+     *
+     * @param player   the player to teleport.
+     * @param target   the target of the player.
+     * @param callback the callback to be executed after the teleport.
+     */
+    void teleport(@NotNull Player player, @NotNull Player target, ITeleportCallback callback);
 
     /**
      * Teleport a player to the give location.
@@ -137,6 +256,20 @@ public interface ITeleportManager {
      * @param target the target of the player.
      */
     void teleport(@NotNull Player player, @NotNull Player target);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
+     * @param player         the player to teleport.
+     * @param center         the center of the teleport area.
+     * @param minDistance    the minimum distance from the center.
+     * @param maxDistance    the maximum distance from the center.
+     * @param timer          the time in seconds before the teleport.
+     * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
+     * @param postMessage    the message to send to the player after the teleport.
+     * @param callback       the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage, ITeleportCallback callback);
 
     /**
      * Teleport a player to a random location after some time.
@@ -160,8 +293,33 @@ public interface ITeleportManager {
      * @param maxDistance the maximum distance from the center.
      * @param timer       the time in seconds before the teleport.
      * @param postMessage the message to send to the player after the teleport.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, long timer, String postMessage, ITeleportCallback callback);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
+     * @param player      the player to teleport.
+     * @param center      the center of the teleport area.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param timer       the time in seconds before the teleport.
+     * @param postMessage the message to send to the player after the teleport.
      */
     void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, long timer, String postMessage);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
+     * @param player      the player to teleport.
+     * @param center      the center of the teleport area.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param timer       the time in seconds before the teleport.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, long timer, ITeleportCallback callback);
 
     /**
      * Teleport a player to a random location after some time.
@@ -183,6 +341,19 @@ public interface ITeleportManager {
      * @param minDistance the minimum distance from the center.
      * @param maxDistance the maximum distance from the center.
      * @param postMessage the message to send to the player after the teleport.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, String postMessage, ITeleportCallback callback);
+
+    /**
+     * Teleport a player to a random location.
+     * Default value for the timer is 0.
+     *
+     * @param player      the player to teleport.
+     * @param center      the center of the teleport area.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param postMessage the message to send to the player after the teleport.
      */
     void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, String postMessage);
 
@@ -194,8 +365,36 @@ public interface ITeleportManager {
      * @param center      the center of the teleport area.
      * @param minDistance the minimum distance from the center.
      * @param maxDistance the maximum distance from the center.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance, ITeleportCallback callback);
+
+    /**
+     * Teleport a player to a random location.
+     * Default value for the timer is 0.
+     *
+     * @param player      the player to teleport.
+     * @param center      the center of the teleport area.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
      */
     void randomTeleport(@NotNull Player player, @NotNull Location center, int minDistance, int maxDistance);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
+     * @param player         the player to teleport.
+     * @param world          the world.
+     * @param xCenter        the x coordinate of the center.
+     * @param zCenter        the z coordinate of the center.
+     * @param minDistance    the minimum distance from the center.
+     * @param maxDistance    the maximum distance from the center.
+     * @param timer          the time in seconds before the teleport.
+     * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
+     * @param postMessage    the message to send to the player after the teleport.
+     * @param callback       the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage, ITeleportCallback callback);
 
     /**
      * Teleport a player to a random location after some time.
@@ -223,8 +422,37 @@ public interface ITeleportManager {
      * @param maxDistance the maximum distance from the center.
      * @param timer       the time in seconds before the teleport.
      * @param postMessage the message to send to the player after the teleport.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String postMessage, ITeleportCallback callback);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
+     * @param player      the player to teleport.
+     * @param world       the world.
+     * @param xCenter     the x coordinate of the center.
+     * @param zCenter     the z coordinate of the center.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param timer       the time in seconds before the teleport.
+     * @param postMessage the message to send to the player after the teleport.
      */
     void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String postMessage);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
+     * @param player      the player to teleport.
+     * @param world       the world.
+     * @param xCenter     the x coordinate of the center.
+     * @param zCenter     the z coordinate of the center.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param timer       the time in seconds before the teleport.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, ITeleportCallback callback);
 
     /**
      * Teleport a player to a random location after some time.
@@ -249,6 +477,20 @@ public interface ITeleportManager {
      * @param minDistance the minimum distance from the center.
      * @param maxDistance the maximum distance from the center.
      * @param postMessage the message to send to the player after the teleport.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, String postMessage, ITeleportCallback callback);
+
+    /**
+     * Teleport a player to a random location.
+     *
+     * @param player      the player to teleport.
+     * @param world       the world.
+     * @param xCenter     the x coordinate of the center.
+     * @param zCenter     the z coordinate of the center.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param postMessage the message to send to the player after the teleport.
      */
     void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, String postMessage);
 
@@ -261,8 +503,37 @@ public interface ITeleportManager {
      * @param zCenter     the z coordinate of the center.
      * @param minDistance the minimum distance from the center.
      * @param maxDistance the maximum distance from the center.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance, ITeleportCallback callback);
+
+    /**
+     * Teleport a player to a random location.
+     *
+     * @param player      the player to teleport.
+     * @param world       the world.
+     * @param xCenter     the x coordinate of the center.
+     * @param zCenter     the z coordinate of the center.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
      */
     void randomTeleport(@NotNull Player player, @NotNull World world, double xCenter, double zCenter, int minDistance, int maxDistance);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
+     * @param player         the player to teleport.
+     * @param world          the world.
+     * @param xCenter        the x coordinate of the center.
+     * @param zCenter        the z coordinate of the center.
+     * @param minDistance    the minimum distance from the center.
+     * @param maxDistance    the maximum distance from the center.
+     * @param timer          the time in seconds before the teleport.
+     * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
+     * @param postMessage    the message to send to the player after the teleport.
+     * @param callback       the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage, ITeleportCallback callback);
 
     /**
      * Teleport a player to a random location after some time.
@@ -290,8 +561,37 @@ public interface ITeleportManager {
      * @param maxDistance the maximum distance from the center.
      * @param timer       the time in seconds before the teleport.
      * @param postMessage the message to send to the player after the teleport.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String postMessage, ITeleportCallback callback);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
+     * @param player      the player to teleport.
+     * @param world       the world.
+     * @param xCenter     the x coordinate of the center.
+     * @param zCenter     the z coordinate of the center.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param timer       the time in seconds before the teleport.
+     * @param postMessage the message to send to the player after the teleport.
      */
     void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String postMessage);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
+     * @param player      the player to teleport.
+     * @param world       the world.
+     * @param xCenter     the x coordinate of the center.
+     * @param zCenter     the z coordinate of the center.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param timer       the time in seconds before the teleport.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, ITeleportCallback callback);
 
     /**
      * Teleport a player to a random location after some time.
@@ -316,6 +616,20 @@ public interface ITeleportManager {
      * @param minDistance the minimum distance from the center.
      * @param maxDistance the maximum distance from the center.
      * @param postMessage the message to send to the player after the teleport.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, String postMessage, ITeleportCallback callback);
+
+    /**
+     * Teleport a player to a random location.
+     *
+     * @param player      the player to teleport.
+     * @param world       the world.
+     * @param xCenter     the x coordinate of the center.
+     * @param zCenter     the z coordinate of the center.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param postMessage the message to send to the player after the teleport.
      */
     void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, String postMessage);
 
@@ -328,8 +642,36 @@ public interface ITeleportManager {
      * @param zCenter     the z coordinate of the center.
      * @param minDistance the minimum distance from the center.
      * @param maxDistance the maximum distance from the center.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance, ITeleportCallback callback);
+
+    /**
+     * Teleport a player to a random location.
+     *
+     * @param player      the player to teleport.
+     * @param world       the world.
+     * @param xCenter     the x coordinate of the center.
+     * @param zCenter     the z coordinate of the center.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
      */
     void randomTeleport(@NotNull Player player, @NotNull String world, double xCenter, double zCenter, int minDistance, int maxDistance);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
+     * @param player         the player to teleport.
+     * @param xCenter        the x coordinate of the center.
+     * @param zCenter        the z coordinate of the center.
+     * @param minDistance    the minimum distance from the center.
+     * @param maxDistance    the maximum distance from the center.
+     * @param timer          the time in seconds before the teleport.
+     * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
+     * @param postMessage    the message to send to the player after the teleport.
+     * @param callback       the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage, ITeleportCallback callback);
 
     /**
      * Teleport a player to a random location after some time.
@@ -355,8 +697,35 @@ public interface ITeleportManager {
      * @param maxDistance the maximum distance from the center.
      * @param timer       the time in seconds before the teleport.
      * @param postMessage the message to send to the player after the teleport.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String postMessage, ITeleportCallback callback);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
+     * @param player      the player to teleport.
+     * @param xCenter     the x coordinate of the center.
+     * @param zCenter     the z coordinate of the center.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param timer       the time in seconds before the teleport.
+     * @param postMessage the message to send to the player after the teleport.
      */
     void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, String postMessage);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
+     * @param player      the player to teleport.
+     * @param xCenter     the x coordinate of the center.
+     * @param zCenter     the z coordinate of the center.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param timer       the time in seconds before the teleport.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, long timer, ITeleportCallback callback);
 
     /**
      * Teleport a player to a random location after some time.
@@ -379,8 +748,33 @@ public interface ITeleportManager {
      * @param minDistance the minimum distance from the center.
      * @param maxDistance the maximum distance from the center.
      * @param postMessage the message to send to the player after the teleport.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, String postMessage, ITeleportCallback callback);
+
+    /**
+     * Teleport a player to a random location.
+     *
+     * @param player      the player to teleport.
+     * @param xCenter     the x coordinate of the center.
+     * @param zCenter     the z coordinate of the center.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param postMessage the message to send to the player after the teleport.
      */
     void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, String postMessage);
+
+    /**
+     * Teleport a player to a random location.
+     *
+     * @param player      the player to teleport.
+     * @param xCenter     the x coordinate of the center.
+     * @param zCenter     the z coordinate of the center.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, double xCenter, double zCenter, int minDistance, int maxDistance, ITeleportCallback callback);
 
     /**
      * Teleport a player to a random location.
@@ -402,8 +796,33 @@ public interface ITeleportManager {
      * @param timer          the time in seconds before the teleport.
      * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
      * @param postMessage    the message to send to the player after the teleport.
+     * @param callback       the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage, ITeleportCallback callback);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
+     * @param player         the player to teleport.
+     * @param minDistance    the minimum distance from the center.
+     * @param maxDistance    the maximum distance from the center.
+     * @param timer          the time in seconds before the teleport.
+     * @param pendingMessage the message to send to the player instantly if the timer is greater than 0.
+     * @param postMessage    the message to send to the player after the teleport.
      */
     void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, long timer, String pendingMessage, String postMessage);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
+     * @param player      the player to teleport.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param timer       the time in seconds before the teleport.
+     * @param postMessage the message to send to the player after the teleport.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, long timer, String postMessage, ITeleportCallback callback);
 
     /**
      * Teleport a player to a random location after some time.
@@ -423,6 +842,17 @@ public interface ITeleportManager {
      * @param minDistance the minimum distance from the center.
      * @param maxDistance the maximum distance from the center.
      * @param timer       the time in seconds before the teleport.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, long timer, ITeleportCallback callback);
+
+    /**
+     * Teleport a player to a random location after some time.
+     *
+     * @param player      the player to teleport.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param timer       the time in seconds before the teleport.
      */
     void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, long timer);
 
@@ -433,8 +863,29 @@ public interface ITeleportManager {
      * @param minDistance the minimum distance from the center.
      * @param maxDistance the maximum distance from the center.
      * @param postMessage the message to send to the player after the teleport.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, String postMessage, ITeleportCallback callback);
+
+    /**
+     * Teleport a player to a random location.
+     *
+     * @param player      the player to teleport.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param postMessage the message to send to the player after the teleport.
      */
     void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, String postMessage);
+
+    /**
+     * Teleport a player to a random location.
+     *
+     * @param player      the player to teleport.
+     * @param minDistance the minimum distance from the center.
+     * @param maxDistance the maximum distance from the center.
+     * @param callback    the callback to be executed after the teleport.
+     */
+    void randomTeleport(@NotNull Player player, int minDistance, int maxDistance, ITeleportCallback callback);
 
     /**
      * Teleport a player to a random location.

@@ -1,7 +1,7 @@
 package it.multicoredev.aio.storage.config.modules;
 
 import it.multicoredev.aio.api.models.Module;
-import it.multicoredev.aio.models.CommandAliases;
+import it.multicoredev.aio.models.CommandAlias;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ import java.util.List;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class CommandAliasesModule extends Module {
-    public List<CommandAliases> aliases;
+    public List<CommandAlias> aliases;
 
     public CommandAliasesModule() {
         super("command_aliases");

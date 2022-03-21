@@ -159,6 +159,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     //TODO placeholderutils.replacePlaceholders does not have the player
     //TODO Add vanilla tp command replacement (Priority low)
     //TODO Add validate method to configs
+    //TODO Add exceptions in api javadoc
 
     @Override
     public void onEnable() {

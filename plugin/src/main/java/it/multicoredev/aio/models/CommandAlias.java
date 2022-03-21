@@ -1,12 +1,11 @@
-package it.multicoredev.aio.listeners.player;
+package it.multicoredev.aio.models;
 
-import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.api.models.User;
-import it.multicoredev.aio.listeners.PluginListenerExecutor;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
-import org.jetbrains.annotations.NotNull;
+import com.google.gson.annotations.SerializedName;
+import it.multicoredev.mclib.json.JsonConfig;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -28,29 +27,22 @@ import org.jetbrains.annotations.NotNull;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class PlayerTeleportListener extends PluginListenerExecutor<PlayerTeleportEvent> {
-
-    public PlayerTeleportListener(Class<PlayerTeleportEvent> eventClass, AIO aio) {
-        super(eventClass, aio);
-    }
+public class CommandAlias extends JsonConfig {
+    public List<String> aliases;
+    public String command;
+    public String permission;
+    public String description;
+    public Map<String, List<String>> usages;
+    @SerializedName("allow_args")
+    public Boolean allowArgs;
+    @SerializedName("add_completions")
+    public Boolean addCompletions;
 
     @Override
-    public void onEvent(@NotNull PlayerTeleportEvent event) {
-        Location from = event.getFrom();
-        Player player = event.getPlayer();
-
-        if (event.getCause().equals(PlayerTeleportEvent.TeleportCause.ENDER_PEARL) ||
-                event.getCause().equals(PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) ||
-                event.getCause().equals(PlayerTeleportEvent.TeleportCause.END_PORTAL) ||
-                event.getCause().equals(PlayerTeleportEvent.TeleportCause.SPECTATE) ||
-                event.getCause().equals(PlayerTeleportEvent.TeleportCause.END_GATEWAY) ||
-                event.getCause().equals(PlayerTeleportEvent.TeleportCause.CHORUS_FRUIT))
-            return;
-
-        User user = aio.getStorage().getUser(player.getUniqueId());
-        if (user != null) {
-            user.setLastLocation(from);
-            aio.getStorage().updateUserAsync(user);
-        }
+    public void init() {
+        if (aliases == null) aliases = new ArrayList<>();
+        if (command == null) command = "";
+        if (allowArgs == null) allowArgs = false;
+        if (addCompletions == null) addCompletions = true;
     }
 }
