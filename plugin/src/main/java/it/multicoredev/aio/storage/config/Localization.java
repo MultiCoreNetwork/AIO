@@ -256,8 +256,13 @@ public class Localization extends JsonConfig {
     @SerializedName("lightning_summon_failed")
     public String lightningSummonFailed;
 
+    // RTP
     @SerializedName("max_rtp_exceeded")
     public String maxRtpExceeded;
+    @SerializedName("pending_rtp")
+    public String pendingRtp;
+    @SerializedName("pending_rtp_self")
+    public String pendingRtpSelf;
     @SerializedName("rtp_blacklisted_world")
     public String rtpBlacklistedWorld;
     @SerializedName("rtp_teleport")
@@ -432,7 +437,7 @@ public class Localization extends JsonConfig {
         if (backTeleport == null) backTeleport = "&h{DISPLAYNAME} has been teleported to the last location.";
         if (backTeleportSelf == null) backTeleportSelf = "&hYou have been teleported to your last location.";
         if (locationNotAvailable == null) locationNotAvailable = "&cYou don't have a previous location.";
-        if (pendingBackTeleport == null) pendingBackTeleport = "&h{DISPLAYNAME} will be teleported in {DELAY} seconds. Don't move!";
+        if (pendingBackTeleport == null) pendingBackTeleport = "&h{DISPLAYNAME} will be teleported in {DELAY} seconds.";
         if (pendingBackTeleportSelf == null) pendingBackTeleportSelf = "&hYou will be teleported in {DELAY} seconds. Don't move!";
 
         if (chatCleaned == null) chatCleaned = "&hChat cleaned by the staff.";
@@ -527,7 +532,10 @@ public class Localization extends JsonConfig {
         if (itemsNotRepaired == null) itemsNotRepaired = "&cNone of {DISPLAYNAME}'s items has been repaired.";
         if (itemsNotRepairedSelf == null) itemsNotRepairedSelf = "&cNone of your items has been repaired.";
 
+        // RTP
         if (maxRtpExceeded == null) maxRtpExceeded = "&cYou exceeded the max amount of RTPs.";
+        if (pendingRtp == null) pendingRtp = "&h{DISPLAYNAME} will be teleported in {DELAY} seconds.";
+        if (pendingRtpSelf == null) pendingRtpSelf = "&hYou will be teleported in {DELAY} seconds. Don't move!";
         if (rtpBlacklistedWorld == null) rtpBlacklistedWorld = "&cYou can't use RTP in this world.";
         if (rtpTeleport == null) rtpTeleport = "&h{DISPLAYNAME} is being teleported to a random location.";
         if (rtpTeleportSelf == null) rtpTeleportSelf = "&hYou are being teleported to a random location.";

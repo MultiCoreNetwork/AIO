@@ -3,6 +3,7 @@ package it.multicoredev.aio.commands.teleport;
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.models.User;
 import it.multicoredev.aio.commands.PluginCommand;
+import it.multicoredev.aio.utils.TeleportMessageCallback;
 import it.multicoredev.mbcore.spigot.Chat;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -87,23 +88,25 @@ public class RTPCommand extends PluginCommand {
             }
         }
 
+        boolean senderIsTarget = sender.equals(target);
+
         Bukkit.getScheduler().runTaskAsynchronously(aio, () -> aio.getTeleportManager().randomTeleport(
                 target,
                 world.getSpawnLocation().getBlockX(),
                 world.getSpawnLocation().getBlockZ(),
                 config.teleportSection.rtpSection.spreadDistance,
                 config.teleportSection.rtpSection.maxRange,
-                config.teleportSection.getRtpDelay()
+                !senderIsTarget && sender.hasPermission("aio.teleport.instant") ? 0 : config.teleportSection.getRtpDelay(),
+                localization.pendingRtpSelf,
+                localization.rtpTeleportSelf,
+                !senderIsTarget ? new TeleportMessageCallback(aio, sender, localization.rtpTeleport) : null
         ));
 
-        if (target.equals(sender)) {
-            Chat.send(pu.replacePlaceholders(localization.rtpTeleportSelf), target);
-        } else {
-            Chat.send(pu.replacePlaceholders(localization.rtpTeleportSelf), target);
+        if (!senderIsTarget) {
             Chat.send(pu.replacePlaceholders(
-                    localization.rtpTeleport,
-                    new String[]{"{NAME}", "{DISPLAYNAME}"},
-                    new Object[]{target.getName(), target.getDisplayName()}
+                    localization.pendingRtp,
+                    new String[]{"{NAME}", "{DISPLAYNAME}", "{DELAY}"},
+                    new Object[]{target.getName(), target.getDisplayName(), config.teleportSection.getBackDelay()}
             ), sender);
         }
 

@@ -160,6 +160,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     //TODO Add vanilla tp command replacement (Priority low)
     //TODO Add validate method to configs
     //TODO Add exceptions in api javadoc
+    //TODO Cancel previous pending teleport when a new one is executed
 
     @Override
     public void onEnable() {
