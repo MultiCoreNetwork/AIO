@@ -1,4 +1,4 @@
-package it.multicoredev.aio.commands.teleport.tp;
+package it.multicoredev.aio.commands.teleport.requests;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.commands.PluginCommand;

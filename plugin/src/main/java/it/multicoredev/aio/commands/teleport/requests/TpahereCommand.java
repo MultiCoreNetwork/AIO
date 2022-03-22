@@ -1,7 +1,6 @@
-package it.multicoredev.aio.commands.teleport.tp;
+package it.multicoredev.aio.commands.teleport.requests;
 
 import it.multicoredev.aio.AIO;
-import it.multicoredev.aio.api.tp.ITeleportManager;
 import it.multicoredev.aio.api.tp.TeleportRequest;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.mbcore.spigot.Chat;
@@ -34,10 +33,10 @@ import java.util.List;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class TpaCommand extends PluginCommand {
-    private static final String CMD = "tpa";
+public class TpahereCommand extends PluginCommand {
+    private static final String CMD = "tpahere";
 
-    public TpaCommand(AIO aio) {
+    public TpahereCommand(AIO aio) {
         super(aio, CMD);
     }
 
@@ -69,14 +68,14 @@ public class TpaCommand extends PluginCommand {
         aio.getTeleportManager().requestTeleport(
                 requester,
                 target,
-                TeleportRequest.RequestType.TPA,
+                TeleportRequest.RequestType.TPAHERE,
                 config.teleportRequestTimeout,
                 pu.replacePlaceholders(
-                        localization.tpaRequestRequester,
+                        localization.tpahereRequestRequester,
                         new String[]{"{REQUESTER_NAME}", "{REQUESTER_DISPLAYNAME}", "{TARGET_NAME}", "{TARGET_DISPLAYNAME}"},
                         new Object[]{requester.getName(), requester.getDisplayName(), target.getName(), target.getDisplayName()}),
                 pu.replacePlaceholders(
-                        localization.tpaRequestTarget,
+                        localization.tpahereRequestTarget,
                         new String[]{"{REQUESTER_NAME}", "{REQUESTER_DISPLAYNAME}", "{TARGET_NAME}", "{TARGET_DISPLAYNAME}"},
                         new Object[]{requester.getName(), requester.getDisplayName(), target.getName(), target.getDisplayName()})
         );

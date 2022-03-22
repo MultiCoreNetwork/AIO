@@ -60,6 +60,13 @@ public class TeleportManager implements ITeleportManager {
 
     private void teleportNow(@NotNull Teleport tp) {
         pendingTeleports.remove(tp.getPlayer());
+        runningTeleports.keySet()
+                .stream()
+                .filter(t -> t.getPlayer().equals(tp.getPlayer()))
+                .forEach(t -> {
+                    runningTeleports.get(t).cancel();
+                    runningTeleports.remove(t);
+                });
 
         if (!tp.getPlayer().isOnline()) {
             cancelTp(tp, Teleport.CancelReason.NOT_ONLINE, null);

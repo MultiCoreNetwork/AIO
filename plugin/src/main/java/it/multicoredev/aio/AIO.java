@@ -23,7 +23,7 @@ import it.multicoredev.aio.commands.teleport.RTPCommand;
 import it.multicoredev.aio.commands.teleport.home.*;
 import it.multicoredev.aio.commands.teleport.spawn.SetSpawnCommand;
 import it.multicoredev.aio.commands.teleport.spawn.SpawnCommand;
-import it.multicoredev.aio.commands.teleport.tp.*;
+import it.multicoredev.aio.commands.teleport.requests.*;
 import it.multicoredev.aio.commands.teleport.warp.DelWarpCommand;
 import it.multicoredev.aio.commands.teleport.warp.SetWarpCommand;
 import it.multicoredev.aio.commands.teleport.warp.WarpCommand;
@@ -145,22 +145,23 @@ public class AIO extends it.multicoredev.aio.api.AIO {
 
     public static boolean debug = true;
 
-    //TODO Improve argument completions
-    //TODO Enchant disenchant commands change output msg enchant name
-    //TODO Fly speed (Save also walk speed and set on Join)
-    //TODO Change command syntax to /command [on|off|toggle] [player]
-    //TODO ALL Chat.send must have placeholderutils.replace....
-    //TODO Add the ability to log transactions inside AIOEconomy
-    //TODO Use this everywhere !hasSubPerm(sender, "other") && !sender.equals(target)
-    //TODO Runlater command should send feedback when the command is executed
-    //TODO Require economy module enabled in checks
-    //TODO Add Objects.requireNonNull(...) where needed
-    //TODO Cancel pending teleports and requests when the player quits
-    //TODO placeholderutils.replacePlaceholders does not have the player
-    //TODO Add vanilla tp command replacement (Priority low)
-    //TODO Add validate method to configs
-    //TODO Add exceptions in api javadoc
-    //TODO Cancel previous pending teleport when a new one is executed
+    // Priorities: 🟢 - Low priority, 🟡 - Medium priority, 🔴 - High priority
+    //TODO 🔴 Improve argument completions
+    //TODO 🟢 Enchant disenchant commands change output msg enchant name
+    //TODO 🔴 Fly speed (Save also walk speed and set on Join)
+    //TODO 🔴 Change command syntax to /command [on|off|toggle] [player]
+    //TODO 🔴 ALL Chat.send must have placeholderutils.replace....
+    //TODO 🟡 Add the ability to log transactions inside AIOEconomy
+    //TODO 🔴 Use this everywhere !hasSubPerm(sender, "other") && !sender.equals(target)
+    //TODO 🟢 Runlater command should send feedback when the command is executed
+    //TODO 🔴 Require economy module enabled in checks
+    //TODO 🟢 Add Objects.requireNonNull(...) where needed
+    //TODO 🔴 Cancel pending teleports and requests when the player quits
+    //TODO 🔴 placeholderutils.replacePlaceholders does not have the player
+    //TODO 🟡 Add vanilla tp command replacement (Priority low)
+    //TODO 🟢 Add validate method to configs
+    //TODO 🟢 Add exceptions in api javadoc
+    //TODO 🟢 Add swim speed
 
     @Override
     public void onEnable() {

@@ -1,17 +1,15 @@
-package it.multicoredev.aio.commands.teleport.tp;
+package it.multicoredev.aio.commands.teleport.requests;
 
 import it.multicoredev.aio.AIO;
+import it.multicoredev.aio.api.tp.ITeleportManager;
 import it.multicoredev.aio.api.tp.TeleportRequest;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.mbcore.spigot.Chat;
-import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 /**
  * Copyright &copy; 2021 - 2022 by Lorenzo Magni &amp; Daniele Patella
@@ -33,10 +31,10 @@ import java.util.List;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class TpahereCommand extends PluginCommand {
-    private static final String CMD = "tpahere";
+public class TpcCommand extends PluginCommand {
+    private static final String CMD = "tpc";
 
-    public TpahereCommand(AIO aio) {
+    public TpcCommand(AIO aio) {
         super(aio, CMD);
     }
 
@@ -49,53 +47,28 @@ public class TpahereCommand extends PluginCommand {
 
         Player requester = (Player) sender;
 
-        if (args.length < 1) {
-            incorrectUsage(sender);
+        ITeleportManager teleportManager = aio.getTeleportManager();
+
+        if (!teleportManager.hasRequesterTeleportRequest(requester)) {
+            Chat.send(pu.replacePlaceholders(localization.noTpRequest), requester);
             return false;
         }
 
-        Player target = Bukkit.getPlayer(args[0]);
-        if (target == null) {
-            Chat.send(pu.replacePlaceholders(localization.playerNotFound), sender);
-            return false;
-        }
+        Player target = Objects.requireNonNull(teleportManager.getRequesterTeleportRequest(requester)).getTarget();
 
-        if (requester.equals(target)) {
-            Chat.send(pu.replacePlaceholders(localization.tpToYourself), sender);
-            return false;
-        }
-
-        aio.getTeleportManager().requestTeleport(
+        teleportManager.cancelTeleportRequest(
                 requester,
-                target,
-                TeleportRequest.RequestType.TPAHERE,
-                config.teleportRequestTimeout,
+                TeleportRequest.CancelReason.CANCELLED,
                 pu.replacePlaceholders(
-                        localization.tpahereRequestRequester,
+                        localization.tpRequestCancelledRequester,
                         new String[]{"{REQUESTER_NAME}", "{REQUESTER_DISPLAYNAME}", "{TARGET_NAME}", "{TARGET_DISPLAYNAME}"},
                         new Object[]{requester.getName(), requester.getDisplayName(), target.getName(), target.getDisplayName()}),
                 pu.replacePlaceholders(
-                        localization.tpahereRequestTarget,
+                        localization.tpRequestCancelledTarget,
                         new String[]{"{REQUESTER_NAME}", "{REQUESTER_DISPLAYNAME}", "{TARGET_NAME}", "{TARGET_DISPLAYNAME}"},
                         new Object[]{requester.getName(), requester.getDisplayName(), target.getName(), target.getDisplayName()})
         );
 
         return true;
-    }
-
-    @Override
-    public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
-        if (hasCommandPerm(sender) && args.length == 1) {
-            List<String> nicknames = TabCompleterUtil.getPlayers(args[0], sender.hasPermission("pv.see"));
-
-            if (isPlayer(sender)) {
-                Player player = (Player) sender;
-                nicknames.remove(player.getName());
-            }
-
-            return nicknames;
-        }
-
-        return new ArrayList<>();
     }
 }

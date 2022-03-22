@@ -1,9 +1,8 @@
-package it.multicoredev.aio.commands.teleport.tp;
+package it.multicoredev.aio.commands.teleport.requests;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.tp.ITeleportManager;
 import it.multicoredev.aio.api.tp.TeleportRequest;
-import it.multicoredev.aio.api.utils.IPlaceholdersUtils;
 import it.multicoredev.aio.commands.PluginCommand;
 import it.multicoredev.mbcore.spigot.Chat;
 import it.multicoredev.mbcore.spigot.util.TabCompleterUtil;
@@ -37,10 +36,10 @@ import java.util.stream.Collectors;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class TpyesCommand extends PluginCommand {
-    private static final String CMD = "tpyes";
+public class TpnoCommand extends PluginCommand {
+    private static final String CMD = "tpno";
 
-    public TpyesCommand(AIO aio) {
+    public TpnoCommand(AIO aio) {
         super(aio, CMD);
     }
 
@@ -80,11 +79,11 @@ public class TpyesCommand extends PluginCommand {
 
         if (request == null) {
             Chat.send(pu.replacePlaceholders(localization.commandException), target);
-            Chat.warning("&6tpyes command returned a null request.");
+            Chat.warning("&6tpno command returned a null request.");
             return false;
         }
 
-        teleportManager.acceptTeleportRequest(request);
+        teleportManager.denyTeleportRequest(request);
         return true;
     }
 

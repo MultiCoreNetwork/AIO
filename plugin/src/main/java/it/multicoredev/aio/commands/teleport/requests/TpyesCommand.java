@@ -1,4 +1,4 @@
-package it.multicoredev.aio.commands.teleport.tp;
+package it.multicoredev.aio.commands.teleport.requests;
 
 import it.multicoredev.aio.AIO;
 import it.multicoredev.aio.api.tp.ITeleportManager;
@@ -36,10 +36,10 @@ import java.util.stream.Collectors;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class TpnoCommand extends PluginCommand {
-    private static final String CMD = "tpno";
+public class TpyesCommand extends PluginCommand {
+    private static final String CMD = "tpyes";
 
-    public TpnoCommand(AIO aio) {
+    public TpyesCommand(AIO aio) {
         super(aio, CMD);
     }
 
@@ -79,11 +79,11 @@ public class TpnoCommand extends PluginCommand {
 
         if (request == null) {
             Chat.send(pu.replacePlaceholders(localization.commandException), target);
-            Chat.warning("&6tpno command returned a null request.");
+            Chat.warning("&6tpyes command returned a null request.");
             return false;
         }
 
-        teleportManager.denyTeleportRequest(request);
+        teleportManager.acceptTeleportRequest(request);
         return true;
     }
 

@@ -53,6 +53,9 @@ public class User extends JsonConfig {
     private Integer rtp;
     private Boolean god;
     private Boolean fly;
+    private float flySpeed;
+    private float walkSpeed;
+
     private transient boolean afk = false;
     private transient long afkCooldownTimestamp = -1; // Initialised with an invalid cooldown
     private transient Location afkLastLocation = null;
@@ -476,6 +479,46 @@ public class User extends JsonConfig {
      */
     public User setFly(Boolean fly) {
         this.fly = fly;
+        return this;
+    }
+
+    /**
+     * Get the player's flying speed.
+     *
+     * @return the player's flying speed.
+     */
+    public Float getFlySpeed() {
+        return flySpeed;
+    }
+
+    /**
+     * Set the player's flying speed.
+     *
+     * @param flySpeed the player's flying speed. Use null to reset to default.
+     * @return this object.
+     */
+    public User setFlySpeed(Float flySpeed) {
+        this.flySpeed = flySpeed;
+        return this;
+    }
+
+    /**
+     * Get the player's walking speed.
+     *
+     * @return the player's walking speed.
+     */
+    public Float getWalkSpeed() {
+        return walkSpeed;
+    }
+
+    /**
+     * Set the player's walking speed.
+     *
+     * @param walkSpeed the player's walking speed. Use null to reset to default.
+     * @return this object.
+     */
+    public User setWalkSpeed(Float walkSpeed) {
+        this.walkSpeed = walkSpeed;
         return this;
     }
 

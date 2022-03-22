@@ -263,6 +263,15 @@ public class Commands extends JsonConfig {
                 "Set the weather to thunderstorm",
                 "/thunder [world]"
         ));
+        if (!commands.containsKey("tp")) commands.put("tp", new CommandData(
+                true,
+                "Teleport yourself or someone else to a player or a location",
+                new UsagesBuilder().add( "default",
+                        "/tp [target] <destination>",
+                        "/tp [player] [world] <x> <y> <z> [pitch] [yaw]"
+                ).build(),
+                "teleport"
+        ));
         if (!commands.containsKey("tpa")) commands.put("tpa", new CommandData(
                 true,
                 "Request to a player to be teleported to him",
