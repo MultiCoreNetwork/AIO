@@ -162,6 +162,8 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     //TODO 🟢 Add validate method to configs
     //TODO 🟢 Add exceptions in api javadoc
     //TODO 🟢 Add swim speed if possible
+    //TODO 🔴 Fix and improve storage
+    //TODO 🔴 Add all placeholders to the hook
     //TODO 🔴 Add 6 hours to timer
 
     @Override

@@ -402,7 +402,7 @@ public class Localization extends JsonConfig {
     @SerializedName("afk_leave_broadcast_others")
     public String afkLeaveBroadcastOthers;
     @SerializedName("afk_placeholder_replacement")
-    public String afkPlaceholderReplacement;
+    public String afkPlaceholder;
     @SerializedName("afk_name_prefix")
     public String afkDisplayNamePrefix;
 
@@ -624,7 +624,7 @@ public class Localization extends JsonConfig {
         if (afkEnterBroadcastOthers == null) afkEnterBroadcastOthers = "&h{PLAYER} is now AFK.";
         if (afkLeaveBroadcastSelf == null) afkLeaveBroadcastSelf = "&hYou are no longer AFK.";
         if (afkLeaveBroadcastOthers == null) afkLeaveBroadcastOthers = "&h{PLAYER} is no longer AFK.";
-        if (afkPlaceholderReplacement == null) afkPlaceholderReplacement = "&7[AFK]&r";
+        if (afkPlaceholder == null) afkPlaceholder = "&7[AFK]&r";
         if (afkDisplayNamePrefix == null) afkDisplayNamePrefix = "&7[AFK] &r";
     }
 }

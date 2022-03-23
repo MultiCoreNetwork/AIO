@@ -29,11 +29,12 @@ import org.jetbrains.annotations.Nullable;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class PAPIPlaceholderHook extends PlaceholderExpansion {
+    public static final String IDENTIFIER = "aio";
 
-    public static final String PLACEHOLDER_PREFIX = "aio";
     public static final String AFK_PLACEHOLDER = "afk";
 
-    private final String authors, version;
+    private final String authors;
+    private final String version;
     private final IStorage storage;
     private final Localization localization;
 
@@ -51,7 +52,7 @@ public class PAPIPlaceholderHook extends PlaceholderExpansion {
 
     @Override
     public String getIdentifier() {
-        return PLACEHOLDER_PREFIX;
+        return IDENTIFIER;
     }
 
     @Override
@@ -61,20 +62,19 @@ public class PAPIPlaceholderHook extends PlaceholderExpansion {
 
     @Override
     public boolean persist() {
-        return true; // This is required or else PlaceholderAPI will unregister the hook on reload
+        return true;
     }
 
     @Override
     public String onRequest(OfflinePlayer player, String params) {
-        @Nullable User user = storage.getUser(player);
+        if (player != null) {
+            User user = storage.getUser(player);
 
-        if (params.equalsIgnoreCase(AFK_PLACEHOLDER)) {
-            if (user == null) {
-                return null;
+            if (user != null) {
+                if (params.equalsIgnoreCase(AFK_PLACEHOLDER)) return user.isAfk() ? localization.afkPlaceholder : "";
             }
-            return user.isAfk() ? localization.afkPlaceholderReplacement : "";
         }
 
-        return null; // Placeholder is unknown
+        return null; //TODO Maybe change this to empty string
     }
 }
