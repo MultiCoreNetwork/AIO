@@ -1,5 +1,6 @@
 package it.multicoredev.aio.api.utils;
 
+import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -29,177 +30,388 @@ public interface IPlaceholdersUtils {
     /**
      * Replace custom placeholders in a string and if loaded PlaceholderAPI placeholders.
      *
-     * @param msg               the string to replace placeholders in.
-     * @param targets           the targets to replace.
-     * @param replacements      the replacements.
-     * @param hasPAPIPermission if true, will use PlaceholderAPI.
+     * @param message      the string to replace placeholders in.
+     * @param targets      the targets to replace.
+     * @param replacements the replacements.
+     * @param player       the player to replace placeholders for.
+     * @param usePAPI      if true, will use PlaceholderAPI.
      * @return the replaced string.
      */
-    String replacePlaceholders(@NotNull String msg, @NotNull String[] targets, @NotNull Object[] replacements, boolean hasPAPIPermission);
+    String replacePlaceholders(String message, @NotNull String[] targets, @NotNull Object[] replacements, OfflinePlayer player, boolean usePAPI);
 
     /**
      * Replace custom placeholders in a string and if loaded PlaceholderAPI placeholders.
      *
-     * @param msg          the string to replace placeholders in.
+     * @param message      the string to replace placeholders in.
+     * @param targets      the targets to replace.
+     * @param replacements the replacements.
+     * @param usePAPI      if true, will use PlaceholderAPI.
+     * @return the replaced string.
+     */
+    String replacePlaceholders(String message, @NotNull String[] targets, @NotNull Object[] replacements, boolean usePAPI);
+
+    /**
+     * Replace custom placeholders in a string and if loaded PlaceholderAPI placeholders.
+     * By default, it will use PlaceholderAPI.
+     *
+     * @param message      the string to replace placeholders in.
+     * @param targets      the targets to replace.
+     * @param replacements the replacements.
+     * @param player       the player to replace placeholders for.
+     * @return the replaced string.
+     */
+    String replacePlaceholders(String message, @NotNull String[] targets, @NotNull Object[] replacements, OfflinePlayer player);
+
+    /**
+     * Replace custom placeholders in a string and if loaded PlaceholderAPI placeholders.
+     * By default, it will use PlaceholderAPI.
+     *
+     * @param message      the string to replace placeholders in.
      * @param targets      the targets to replace.
      * @param replacements the replacements.
      * @return the replaced string.
      */
-    String replacePlaceholders(@NotNull String msg, @NotNull String[] targets, @NotNull Object[] replacements);
+    String replacePlaceholders(String message, @NotNull String[] targets, @NotNull Object[] replacements);
 
     /**
      * Replace custom placeholders in a string and if loaded PlaceholderAPI placeholders.
      *
-     * @param msg               the string to replace placeholders in.
-     * @param target            the target to replace.
-     * @param replacement       the replacement.
-     * @param hasPAPIPermission if true, will use PlaceholderAPI.
+     * @param message     the string to replace placeholders in.
+     * @param target      the target to replace.
+     * @param replacement the replacement.
+     * @param player      the player to replace placeholders for.
+     * @param usePAPI     if true, will use PlaceholderAPI.
      * @return the replaced string.
      */
-    String replacePlaceholders(@NotNull String msg, @NotNull String target, @NotNull Object replacement, boolean hasPAPIPermission);
+    String replacePlaceholders(String message, @NotNull String target, @NotNull Object replacement, OfflinePlayer player, boolean usePAPI);
 
     /**
      * Replace custom placeholders in a string and if loaded PlaceholderAPI placeholders.
      *
-     * @param msg         the string to replace placeholders in.
+     * @param message     the string to replace placeholders in.
+     * @param target      the target to replace.
+     * @param replacement the replacement.
+     * @param usePAPI     if true, will use PlaceholderAPI.
+     * @return the replaced string.
+     */
+    String replacePlaceholders(String message, @NotNull String target, @NotNull Object replacement, boolean usePAPI);
+
+    /**
+     * Replace custom placeholders in a string and if loaded PlaceholderAPI placeholders.
+     * By default, it will use PlaceholderAPI.
+     *
+     * @param message     the string to replace placeholders in.
+     * @param target      the target to replace.
+     * @param replacement the replacement.
+     * @param player      the player to replace placeholders for.
+     * @return the replaced string.
+     */
+    String replacePlaceholders(String message, @NotNull String target, @NotNull Object replacement, OfflinePlayer player);
+
+    /**
+     * Replace custom placeholders in a string and if loaded PlaceholderAPI placeholders.
+     * By default, it will use PlaceholderAPI.
+     *
+     * @param message     the string to replace placeholders in.
      * @param target      the target to replace.
      * @param replacement the replacement.
      * @return the replaced string.
      */
-    String replacePlaceholders(@NotNull String msg, @NotNull String target, @NotNull Object replacement);
+    String replacePlaceholders(String message, @NotNull String target, @NotNull Object replacement);
 
     /**
      * Replace, if loaded, PlaceholderAPI placeholders.
      *
-     * @param msg               the string to replace placeholders in.
-     * @param hasPAPIPermission if true, will use PlaceholderAPI.
+     * @param message the string to replace placeholders in.
+     * @param player  the player to replace placeholders for.
+     * @param usePAPI if true, will use PlaceholderAPI.
      * @return the replaced string.
      */
-    String replacePlaceholders(@NotNull String msg, boolean hasPAPIPermission);
+    String replacePlaceholders(String message, OfflinePlayer player, boolean usePAPI);
 
     /**
      * Replace, if loaded, PlaceholderAPI placeholders.
      *
-     * @param msg the string to replace placeholders in.
+     * @param message the string to replace placeholders in.
+     * @param usePAPI if true, will use PlaceholderAPI.
      * @return the replaced string.
      */
-    String replacePlaceholders(@NotNull String msg);
+    String replacePlaceholders(String message, boolean usePAPI);
+
+    /**
+     * Replace, if loaded, PlaceholderAPI placeholders.
+     * By default, it will use PlaceholderAPI.
+     *
+     * @param message the string to replace placeholders in.
+     * @param player  the player to replace placeholders for.
+     * @return the replaced string.
+     */
+    String replacePlaceholders(String message, OfflinePlayer player);
+
+    /**
+     * Replace, if loaded, PlaceholderAPI placeholders.
+     * By default, it will use PlaceholderAPI.
+     *
+     * @param message the string to replace placeholders in.
+     * @return the replaced string.
+     */
+    String replacePlaceholders(String message);
 
     /**
      * Replace custom placeholders in a list of strings and if loaded PlaceholderAPI placeholders.
      *
-     * @param msgs              the list of strings to replace placeholders in.
-     * @param targets           the targets to replace.
-     * @param replacements      the replacements.
-     * @param hasPAPIPermission if true, will use PlaceholderAPI.
+     * @param messages     the list of strings to replace placeholders in.
+     * @param targets      the targets to replace.
+     * @param replacements the replacements.
+     * @param player       the player to replace placeholders for.
+     * @param usePAPI      if true, will use PlaceholderAPI.
      * @return the replaced list of strings.
      */
-    List<String> replacePlaceholders(@NotNull List<String> msgs, @NotNull String[] targets, @NotNull Object[] replacements, boolean hasPAPIPermission);
+    List<String> replacePlaceholders(List<String> messages, @NotNull String[] targets, @NotNull Object[] replacements, OfflinePlayer player, boolean usePAPI);
 
     /**
      * Replace custom placeholders in a list of strings and if loaded PlaceholderAPI placeholders.
      *
-     * @param msgs         the list of strings to replace placeholders in.
+     * @param messages     the list of strings to replace placeholders in.
+     * @param targets      the targets to replace.
+     * @param replacements the replacements.
+     * @param usePAPI      if true, will use PlaceholderAPI.
+     * @return the replaced list of strings.
+     */
+    List<String> replacePlaceholders(List<String> messages, @NotNull String[] targets, @NotNull Object[] replacements, boolean usePAPI);
+
+    /**
+     * Replace custom placeholders in a list of strings and if loaded PlaceholderAPI placeholders.
+     * By default, it will use PlaceholderAPI.
+     *
+     * @param messages     the list of strings to replace placeholders in.
+     * @param targets      the targets to replace.
+     * @param replacements the replacements.
+     * @param player       the player to replace placeholders for.
+     * @return the replaced list of strings.
+     */
+    List<String> replacePlaceholders(List<String> messages, @NotNull String[] targets, @NotNull Object[] replacements, OfflinePlayer player);
+
+    /**
+     * Replace custom placeholders in a list of strings and if loaded PlaceholderAPI placeholders.
+     *
+     * @param messages     the list of strings to replace placeholders in.
      * @param targets      the targets to replace.
      * @param replacements the replacements.
      * @return the replaced list of strings.
      */
-    List<String> replacePlaceholders(@NotNull List<String> msgs, @NotNull String[] targets, @NotNull Object[] replacements);
+    List<String> replacePlaceholders(List<String> messages, @NotNull String[] targets, @NotNull Object[] replacements);
 
     /**
      * Replace custom placeholders in a list of strings and if loaded PlaceholderAPI placeholders.
      *
-     * @param msgs              the list of strings to replace placeholders in.
-     * @param target            the target to replace.
-     * @param replacement       the replacement.
-     * @param hasPAPIPermission if true, will use PlaceholderAPI.
+     * @param messages    the list of strings to replace placeholders in.
+     * @param target      the target to replace.
+     * @param replacement the replacement.
+     * @param player      the player to replace placeholders for.
+     * @param usePAPI     if true, will use PlaceholderAPI.
      * @return the replaced list of strings.
      */
-    List<String> replacePlaceholders(@NotNull List<String> msgs, @NotNull String target, @NotNull Object replacement, boolean hasPAPIPermission);
+    List<String> replacePlaceholders(List<String> messages, @NotNull String target, @NotNull Object replacement, OfflinePlayer player, boolean usePAPI);
 
     /**
      * Replace custom placeholders in a list of strings and if loaded PlaceholderAPI placeholders.
      *
-     * @param msgs        the list of strings to replace placeholders in.
+     * @param messages    the list of strings to replace placeholders in.
+     * @param target      the target to replace.
+     * @param replacement the replacement.
+     * @param usePAPI     if true, will use PlaceholderAPI.
+     * @return the replaced list of strings.
+     */
+    List<String> replacePlaceholders(List<String> messages, @NotNull String target, @NotNull Object replacement, boolean usePAPI);
+
+    /**
+     * Replace custom placeholders in a list of strings and if loaded PlaceholderAPI placeholders.
+     * By default, it will use PlaceholderAPI.
+     *
+     * @param messages    the list of strings to replace placeholders in.
+     * @param target      the target to replace.
+     * @param replacement the replacement.
+     * @param player      the player to replace placeholders for.
+     * @return the replaced list of strings.
+     */
+    List<String> replacePlaceholders(List<String> messages, @NotNull String target, @NotNull Object replacement, OfflinePlayer player);
+
+    /**
+     * Replace custom placeholders in a list of strings and if loaded PlaceholderAPI placeholders.
+     * By default, it will use PlaceholderAPI.
+     *
+     * @param messages    the list of strings to replace placeholders in.
      * @param target      the target to replace.
      * @param replacement the replacement.
      * @return the replaced list of strings.
      */
-    List<String> replacePlaceholders(@NotNull List<String> msgs, @NotNull String target, @NotNull Object replacement);
+    List<String> replacePlaceholders(List<String> messages, @NotNull String target, @NotNull Object replacement);
 
     /**
      * Replace, if loaded, PlaceholderAPI placeholders.
      *
-     * @param msgs              the list of strings to replace placeholders in.
-     * @param hasPAPIPermission if true, will use PlaceholderAPI.
+     * @param messages the list of strings to replace placeholders in.
+     * @param player   the player to replace placeholders for.
+     * @param usePAPI  if true, will use PlaceholderAPI.
      * @return the replaced list of strings.
      */
-    List<String> replacePlaceholders(@NotNull List<String> msgs, boolean hasPAPIPermission);
+    List<String> replacePlaceholders(List<String> messages, OfflinePlayer player, boolean usePAPI);
 
     /**
      * Replace, if loaded, PlaceholderAPI placeholders.
      *
-     * @param msgs the list of strings to replace placeholders in.
+     * @param messages the list of strings to replace placeholders in.
+     * @param usePAPI  if true, will use PlaceholderAPI.
      * @return the replaced list of strings.
      */
-    List<String> replacePlaceholders(@NotNull List<String> msgs);
+    List<String> replacePlaceholders(List<String> messages, boolean usePAPI);
+
+    /**
+     * Replace, if loaded, PlaceholderAPI placeholders.
+     * By default, it will use PlaceholderAPI.
+     *
+     * @param messages the list of strings to replace placeholders in.
+     * @param player   the player to replace placeholders for.
+     * @return the replaced list of strings.
+     */
+    List<String> replacePlaceholders(List<String> messages, OfflinePlayer player);
+
+    /**
+     * Replace, if loaded, PlaceholderAPI placeholders.
+     * By default, it will use PlaceholderAPI.
+     *
+     * @param messages the list of strings to replace placeholders in.
+     * @return the replaced list of strings.
+     */
+    List<String> replacePlaceholders(List<String> messages);
 
     /**
      * Replace custom placeholders in a list of strings and if loaded PlaceholderAPI placeholders.
      *
-     * @param msgs              the list of strings to replace placeholders in.
-     * @param targets           the targets to replace.
-     * @param replacements      the replacements.
-     * @param hasPAPIPermission if true, will use PlaceholderAPI.
+     * @param messages     the list of strings to replace placeholders in.
+     * @param targets      the targets to replace.
+     * @param replacements the replacements.
+     * @param player       the player to replace placeholders for.
+     * @param usePAPI      if true, will use PlaceholderAPI.
      * @return the replaced list of strings.
      */
-    String[] replacePlaceholders(@NotNull String[] msgs, @NotNull String[] targets, @NotNull Object[] replacements, boolean hasPAPIPermission);
+    String[] replacePlaceholders(String[] messages, @NotNull String[] targets, @NotNull Object[] replacements, OfflinePlayer player, boolean usePAPI);
 
     /**
      * Replace custom placeholders in a list of strings and if loaded PlaceholderAPI placeholders.
      *
-     * @param msgs         the list of strings to replace placeholders in.
+     * @param messages     the list of strings to replace placeholders in.
+     * @param targets      the targets to replace.
+     * @param replacements the replacements.
+     * @param usePAPI      if true, will use PlaceholderAPI.
+     * @return the replaced list of strings.
+     */
+    String[] replacePlaceholders(String[] messages, @NotNull String[] targets, @NotNull Object[] replacements, boolean usePAPI);
+
+    /**
+     * Replace custom placeholders in a list of strings and if loaded PlaceholderAPI placeholders.
+     * By default, it will use PlaceholderAPI.
+     *
+     * @param messages     the list of strings to replace placeholders in.
+     * @param targets      the targets to replace.
+     * @param replacements the replacements.
+     * @param player       the player to replace placeholders for.
+     * @return the replaced list of strings.
+     */
+    String[] replacePlaceholders(String[] messages, @NotNull String[] targets, @NotNull Object[] replacements, OfflinePlayer player);
+
+    /**
+     * Replace custom placeholders in a list of strings and if loaded PlaceholderAPI placeholders.
+     *
+     * @param messages     the list of strings to replace placeholders in.
      * @param targets      the targets to replace.
      * @param replacements the replacements.
      * @return the replaced list of strings.
      */
-    String[] replacePlaceholders(@NotNull String[] msgs, @NotNull String[] targets, @NotNull Object[] replacements);
+    String[] replacePlaceholders(String[] messages, @NotNull String[] targets, @NotNull Object[] replacements);
 
     /**
      * Replace custom placeholders in a list of strings and if loaded PlaceholderAPI placeholders.
      *
-     * @param msgs              the list of strings to replace placeholders in.
-     * @param target            the target to replace.
-     * @param replacement       the replacement.
-     * @param hasPAPIPermission if true, will use PlaceholderAPI.
+     * @param messages    the list of strings to replace placeholders in.
+     * @param target      the target to replace.
+     * @param replacement the replacement.
+     * @param player      the player to replace placeholders for.
+     * @param usePAPI     if true, will use PlaceholderAPI.
      * @return the replaced list of strings.
      */
-    String[] replacePlaceholders(@NotNull String[] msgs, @NotNull String target, @NotNull Object replacement, boolean hasPAPIPermission);
+    String[] replacePlaceholders(String[] messages, @NotNull String target, @NotNull Object replacement, OfflinePlayer player, boolean usePAPI);
 
     /**
      * Replace custom placeholders in a list of strings and if loaded PlaceholderAPI placeholders.
      *
-     * @param msgs        the list of strings to replace placeholders in.
+     * @param messages    the list of strings to replace placeholders in.
+     * @param target      the target to replace.
+     * @param replacement the replacement.
+     * @param usePAPI     if true, will use PlaceholderAPI.
+     * @return the replaced list of strings.
+     */
+    String[] replacePlaceholders(String[] messages, @NotNull String target, @NotNull Object replacement, boolean usePAPI);
+
+    /**
+     * Replace custom placeholders in a list of strings and if loaded PlaceholderAPI placeholders.
+     * By default, it will use PlaceholderAPI.
+     *
+     * @param messages    the list of strings to replace placeholders in.
+     * @param target      the target to replace.
+     * @param replacement the replacement.
+     * @param player      the player to replace placeholders for.
+     * @return the replaced list of strings.
+     */
+    String[] replacePlaceholders(String[] messages, @NotNull String target, @NotNull Object replacement, OfflinePlayer player);
+
+    /**
+     * Replace custom placeholders in a list of strings and if loaded PlaceholderAPI placeholders.
+     * By default, it will use PlaceholderAPI.
+     *
+     * @param messages    the list of strings to replace placeholders in.
      * @param target      the target to replace.
      * @param replacement the replacement.
      * @return the replaced list of strings.
      */
-    String[] replacePlaceholders(@NotNull String[] msgs, @NotNull String target, @NotNull Object replacement);
+    String[] replacePlaceholders(String[] messages, @NotNull String target, @NotNull Object replacement);
 
     /**
      * Replace, if loaded, PlaceholderAPI placeholders.
      *
-     * @param msgs              the list of strings to replace placeholders in.
-     * @param hasPAPIPermission if true, will use PlaceholderAPI.
+     * @param messages the list of strings to replace placeholders in.
+     * @param player   the player to replace placeholders for.
+     * @param usePAPI  if true, will use PlaceholderAPI.
      * @return the replaced list of strings.
      */
-    String[] replacePlaceholders(@NotNull String[] msgs, boolean hasPAPIPermission);
+    String[] replacePlaceholders(String[] messages, OfflinePlayer player, boolean usePAPI);
 
     /**
      * Replace, if loaded, PlaceholderAPI placeholders.
      *
-     * @param msgs the list of strings to replace placeholders in.
+     * @param messages the list of strings to replace placeholders in.
+     * @param usePAPI  if true, will use PlaceholderAPI.
      * @return the replaced list of strings.
      */
-    String[] replacePlaceholders(@NotNull String[] msgs);
+    String[] replacePlaceholders(String[] messages, boolean usePAPI);
+
+    /**
+     * Replace, if loaded, PlaceholderAPI placeholders.
+     * By default, it will use PlaceholderAPI.
+     *
+     * @param messages the list of strings to replace placeholders in.
+     * @param player   the player to replace placeholders for.
+     * @return the replaced list of strings.
+     */
+    String[] replacePlaceholders(String[] messages, OfflinePlayer player);
+
+    /**
+     * Replace, if loaded, PlaceholderAPI placeholders.
+     * By default, it will use PlaceholderAPI.
+     *
+     * @param messages the list of strings to replace placeholders in.
+     * @return the replaced list of strings.
+     */
+    String[] replacePlaceholders(String[] messages);
 }

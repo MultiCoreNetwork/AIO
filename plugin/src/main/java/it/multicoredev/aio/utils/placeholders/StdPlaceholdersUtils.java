@@ -2,6 +2,7 @@ package it.multicoredev.aio.utils.placeholders;
 
 import com.google.common.base.Preconditions;
 import it.multicoredev.aio.api.utils.IPlaceholdersUtils;
+import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -30,132 +31,199 @@ import java.util.stream.Collectors;
  */
 public class StdPlaceholdersUtils implements IPlaceholdersUtils {
 
-    public String replacePlaceholders(@NotNull String msg, @NotNull String[] targets, @NotNull Object[] replacements, boolean hasPAPIPermission) {
-        Preconditions.checkNotNull(msg);
+    @Override
+    public String replacePlaceholders(String msg, @NotNull String[] targets, @NotNull Object[] replacements, OfflinePlayer player, boolean usePAPI) {
         Preconditions.checkNotNull(targets);
         Preconditions.checkNotNull(replacements);
         Preconditions.checkArgument(targets.length == replacements.length);
+
+        if (msg == null) return null;
 
         for (int i = 0; i < targets.length; i++) msg = msg.replace(targets[i], replacements[i].toString());
 
         return msg;
     }
 
-    public String replacePlaceholders(@NotNull String msg, @NotNull String[] targets, @NotNull Object[] replacements) {
-        return replacePlaceholders(msg, targets, replacements, true);
+    @Override
+    public String replacePlaceholders(String message, @NotNull String[] targets, @NotNull Object[] replacements, boolean usePAPI) {
+        return replacePlaceholders(message, targets, replacements, null, usePAPI);
     }
 
-    public String replacePlaceholders(@NotNull String msg, @NotNull String target, @NotNull Object replacement, boolean hasPAPIPermission) {
-        Preconditions.checkNotNull(target);
-        Preconditions.checkNotNull(replacement);
-
-        return replacePlaceholders(msg, new String[]{target}, new Object[]{replacement}, hasPAPIPermission);
+    @Override
+    public String replacePlaceholders(String message, @NotNull String[] targets, @NotNull Object[] replacements, OfflinePlayer player) {
+        return replacePlaceholders(message, targets, replacements, player, false);
     }
 
-    public String replacePlaceholders(@NotNull String msg, @NotNull String target, @NotNull Object replacement) {
-        Preconditions.checkNotNull(target);
-        Preconditions.checkNotNull(replacement);
-
-        return replacePlaceholders(msg, new String[]{target}, new Object[]{replacement}, true);
+    @Override
+    public String replacePlaceholders(String message, @NotNull String[] targets, @NotNull Object[] replacements) {
+        return replacePlaceholders(message, targets, replacements, false);
     }
 
-    public String replacePlaceholders(@NotNull String msg, boolean hasPAPIPermission) {
-        return replacePlaceholders(msg, new String[]{}, new Object[]{}, hasPAPIPermission);
+    @Override
+    public String replacePlaceholders(String message, @NotNull String target, @NotNull Object replacement, OfflinePlayer player, boolean usePAPI) {
+        return replacePlaceholders(message, new String[]{target}, new Object[]{replacement}, player, usePAPI);
     }
 
-    public String replacePlaceholders(@NotNull String msg) {
-        return replacePlaceholders(msg, new String[]{}, new Object[]{}, true);
+    @Override
+    public String replacePlaceholders(String message, @NotNull String target, @NotNull Object replacement, boolean usePAPI) {
+        return replacePlaceholders(message, new String[]{target}, new Object[]{replacement}, usePAPI);
     }
 
-    public List<String> replacePlaceholders(@NotNull List<String> msgs, @NotNull String[] targets, @NotNull Object[] replacements, boolean hasPAPIPermission) {
-        Preconditions.checkNotNull(msgs);
-        Preconditions.checkNotNull(targets);
-        Preconditions.checkNotNull(replacements);
-        Preconditions.checkArgument(targets.length == replacements.length);
-
-        return msgs.stream().map(msg -> replacePlaceholders(msg, targets, replacements, hasPAPIPermission)).collect(Collectors.toList());
+    @Override
+    public String replacePlaceholders(String message, @NotNull String target, @NotNull Object replacement, OfflinePlayer player) {
+        return replacePlaceholders(message, new String[]{target}, new Object[]{replacement}, player);
     }
 
-    public List<String> replacePlaceholders(@NotNull List<String> msgs, @NotNull String[] targets, @NotNull Object[] replacements) {
-        Preconditions.checkNotNull(msgs);
-        Preconditions.checkNotNull(targets);
-        Preconditions.checkNotNull(replacements);
-        Preconditions.checkArgument(targets.length == replacements.length);
-
-        return msgs.stream().map(msg -> replacePlaceholders(msg, targets, replacements, true)).collect(Collectors.toList());
+    @Override
+    public String replacePlaceholders(String message, @NotNull String target, @NotNull Object replacement) {
+        return replacePlaceholders(message, new String[]{target}, new Object[]{replacement});
     }
 
-    public List<String> replacePlaceholders(@NotNull List<String> msgs, @NotNull String target, @NotNull Object replacement, boolean hasPAPIPermission) {
-        Preconditions.checkNotNull(msgs);
-        Preconditions.checkNotNull(target);
-        Preconditions.checkNotNull(replacement);
-
-        return msgs.stream().map(msg -> replacePlaceholders(msg, target, replacement, hasPAPIPermission)).collect(Collectors.toList());
+    @Override
+    public String replacePlaceholders(String message, OfflinePlayer player, boolean usePAPI) {
+        return replacePlaceholders(message, new String[0], new Object[0], player, usePAPI);
     }
 
-    public List<String> replacePlaceholders(@NotNull List<String> msgs, @NotNull String target, @NotNull Object replacement) {
-        Preconditions.checkNotNull(msgs);
-        Preconditions.checkNotNull(target);
-        Preconditions.checkNotNull(replacement);
-
-        return msgs.stream().map(msg -> replacePlaceholders(msg, target, replacement, true)).collect(Collectors.toList());
+    @Override
+    public String replacePlaceholders(String message, boolean usePAPI) {
+        return replacePlaceholders(message, new String[0], new Object[0], usePAPI);
     }
 
-    public List<String> replacePlaceholders(@NotNull List<String> msgs, boolean hasPAPIPermission) {
-        Preconditions.checkNotNull(msgs);
-
-        return msgs.stream().map(msg -> replacePlaceholders(msg, new String[]{}, new Object[]{}, hasPAPIPermission)).collect(Collectors.toList());
+    @Override
+    public String replacePlaceholders(String message, OfflinePlayer player) {
+        return replacePlaceholders(message, new String[0], new Object[0], player);
     }
 
-    public List<String> replacePlaceholders(@NotNull List<String> msgs) {
-        Preconditions.checkNotNull(msgs);
-
-        return msgs.stream().map(msg -> replacePlaceholders(msg, new String[]{}, new Object[]{}, true)).collect(Collectors.toList());
+    @Override
+    public String replacePlaceholders(String message) {
+        return replacePlaceholders(message, new String[0], new Object[0]);
     }
 
-    public String[] replacePlaceholders(@NotNull String[] msgs, @NotNull String[] targets, @NotNull Object[] replacements, boolean hasPAPIPermission) {
-        Preconditions.checkNotNull(msgs);
-        Preconditions.checkNotNull(targets);
-        Preconditions.checkNotNull(replacements);
-        Preconditions.checkArgument(targets.length == replacements.length);
+    @Override
+    public List<String> replacePlaceholders(List<String> messages, @NotNull String[] targets, @NotNull Object[] replacements, OfflinePlayer player, boolean usePAPI) {
+        if (messages == null) return null;
 
-        return Arrays.stream(msgs).map(msg -> replacePlaceholders(msg, targets, replacements, hasPAPIPermission)).toArray(String[]::new);
+        return messages.stream()
+                .map(message -> replacePlaceholders(message, targets, replacements, player, usePAPI))
+                .collect(Collectors.toList());
     }
 
-    public String[] replacePlaceholders(@NotNull String[] msgs, @NotNull String[] targets, @NotNull Object[] replacements) {
-        Preconditions.checkNotNull(msgs);
-        Preconditions.checkNotNull(targets);
-        Preconditions.checkNotNull(replacements);
-        Preconditions.checkArgument(targets.length == replacements.length);
-
-        return Arrays.stream(msgs).map(msg -> replacePlaceholders(msg, targets, replacements, true)).toArray(String[]::new);
+    @Override
+    public List<String> replacePlaceholders(List<String> messages, @NotNull String[] targets, @NotNull Object[] replacements, boolean usePAPI) {
+        return replacePlaceholders(messages, targets, replacements, null, usePAPI);
     }
 
-    public String[] replacePlaceholders(@NotNull String[] msgs, @NotNull String target, @NotNull Object replacement, boolean hasPAPIPermission) {
-        Preconditions.checkNotNull(msgs);
-        Preconditions.checkNotNull(target);
-        Preconditions.checkNotNull(replacement);
-
-        return Arrays.stream(msgs).map(msg -> replacePlaceholders(msg, target, replacement, hasPAPIPermission)).toArray(String[]::new);
+    @Override
+    public List<String> replacePlaceholders(List<String> messages, @NotNull String[] targets, @NotNull Object[] replacements, OfflinePlayer player) {
+        return replacePlaceholders(messages, targets, replacements, player, false);
     }
 
-    public String[] replacePlaceholders(@NotNull String[] msgs, @NotNull String target, @NotNull Object replacement) {
-        Preconditions.checkNotNull(msgs);
-        Preconditions.checkNotNull(target);
-        Preconditions.checkNotNull(replacement);
-
-        return Arrays.stream(msgs).map(msg -> replacePlaceholders(msg, target, replacement, true)).toArray(String[]::new);
+    @Override
+    public List<String> replacePlaceholders(List<String> messages, @NotNull String[] targets, @NotNull Object[] replacements) {
+        return replacePlaceholders(messages, targets, replacements, false);
     }
 
-    public String[] replacePlaceholders(@NotNull String[] msgs, boolean hasPAPIPermission) {
-        Preconditions.checkNotNull(msgs);
-
-        return Arrays.stream(msgs).map(msg -> replacePlaceholders(msg, new String[]{}, new Object[]{}, hasPAPIPermission)).toArray(String[]::new);
+    @Override
+    public List<String> replacePlaceholders(List<String> messages, @NotNull String target, @NotNull Object replacement, OfflinePlayer player, boolean usePAPI) {
+        return replacePlaceholders(messages, new String[]{target}, new Object[]{replacement}, player, usePAPI);
     }
 
-    public String[] replacePlaceholders(@NotNull String[] msgs) {
-        Preconditions.checkNotNull(msgs);
+    @Override
+    public List<String> replacePlaceholders(List<String> messages, @NotNull String target, @NotNull Object replacement, boolean usePAPI) {
+        return replacePlaceholders(messages, new String[]{target}, new Object[]{replacement}, usePAPI);
+    }
 
-        return Arrays.stream(msgs).map(msg -> replacePlaceholders(msg, new String[]{}, new Object[]{}, true)).toArray(String[]::new);
+    @Override
+    public List<String> replacePlaceholders(List<String> messages, @NotNull String target, @NotNull Object replacement, OfflinePlayer player) {
+        return replacePlaceholders(messages, new String[]{target}, new Object[]{replacement}, player);
+    }
+
+    @Override
+    public List<String> replacePlaceholders(List<String> messages, @NotNull String target, @NotNull Object replacement) {
+        return replacePlaceholders(messages, new String[]{target}, new Object[]{replacement});
+    }
+
+    @Override
+    public List<String> replacePlaceholders(List<String> messages, OfflinePlayer player, boolean usePAPI) {
+        return replacePlaceholders(messages, new String[0], new Object[0], player, usePAPI);
+    }
+
+    @Override
+    public List<String> replacePlaceholders(List<String> messages, boolean usePAPI) {
+        return replacePlaceholders(messages, new String[0], new Object[0], usePAPI);
+    }
+
+    @Override
+    public List<String> replacePlaceholders(List<String> messages, OfflinePlayer player) {
+        return replacePlaceholders(messages, new String[0], new Object[0], player);
+    }
+
+    @Override
+    public List<String> replacePlaceholders(List<String> messages) {
+        return replacePlaceholders(messages, new String[0], new Object[0]);
+    }
+
+    @Override
+    public String[] replacePlaceholders(String[] messages, @NotNull String[] targets, @NotNull Object[] replacements, OfflinePlayer player, boolean usePAPI) {
+        if (messages == null) return null;
+
+        return Arrays.stream(messages)
+                .map(message -> replacePlaceholders(message, targets, replacements, player, usePAPI))
+                .toArray(String[]::new);
+    }
+
+    @Override
+    public String[] replacePlaceholders(String[] messages, @NotNull String[] targets, @NotNull Object[] replacements, boolean usePAPI) {
+        return replacePlaceholders(messages, targets, replacements, null, usePAPI);
+    }
+
+    @Override
+    public String[] replacePlaceholders(String[] messages, @NotNull String[] targets, @NotNull Object[] replacements, OfflinePlayer player) {
+        return replacePlaceholders(messages, targets, replacements, player, false);
+    }
+
+    @Override
+    public String[] replacePlaceholders(String[] messages, @NotNull String[] targets, @NotNull Object[] replacements) {
+        return replacePlaceholders(messages, targets, replacements, false);
+    }
+
+    @Override
+    public String[] replacePlaceholders(String[] messages, @NotNull String target, @NotNull Object replacement, OfflinePlayer player, boolean usePAPI) {
+        return replacePlaceholders(messages, new String[]{target}, new Object[]{replacement}, player, usePAPI);
+    }
+
+    @Override
+    public String[] replacePlaceholders(String[] messages, @NotNull String target, @NotNull Object replacement, boolean usePAPI) {
+        return replacePlaceholders(messages, new String[]{target}, new Object[]{replacement}, usePAPI);
+    }
+
+    @Override
+    public String[] replacePlaceholders(String[] messages, @NotNull String target, @NotNull Object replacement, OfflinePlayer player) {
+        return replacePlaceholders(messages, new String[]{target}, new Object[]{replacement}, player);
+    }
+
+    @Override
+    public String[] replacePlaceholders(String[] messages, @NotNull String target, @NotNull Object replacement) {
+        return replacePlaceholders(messages, new String[]{target}, new Object[]{replacement});
+    }
+
+    @Override
+    public String[] replacePlaceholders(String[] messages, OfflinePlayer player, boolean usePAPI) {
+        return replacePlaceholders(messages, new String[0], new Object[0], player, usePAPI);
+    }
+
+    @Override
+    public String[] replacePlaceholders(String[] messages, boolean usePAPI) {
+        return replacePlaceholders(messages, new String[0], new Object[0], usePAPI);
+    }
+
+    @Override
+    public String[] replacePlaceholders(String[] messages, OfflinePlayer player) {
+        return replacePlaceholders(messages, new String[0], new Object[0], player);
+    }
+
+    @Override
+    public String[] replacePlaceholders(String[] messages) {
+        return replacePlaceholders(messages, new String[0], new Object[0]);
     }
 }

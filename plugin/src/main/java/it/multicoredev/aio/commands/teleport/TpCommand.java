@@ -65,7 +65,7 @@ public class TpCommand extends PluginCommand {
                         target,
                         config.teleportSection.getTpDelay(),
                         localization.pendingTpSelf,
-                        localization.tpSelf
+                        localization.postTpSelf
                 );
             } else if (args.length == 2) { //tp <player> <player>
                 Player src = Bukkit.getPlayer(args[0]);
@@ -83,8 +83,8 @@ public class TpCommand extends PluginCommand {
                         target,
                         !senderIsTarget && sender.hasPermission("aio.teleport.instant") ? 0 : config.teleportSection.getTpDelay(),
                         localization.pendingTpSelf,
-                        localization.tpSelf,
-                        !senderIsTarget ? new TeleportMessageCallback(aio, sender, localization.tp) : null
+                        localization.postTpSelf,
+                        !senderIsTarget ? new TeleportMessageCallback(aio, sender, localization.postTp) : null
                 );
             } else if (args.length == 3) { //tp <x> <y> <z>
                 Player src = (Player) sender;
@@ -109,7 +109,7 @@ public class TpCommand extends PluginCommand {
                         target,
                         config.teleportSection.getTpDelay(),
                         localization.pendingTpSelf,
-                        localization.tpSelf
+                        localization.postTpSelf
                 );
             } else if (args.length == 4) { //tp <player> <x> <y> <z> | tp <world> <x> <y> <z>
                 Player src = Bukkit.getPlayer(args[0]);
@@ -138,8 +138,8 @@ public class TpCommand extends PluginCommand {
                             target,
                             !senderIsTarget && sender.hasPermission("aio.teleport.instant") ? 0 : config.teleportSection.getTpDelay(),
                             localization.pendingTpSelf,
-                            localization.tpSelf,
-                            !senderIsTarget ? new TeleportMessageCallback(aio, sender, localization.tp) : null
+                            localization.postTpSelf,
+                            !senderIsTarget ? new TeleportMessageCallback(aio, sender, localization.postTp) : null
                     );
                 } else {
                     src = (Player) sender;
@@ -171,7 +171,7 @@ public class TpCommand extends PluginCommand {
                             target,
                             config.teleportSection.getTpDelay(),
                             localization.pendingTpSelf,
-                            localization.tpSelf
+                            localization.postTpSelf
                     );
                 }
             } else if (args.length == 5) { //tp <player> <world> <x> <y> <z> | tp <x> <y> <z> <pitch> <yaw>
@@ -207,8 +207,8 @@ public class TpCommand extends PluginCommand {
                             target,
                             !senderIsTarget && sender.hasPermission("aio.teleport.instant") ? 0 : config.teleportSection.getTpDelay(),
                             localization.pendingTpSelf,
-                            localization.tpSelf,
-                            !senderIsTarget ? new TeleportMessageCallback(aio, sender, localization.tp) : null
+                            localization.postTpSelf,
+                            !senderIsTarget ? new TeleportMessageCallback(aio, sender, localization.postTp) : null
                     );
                 } else {
                     src = (Player) sender;
@@ -240,7 +240,7 @@ public class TpCommand extends PluginCommand {
                             target,
                             config.teleportSection.getTpDelay(),
                             localization.pendingTpSelf,
-                            localization.tpSelf
+                            localization.postTpSelf
                     );
                 }
             } else if (args.length == 6) { //tp <player> <x> <y> <z> <pitch> <yaw> | tp <world> <x> <y> <z> <pitch> <yaw>
@@ -282,8 +282,8 @@ public class TpCommand extends PluginCommand {
                             target,
                             !senderIsTarget && sender.hasPermission("aio.teleport.instant") ? 0 : config.teleportSection.getTpDelay(),
                             localization.pendingTpSelf,
-                            localization.tpSelf,
-                            !senderIsTarget ? new TeleportMessageCallback(aio, sender, localization.tp) : null
+                            localization.postTpSelf,
+                            !senderIsTarget ? new TeleportMessageCallback(aio, sender, localization.postTp) : null
                     );
                 } else {
                     src = (Player) sender;
@@ -320,7 +320,7 @@ public class TpCommand extends PluginCommand {
                             target,
                             config.teleportSection.getTpDelay(),
                             localization.pendingTpSelf,
-                            localization.tpSelf
+                            localization.postTpSelf
                     );
                 }
             } else { //tp <player> <world> <x> <y> <z> <yaw> <pitch>
@@ -364,8 +364,8 @@ public class TpCommand extends PluginCommand {
                         target,
                         !senderIsTarget && sender.hasPermission("aio.teleport.instant") ? 0 : config.teleportSection.getTpDelay(),
                         localization.pendingTpSelf,
-                        localization.tpSelf,
-                        !senderIsTarget ? new TeleportMessageCallback(aio, sender, localization.tp) : null
+                        localization.postTpSelf,
+                        !senderIsTarget ? new TeleportMessageCallback(aio, sender, localization.postTp) : null
                 );
             }
         } else {
@@ -388,8 +388,8 @@ public class TpCommand extends PluginCommand {
                         target,
                         !senderIsTarget && sender.hasPermission("aio.teleport.instant") ? 0 : config.teleportSection.getTpDelay(),
                         localization.pendingTpSelf,
-                        localization.tpSelf,
-                        !senderIsTarget ? new TeleportMessageCallback(aio, sender, localization.tp) : null
+                        localization.postTpSelf,
+                        !senderIsTarget ? new TeleportMessageCallback(aio, sender, localization.postTp) : null
                 );
             } else if (args.length == 3) {
                 Chat.send(pu.replacePlaceholders(localization.notPlayer), sender);
@@ -425,8 +425,8 @@ public class TpCommand extends PluginCommand {
                         target,
                         !senderIsTarget && sender.hasPermission("aio.teleport.instant") ? 0 : config.teleportSection.getTpDelay(),
                         localization.pendingTpSelf,
-                        localization.tpSelf,
-                        !senderIsTarget ? new TeleportMessageCallback(aio, sender, localization.tp) : null
+                        localization.postTpSelf,
+                        !senderIsTarget ? new TeleportMessageCallback(aio, sender, localization.postTp) : null
                 );
             } else if (args.length == 5) { //tp <player> <world> <x> <y> <z>
                 Player src = Bukkit.getPlayer(args[0]);
@@ -465,8 +465,8 @@ public class TpCommand extends PluginCommand {
                         target,
                         !senderIsTarget && sender.hasPermission("aio.teleport.instant") ? 0 : config.teleportSection.getTpDelay(),
                         localization.pendingTpSelf,
-                        localization.tpSelf,
-                        !senderIsTarget ? new TeleportMessageCallback(aio, sender, localization.tp) : null
+                        localization.postTpSelf,
+                        !senderIsTarget ? new TeleportMessageCallback(aio, sender, localization.postTp) : null
                 );
             } else if (args.length == 6) { //tp <player> <x> <y> <z> <pitch> <yaw>
                 Player src = Bukkit.getPlayer(args[0]);
@@ -511,8 +511,8 @@ public class TpCommand extends PluginCommand {
                         target,
                         !senderIsTarget && sender.hasPermission("aio.teleport.instant") ? 0 : config.teleportSection.getTpDelay(),
                         localization.pendingTpSelf,
-                        localization.tpSelf,
-                        !senderIsTarget ? new TeleportMessageCallback(aio, sender, localization.tp) : null
+                        localization.postTpSelf,
+                        !senderIsTarget ? new TeleportMessageCallback(aio, sender, localization.postTp) : null
                 );
             } else { //tp <player> <world> <x> <y> <z> <yaw> <pitch>
                 Player src = Bukkit.getPlayer(args[0]);
@@ -555,8 +555,8 @@ public class TpCommand extends PluginCommand {
                         target,
                         !senderIsTarget && sender.hasPermission("aio.teleport.instant") ? 0 : config.teleportSection.getTpDelay(),
                         localization.pendingTpSelf,
-                        localization.tpSelf,
-                        !senderIsTarget ? new TeleportMessageCallback(aio, sender, localization.tp) : null
+                        localization.postTpSelf,
+                        !senderIsTarget ? new TeleportMessageCallback(aio, sender, localization.postTp) : null
                 );
             }
         }

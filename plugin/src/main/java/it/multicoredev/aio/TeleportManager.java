@@ -87,7 +87,7 @@ public class TeleportManager implements ITeleportManager {
         PlayerPostTeleportEvent postTpEvent = new PlayerPostTeleportEvent(tp);
         Bukkit.getPluginManager().callEvent(postTpEvent);
 
-        if (postTpEvent.getPostMessage() != null && tp.getPlayer().isOnline()) {
+        if (postTpEvent.getPostMessage() != null && !postTpEvent.getPostMessage().trim().isEmpty() && tp.getPlayer().isOnline()) {
             Chat.send(pu.replacePlaceholders(
                     postTpEvent.getPostMessage(),
                     new String[]{"{NAME}", "{DISPLAYNAME}", "{DELAY}"},
@@ -112,7 +112,7 @@ public class TeleportManager implements ITeleportManager {
         PlayerTeleportCancelledEvent tpCancEvent = new PlayerTeleportCancelledEvent(tp, reason, cancelMessage);
         Bukkit.getPluginManager().callEvent(tpCancEvent);
 
-        if (tpCancEvent.getCancelMessage() != null && tp.getPlayer().isOnline()) {
+        if (tpCancEvent.getCancelMessage() != null && !tpCancEvent.getCancelMessage().trim().isEmpty() && tp.getPlayer().isOnline()) {
             Chat.send(pu.replacePlaceholders(tpCancEvent.getCancelMessage()), tp.getPlayer());
         }
 
@@ -125,11 +125,11 @@ public class TeleportManager implements ITeleportManager {
         PlayerTeleportRequestCancelledEvent tpReqCancEvent = new PlayerTeleportRequestCancelledEvent(request, reason, cancelMessageRequester, cancelMessageTarget);
         Bukkit.getPluginManager().callEvent(tpReqCancEvent);
 
-        if (tpReqCancEvent.getCancelMessageRequester() != null && request.getRequester().isOnline()) {
+        if (tpReqCancEvent.getCancelMessageRequester() != null && !tpReqCancEvent.getCancelMessageRequester().trim().isEmpty() && request.getRequester().isOnline()) {
             Chat.send(pu.replacePlaceholders(tpReqCancEvent.getCancelMessageRequester()), request.getRequester());
         }
 
-        if (tpReqCancEvent.getCancelMessageTarget() != null && request.getTarget().isOnline()) {
+        if (tpReqCancEvent.getCancelMessageTarget() != null && !tpReqCancEvent.getCancelMessageTarget().trim().isEmpty() && request.getTarget().isOnline()) {
             Chat.send(pu.replacePlaceholders(tpReqCancEvent.getCancelMessageTarget()), request.getTarget());
         }
     }
@@ -148,7 +148,7 @@ public class TeleportManager implements ITeleportManager {
             return;
         }
 
-        if (tpReqEvent.getPendingMessage() != null && tpReqEvent.getTimer() > 0 && teleport.getPlayer().isOnline()) {
+        if (tpReqEvent.getPendingMessage() != null && !tpReqEvent.getPendingMessage().trim().isEmpty() && tpReqEvent.getTimer() > 0 && teleport.getPlayer().isOnline()) {
             Chat.send(pu.replacePlaceholders(
                     tpReqEvent.getPendingMessage(),
                     new String[]{"{NAME}", "{DISPLAYNAME}", "{DELAY}"},
@@ -614,10 +614,10 @@ public class TeleportManager implements ITeleportManager {
             return;
         }
 
-        if (request.getRequesterMessage() != null) {
+        if (request.getRequesterMessage() != null && !request.getRequesterMessage().trim().isEmpty()) {
             Chat.send(pu.replacePlaceholders(request.getRequesterMessage()), request.getRequester());
         }
-        if (request.getTargetMessage() != null) {
+        if (request.getTargetMessage() != null && !request.getTargetMessage().trim().isEmpty()) {
             Chat.send(pu.replacePlaceholders(request.getTargetMessage()), request.getTarget());
         }
     }
@@ -693,10 +693,14 @@ public class TeleportManager implements ITeleportManager {
         Player requester = request.getRequester();
         Player target = request.getTarget();
 
+        int delay = aio.getConfiguration().teleportSection.getTpDelay();
+        if (request.getType().equals(TeleportRequest.RequestType.TPA)) delay = aio.getConfiguration().teleportSection.getTpaDelay();
+        else if (request.getType().equals(TeleportRequest.RequestType.TPAHERE)) delay = aio.getConfiguration().teleportSection.getTpahereDelay();
+
         teleport(
                 requester,
                 target,
-                0, //TODO
+                delay,
                 pu.replacePlaceholders(localization.pendingTp, "{DELAY}", 0),
                 pu.replacePlaceholders(localization.postTp)
         );

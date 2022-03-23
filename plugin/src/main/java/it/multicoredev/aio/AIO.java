@@ -162,6 +162,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     //TODO 🟢 Add validate method to configs
     //TODO 🟢 Add exceptions in api javadoc
     //TODO 🟢 Add swim speed
+    //TODO 🔴 Add 6 hours to timer
 
     @Override
     public void onEnable() {

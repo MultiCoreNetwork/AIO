@@ -308,14 +308,23 @@ public class Localization extends JsonConfig {
     @SerializedName("time_set_night")
     public String timeSetNight;
 
-    @SerializedName("no_tp_request")
-    public String noTpRequest;
+    // Tp command
+    @SerializedName("invalid_tp_destination")
+    public String invalidTpDestination;
     @SerializedName("pending_tp")
     public String pendingTp;
+    @SerializedName("pending_tp_self")
+    public String pendingTpSelf;
     @SerializedName("post_tp")
     public String postTp;
+    @SerializedName("post_tp_self")
+    public String postTpSelf;
     @SerializedName("tp_to_yourself")
     public String tpToYourself;
+
+    // Tp requests
+    @SerializedName("no_tp_request")
+    public String noTpRequest;
 
     @SerializedName("tpahere_request_requester")
     public String tpahereRequestRequester;
@@ -562,10 +571,16 @@ public class Localization extends JsonConfig {
         if (timeSetDay == null) timeSetDay = "&eTime set to day in world {WORLD}.";
         if (timeSetNight == null) timeSetNight = "&hTime set to night in world {WORLD}.";
 
-        if (noTpRequest == null) noTpRequest = "&cYou don't have any teleport request.";
-        if (pendingTp == null) pendingTp = "&hYou will be teleported in {DELAY} seconds. Don't move!";
-        if (postTp == null) postTp = "&hYou have been teleported.";
+        // Tp command
+        if (invalidTpDestination == null) invalidTpDestination = "&cInvalid teleport destination.";
+        if (pendingTp == null) pendingTp = "&h{DISPLAYNAME} will be teleported in {DELAY} seconds."; //TODO Use a different message for all teleport types
+        if (pendingTpSelf == null) pendingTpSelf = "&hYou will be teleported in {DELAY} seconds. Don't move!"; //TODO Use a different message for all teleport types
+        if (postTp == null) postTp = "&h{DISPLAYNAME} has been teleported.";
+        if (postTpSelf == null) postTpSelf = "&hYou have been teleported.";
         if (tpToYourself == null) tpToYourself = "&cYou can't teleport to yourself.";
+
+        // Tp requestes
+        if (noTpRequest == null) noTpRequest = "&cYou don't have any teleport request.";
 
         if (tpahereRequestRequester == null) tpahereRequestRequester = "&hYou sent a tpahere request to {TARGET_DISPLAYNAME}.";
         if (tpahereRequestTarget == null) tpahereRequestTarget = "&hYou received a tpahere request from {REQUESTER_DISPLAYNAME}.\n&hType /tpyes to accept or /tpno to deny.";
