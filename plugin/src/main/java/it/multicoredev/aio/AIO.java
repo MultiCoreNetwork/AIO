@@ -161,7 +161,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     //TODO 🟡 Add vanilla tp command replacement (Priority low)
     //TODO 🟢 Add validate method to configs
     //TODO 🟢 Add exceptions in api javadoc
-    //TODO 🟢 Add swim speed
+    //TODO 🟢 Add swim speed if possible
     //TODO 🔴 Add 6 hours to timer
 
     @Override
