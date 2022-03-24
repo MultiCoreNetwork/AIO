@@ -268,7 +268,7 @@ public class Commands extends JsonConfig {
                 "Teleport yourself or someone else to a player or a location",
                 new UsagesBuilder().add( "default",
                         "/tp [target] <destination>",
-                        "/tp [player] [world] <x> <y> <z> [pitch] [yaw]"
+                        "/tp [player] [world] <x> <y> <z> [yaw] [pitch]"
                 ).build(),
                 "teleport"
         ));

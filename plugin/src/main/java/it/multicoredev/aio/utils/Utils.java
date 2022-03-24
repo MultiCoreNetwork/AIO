@@ -12,6 +12,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -40,6 +41,7 @@ import java.util.regex.Pattern;
 public class Utils {
     private static final Pattern URL_PATTERN = Pattern.compile("((http|https)://)(www.)?[a-zA-Z0-9@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)");
     private static final int[] MULTIPLIERS = {-1, 1};
+    private static final DecimalFormat ONE_DECIMAL = new DecimalFormat("#.0");
 
     public static boolean isVanished(Player player) {
         for (MetadataValue meta : player.getMetadata("vanished")) {
@@ -238,5 +240,9 @@ public class Utils {
         }
 
         return true;
+    }
+
+    public static String doubleToString(double d) {
+        return ONE_DECIMAL.format(d);
     }
 }

@@ -106,7 +106,7 @@ public class RTPCommand extends PluginCommand {
             Chat.send(pu.replacePlaceholders(
                     localization.pendingRtp,
                     new String[]{"{NAME}", "{DISPLAYNAME}", "{DELAY}"},
-                    new Object[]{target.getName(), target.getDisplayName(), config.teleportSection.getBackDelay()}
+                    new Object[]{target.getName(), target.getDisplayName(), config.teleportSection.getRtpDelay()}
             ), sender);
         }
 

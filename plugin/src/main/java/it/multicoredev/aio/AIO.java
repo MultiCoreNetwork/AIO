@@ -150,7 +150,7 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     //TODO 🟢 Enchant disenchant commands change output msg enchant name
     //TODO 🔴 Fly speed (Save also walk speed and set on Join)
     //TODO 🔴 Change command syntax to /command [on|off|toggle] [player]
-    //TODO 🔴 ALL Chat.send must have placeholderutils.replace....
+    //TODO 🔴 ALL Chat.send must have pu.replace....
     //TODO 🟡 Add the ability to log transactions inside AIOEconomy
     //TODO 🔴 Use this everywhere !hasSubPerm(sender, "other") && !sender.equals(target)
     //TODO 🟢 Runlater command should send feedback when the command is executed
@@ -158,13 +158,11 @@ public class AIO extends it.multicoredev.aio.api.AIO {
     //TODO 🟢 Add Objects.requireNonNull(...) where needed
     //TODO 🔴 Cancel pending teleports and requests when the player quits
     //TODO 🔴 placeholderutils.replacePlaceholders does not have the player
-    //TODO 🟡 Add vanilla tp command replacement (Priority low)
     //TODO 🟢 Add validate method to configs
     //TODO 🟢 Add exceptions in api javadoc
     //TODO 🟢 Add swim speed if possible
     //TODO 🔴 Fix and improve storage
     //TODO 🔴 Add all placeholders to the hook
-    //TODO 🔴 Add 6 hours to timer
 
     @Override
     public void onEnable() {
